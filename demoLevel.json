@@ -1,0 +1,96 @@
+{
+    "levelTitle": "Demo Custom Level",
+    "cratesRequired": 2,
+    "cameraPosition": [1, 1, 0],
+    "cameraDistance": 5,
+    "cameraStartAngle": [1.57072, 0.785375],
+    "floorHeight": -5,
+    "elements": [
+        {
+            "type": "crate",
+            "position": [0, 3, 1],
+            "letter": "a",
+            "angle": 0
+        },
+        {
+            "type": "crate",
+            "position": [0, 1, 1],
+            "letter": "b",
+            "angle": 0
+        },
+
+
+        {
+            "type": "chute",
+            "position": [-1, 0, 0],
+            "letter": "a",
+            "angle": 0
+        },
+        {
+            "type": "chute",
+            "position": [0, -1, 0],
+            "letter": "b",
+            "angle": 0
+        },
+
+
+        {
+            "type": "block",
+            "position": [1, 0, 0]
+        },
+        {
+            "type": "block",
+            "position": [2, 0, 0]
+        },
+        {
+            "type": "block",
+            "position": [3, 0, 0]
+        },
+        {
+            "type": "block",
+            "position": [3, 1, 0]
+        },
+
+
+        {
+            "type": "fan",
+            "position": [3, 0, 1],
+            "angle": 3,
+            "color": "green"
+        },
+
+
+        {
+            "type": "laser",
+            "position": [3, 1, 1],
+            "angle": 3,
+            "color": "blue"
+        },
+
+
+        {
+            "type": "conveyor",
+            "position": [0, 0, 0],
+            "angle": 2,
+            "color": "red"
+        },
+        {
+            "type": "conveyor",
+            "position": [0, 1, 0],
+            "angle": 2,
+            "color": "red"
+        },
+        {
+            "type": "conveyor",
+            "position": [0, 2, 0],
+            "angle": 2,
+            "color": "red"
+        },
+        {
+            "type": "conveyor",
+            "position": [0, 3, 0],
+            "angle": 2,
+            "color": "red"
+        }
+    ]
+}

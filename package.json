@@ -1,0 +1,10 @@
+{
+  "name": "Super Solitaire",
+  "main": "index.html",
+  "chromium-args": "--enable-logging=stderr",
+  "window": {
+    "position": "center",
+    "width": 800,
+    "height": 600
+  }
+}
