@@ -1,4 +1,5 @@
 import * as u from './core/utils.js'
+import * as vec3 from './core/vector3.js'
 
 export const CHUNKSIZE = 32
 export const CHUNKVOLUME = CHUNKSIZE*CHUNKSIZE*CHUNKSIZE
@@ -62,6 +63,7 @@ export function emptyChunk() {
   return {
     voxels: zeros,
     things: [],
+    modified: false,
   }
 }
 
@@ -106,6 +108,17 @@ export function setVoxel(chunks, position, index) {
 
   // Change the voxel
   chunk.voxels[indexInChunk] = index
+
+  // Mark this chunk as modified so the renderer knows to rebuild it
+  chunk.modified = true
+}
+
+export function mergeStructureIntoWorld(chunks, position, structure) {
+  for (const sPos in structure) {
+    const colorIndex = structure[sPos]
+    const deltaPos = vec3.add(position, stringToArray(sPos))
+    setVoxel(chunks, deltaPos, colorIndex)
+  }
 }
 
 export function listVoxels(chunks) {

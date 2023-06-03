@@ -7,6 +7,7 @@ import * as vec2 from './core/vector2.js'
 import * as vec3 from './core/vector3.js'
 import * as vox from './voxel.js'
 import * as pal from './palette.js'
+import * as procbasics from './procbasics.js'
 import Thing from './core/thing.js'
 import { assets } from './core/game.js'
 
@@ -15,7 +16,6 @@ export default class Terrain extends Thing {
   chunks = {}
   chunkMeshes = {}
   chunkGeneratorData = {}
-  selectedColor = 2
   fogColor = [1, 1, 1]
 
   // TEMP
@@ -27,6 +27,21 @@ export default class Terrain extends Thing {
   constructor () {
     super()
     game.setThingName(this, 'terrain')
+
+    let plat = procbasics.generateRectangularPrism({
+      length: 5,
+      width: 5,
+      colorIndex: 3,
+    })
+
+    plat = procbasics.applyPattern(plat, {
+      colorMask: 3,
+      pattern: 'checker',
+      color1: 50,
+      color2: 51,
+    })
+
+    vox.mergeStructureIntoWorld(this.chunks, [0, 0, 0], plat)
   }
 
   update () {
@@ -41,14 +56,7 @@ export default class Terrain extends Thing {
         Math.floor((Math.random()-0.5) * 20),
         -5,
       ]
-      vox.setVoxel(this.chunks, coord, this.selectedColor)
-      this.selectedColor ++
-      if (this.selectedColor > 255) {
-        this.selectedColor = 2
-      }
-
-      // Rebuild meshes
-      this.rebuildChunkMesh(vox.positionToChunkKey(coord))
+      vox.setVoxel(this.chunks, coord, 0.5 < Math.random() ? 2 : 230)
     }
 
     // TEMP
@@ -79,6 +87,16 @@ export default class Terrain extends Thing {
     cam.position[2] = Math.sin(this.viewAngle[1]) * this.viewDistance + 1
     cam.position = vec3.add(cam.position, this.viewPosition)
     cam.lookVector = vec3.anglesToVector(this.viewAngle[0], this.viewAngle[1])
+  }
+
+  rebuildChunkMeshes() {
+    // Iterate over chunks and rebuild all marked "modified"
+    for (const chunkKey in this.chunks) {
+      if (this.chunks[chunkKey].modified) {
+        this.rebuildChunkMesh(chunkKey)
+        this.chunks[chunkKey].modified = false
+      }
+    }
   }
 
   rebuildChunkMesh(chunkKey) {
@@ -203,6 +221,9 @@ export default class Terrain extends Thing {
   draw () {
     const { ctx, gl } = game
 
+    // Rebuild chunk meshes that have been modified since the last frame
+    this.rebuildChunkMeshes()
+
     // gfx setup
     gfx.setShader(assets.shaders.shaded)
     game.getCamera3D().setUniforms()
@@ -215,7 +236,7 @@ export default class Terrain extends Thing {
     for (const chunkKey in this.chunkMeshes) {
       const chunkMesh = this.chunkMeshes[chunkKey]
       gfx.set('fogColor', this.fogColor)
-      gfx.set('fogDensity', 1.0)
+      gfx.set('fogDensity', 0.0)
       gfx.set('emission', 0.0)
       gfx.setTexture(assets.textures.palette)
       gfx.set('modelMatrix', mat.getTransformation({
