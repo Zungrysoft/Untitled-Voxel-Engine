@@ -6,7 +6,6 @@ import * as mat from './core/matrices.js'
 import * as vec2 from './core/vector2.js'
 import * as vec3 from './core/vector3.js'
 import Thing from './core/thing.js'
-import { assets } from './core/game.js'
 import { getLevel } from './levelloader.js'
 
 export default class Board extends Thing {
