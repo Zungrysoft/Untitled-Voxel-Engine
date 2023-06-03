@@ -28,6 +28,10 @@ export function inverseSquareMap (n, start1, stop1, start2, stop2, withinBounds 
   return map(map(n, start1, stop1, 1, 0, withinBounds) ** 2, 0, 1, start2, stop2, withinBounds)
 }
 
+export function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
 // based on args does either 2d or 3d distance
 export function distance (...args) {
   if (args.length === 2) {

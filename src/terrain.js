@@ -36,7 +36,6 @@ export default class Terrain extends Thing {
         Math.floor((Math.random()-0.5) * 40),
       ]
       vox.setVoxel(this.chunks, coord, 70)
-      console.log(this.chunks)
     }
 
     // TEMP
@@ -73,17 +72,18 @@ export default class Terrain extends Thing {
     const { ctx } = game
 
     // TEMP
-    for (const coord of [[1, 1, 1], [-1, -1, -1]]) {
+    const voxels = vox.listVoxels(this.chunks)
+    for (const voxel of voxels) {
       gfx.setShader(assets.shaders.shaded)
       game.getCamera3D().setUniforms()
       gfx.set('color', [1, 1, 1, 1])
       gfx.set('scroll', 0)
       gfx.setTexture(assets.textures.square)
       gfx.set('modelMatrix', mat.getTransformation({
-        translation: coord,
+        translation: voxel.position,
       }))
       gfx.drawMesh(assets.meshes.cube)
     }
-    
+
   }
 }
