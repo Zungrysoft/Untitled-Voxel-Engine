@@ -16,6 +16,7 @@ export default class Terrain extends Thing {
   chunkMeshes = {}
   chunkGeneratorData = {}
   selectedColor = 2
+  fogColor = [1, 1, 1]
 
   // TEMP
   viewAngle = [Math.PI/2, Math.PI*(1/4)]
@@ -36,9 +37,9 @@ export default class Terrain extends Thing {
     // Debug button
     if (game.keysPressed.KeyJ) {
       let coord = [
-        Math.floor((Math.random()-0.5) * 40),
-        Math.floor((Math.random()-0.5) * 40),
-        Math.floor((Math.random()-0.5) * 40),
+        Math.floor((Math.random()-0.5) * 50),
+        Math.floor((Math.random()-0.5) * 50),
+        Math.floor((Math.random()-0.5) * 50),
       ]
       vox.setVoxel(this.chunks, coord, this.selectedColor)
       this.selectedColor ++
@@ -48,8 +49,6 @@ export default class Terrain extends Thing {
 
       // Rebuild meshes
       this.rebuildChunkMesh(vox.positionToChunkKey(coord))
-
-      // console.log(this.chunkMeshes)
     }
 
     // TEMP
@@ -204,14 +203,18 @@ export default class Terrain extends Thing {
   draw () {
     const { ctx } = game
 
-    // Voxels
+    // Set up gfx
+    gfx.setShader(assets.shaders.shaded)
+    game.getCamera3D().setUniforms()
+
+    // TODO: Fog skybox
+
+    // Chunk meshes
     for (const chunkKey in this.chunkMeshes) {
       const chunkMesh = this.chunkMeshes[chunkKey]
-
-      gfx.setShader(assets.shaders.shaded)
-      game.getCamera3D().setUniforms()
-      gfx.set('color', [1, 1, 1, 1])
-      gfx.set('scroll', 0)
+      gfx.set('fogColor', this.fogColor)
+      gfx.set('fogDensity', 1.0)
+      gfx.set('emission', 0.0)
       gfx.setTexture(assets.textures.palette)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: vox.getWorldPosition(chunkKey, [0, 0, 0]),
