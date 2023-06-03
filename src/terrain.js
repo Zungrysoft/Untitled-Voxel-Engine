@@ -35,11 +35,11 @@ export default class Terrain extends Thing {
     this.time ++
 
     // Debug button
-    if (game.keysPressed.KeyJ) {
+    if (game.keysDown.KeyJ) {
       let coord = [
-        Math.floor((Math.random()-0.5) * 50),
-        Math.floor((Math.random()-0.5) * 50),
-        Math.floor((Math.random()-0.5) * 50),
+        Math.floor((Math.random()-0.5) * 20),
+        Math.floor((Math.random()-0.5) * 20),
+        -5,
       ]
       vox.setVoxel(this.chunks, coord, this.selectedColor)
       this.selectedColor ++
@@ -104,7 +104,7 @@ export default class Terrain extends Thing {
             }
             // -X
             if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [-1, 0, 0])))) {
-              faces.push([[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], [-1, 0, 0], colorIndex])
+              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x - 0.5, y - 0.5, z + 0.5], [-1, 0, 0], colorIndex])
             }
             // +Y
             if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, 1, 0])))) {
@@ -112,7 +112,7 @@ export default class Terrain extends Thing {
             }
             // -Y
             if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, -1, 0])))) {
-              faces.push([[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], [0, -1, 0], colorIndex])
+              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, -1, 0], colorIndex])
             }
             // +Z
             if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, 0, 1])))) {
@@ -120,7 +120,7 @@ export default class Terrain extends Thing {
             }
             // -Z
             if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, 0, -1])))) {
-              faces.push([[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], [0, 0, -1], colorIndex])
+              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, 0, -1], colorIndex])
             }
           }
         }
@@ -177,8 +177,8 @@ export default class Terrain extends Thing {
         colorIndex
       )
       const t2 = addTriangle(
-        v1,
         v2,
+        v1,
         v4,
         normal,
         colorIndex
@@ -201,11 +201,13 @@ export default class Terrain extends Thing {
   }
 
   draw () {
-    const { ctx } = game
+    const { ctx, gl } = game
 
-    // Set up gfx
+    // gfx setup
     gfx.setShader(assets.shaders.shaded)
     game.getCamera3D().setUniforms()
+    gl.enable(gl.CULL_FACE)
+    gl.cullFace(gl.BACK)
 
     // TODO: Fog skybox
 
@@ -221,6 +223,9 @@ export default class Terrain extends Thing {
       }))
       gfx.drawMesh(chunkMesh)
     }
+
+    // gfx teardown
+    gl.disable(gl.CULL_FACE)
 
   }
 }
