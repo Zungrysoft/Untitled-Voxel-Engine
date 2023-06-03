@@ -113,11 +113,13 @@ export function setVoxel(chunks, position, index) {
   chunk.modified = true
 }
 
-export function mergeStructureIntoWorld(chunks, position, structure) {
+export function mergeStructureIntoWorld(chunks, position, structure, airMask=true) {
   for (const sPos in structure) {
     const colorIndex = structure[sPos]
-    const deltaPos = vec3.add(position, stringToArray(sPos))
-    setVoxel(chunks, deltaPos, colorIndex)
+    if (colorIndex > 1 || !airMask) {
+      const deltaPos = vec3.add(position, stringToArray(sPos))
+      setVoxel(chunks, deltaPos, colorIndex)
+    }
   }
 }
 

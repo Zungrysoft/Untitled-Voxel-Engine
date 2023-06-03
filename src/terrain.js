@@ -27,21 +27,6 @@ export default class Terrain extends Thing {
   constructor () {
     super()
     game.setThingName(this, 'terrain')
-
-    let plat = procbasics.generateRectangularPrism({
-      length: 5,
-      width: 5,
-      colorIndex: 3,
-    })
-
-    plat = procbasics.applyPattern(plat, {
-      colorMask: 3,
-      pattern: 'checker',
-      color1: 50,
-      color2: 51,
-    })
-
-    vox.mergeStructureIntoWorld(this.chunks, [0, 0, 0], plat)
   }
 
   update () {
@@ -50,13 +35,29 @@ export default class Terrain extends Thing {
     this.time ++
 
     // Debug button
-    if (game.keysDown.KeyJ) {
+    if (game.keysPressed.KeyJ) {
       let coord = [
         Math.floor((Math.random()-0.5) * 20),
         Math.floor((Math.random()-0.5) * 20),
-        -5,
+        Math.floor((Math.random()-0.5) * 3) - 8,
       ]
-      vox.setVoxel(this.chunks, coord, 0.5 < Math.random() ? 2 : 230)
+      const color1 = Math.floor(Math.random()*254 + 2)
+      const color2 = Math.floor(Math.random()*254 + 2)
+
+      let plat = procbasics.generateRectangularPrism({
+        length: 5,
+        width: 5,
+        colorIndex: 2,
+      })
+
+      plat = procbasics.applyPattern(plat, {
+        colorMask: 2,
+        pattern: 'checker',
+        color1: color1,
+        color2: color2,
+      })
+
+      vox.mergeStructureIntoWorld(this.chunks, coord, plat)
     }
 
     // TEMP
