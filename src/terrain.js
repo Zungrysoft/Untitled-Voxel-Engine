@@ -15,6 +15,7 @@ export default class Terrain extends Thing {
   chunks = {}
   chunkMeshes = {}
   chunkGeneratorData = {}
+  selectedColor = 2
 
   // TEMP
   viewAngle = [Math.PI/2, Math.PI*(1/4)]
@@ -39,7 +40,11 @@ export default class Terrain extends Thing {
         Math.floor((Math.random()-0.5) * 40),
         Math.floor((Math.random()-0.5) * 40),
       ]
-      vox.setVoxel(this.chunks, coord, 70)
+      vox.setVoxel(this.chunks, coord, this.selectedColor)
+      this.selectedColor ++
+      if (this.selectedColor > 255) {
+        this.selectedColor = 2
+      }
 
       // Rebuild meshes
       this.rebuildChunkMesh(vox.positionToChunkKey(coord))
@@ -207,7 +212,7 @@ export default class Terrain extends Thing {
       game.getCamera3D().setUniforms()
       gfx.set('color', [1, 1, 1, 1])
       gfx.set('scroll', 0)
-      gfx.setTexture(assets.textures.square)
+      gfx.setTexture(assets.textures.palette)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: vox.getWorldPosition(chunkKey, [0, 0, 0]),
       }))

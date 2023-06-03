@@ -1,6 +1,6 @@
 import * as u from './core/utils.js'
 
-export const CHUNKSIZE = 64
+export const CHUNKSIZE = 32
 export const CHUNKVOLUME = CHUNKSIZE*CHUNKSIZE*CHUNKSIZE
 
 export function stringToArray(s) {
