@@ -5,12 +5,13 @@ import Terrain from './terrain.js'
 game.config.width = 1920
 game.config.height = 1080
 //game.config.isWebglEnabled = false
-document.title = 'Sorting Center Savant'
+document.title = 'Untitled Voxel Shooter'
 
 await game.loadAssets({
   images: {
     background: 'images/bg1.png',
     square: 'images/square.png',
+    palette: 'images/palette.png',
   },
 
   sounds: {

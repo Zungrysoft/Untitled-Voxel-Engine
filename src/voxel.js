@@ -120,7 +120,7 @@ export function listVoxels(chunks) {
       const colorIndex = chunk.voxels[i]
 
       // If this voxel is not air, list it
-      if (colorIndex > 1) {
+      if (isSolid(colorIndex)) {
         const chunkPosition = chunkIndexToChunkPosition(i)
         const worldPosition = getWorldPosition(chunkKey, chunkPosition)
         ret.push({
@@ -132,4 +132,8 @@ export function listVoxels(chunks) {
   }
 
   return ret
+}
+
+export function isSolid(colorIndex) {
+  return colorIndex > 1 && colorIndex < 255
 }
