@@ -21,7 +21,7 @@ export default class Player extends Thing {
   cameraLookAhead = 64
   moveDirection = [1, 0, 0]
   forward = [1, 0, 0]
-  width = 0.8
+  width = 0.9
   canDash = true
   wannaJump = 0
   coyoteFrames = 0
@@ -452,16 +452,16 @@ export default class Player extends Thing {
 
       // TODO: Fix mouse control and remove arrow key controls
       if (game.keysDown.ArrowDown) {
-        pitch += 0.02
+        pitch += 0.03
       }
       if (game.keysDown.ArrowUp) {
-        pitch -= 0.02
+        pitch -= 0.03
       }
       if (game.keysDown.ArrowLeft) {
-        yaw -= 0.02
+        yaw -= 0.05
       }
       if (game.keysDown.ArrowRight) {
-        yaw += 0.02
+        yaw += 0.05
       }
 
       game.getCamera3D().lookVector = vec3.anglesToVector(yaw, pitch)
