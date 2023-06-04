@@ -129,11 +129,10 @@ export default class Terrain extends Thing {
           // If the voxel is not air, add its faces
           const voxel = vox.getVoxel(this.chunks, position)
           if (voxel.solid) {
-            // Get voxel material
+            // Get voxel palette
             const palette = this.palette[voxel.material]
 
             // Check for adjacent voxels so we don't render faces that are hidden by other voxels
-
             // +X
             if (!vox.getVoxel(this.chunks, vec3.add(position, [1, 0, 0])).solid) {
               faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], pal.getColor(palette, voxel.shades[3])])
@@ -294,7 +293,7 @@ export default class Terrain extends Thing {
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
       gfx.set('emission', 0.0)
-      gfx.setTexture(assets.textures.palette)
+      gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: vox.getWorldPosition(chunkKey, [0, 0, 0]),
       }))
