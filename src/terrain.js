@@ -160,7 +160,10 @@ export default class Terrain extends Thing {
           )
         }
 
-        this.addToSpatialHash(v1, v2, v3, chunkKey)
+        const dv1 = vox.getWorldPosition(chunkKey, v1)
+        const dv2 = vox.getWorldPosition(chunkKey, v2)
+        const dv3 = vox.getWorldPosition(chunkKey, v3)
+        this.addToSpatialHash(dv1, dv2, dv3, chunkKey)
 
         return verts
       }
