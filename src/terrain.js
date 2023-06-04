@@ -38,6 +38,16 @@ export default class Terrain extends Thing {
       color2: 24,
     })
 
+    let wall = procbasics.generateRectangularPrism({
+      width: 25,
+      length: 1,
+      height: 6,
+      colorIndex: 88,
+    })
+
+    vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 3], wall)
+    vox.mergeStructureIntoWorld(this.chunks, [-7, -7, 3], wall)
+
     vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 2], plat)
     vox.mergeStructureIntoWorld(this.chunks, [0, 0, 3], plat)
     vox.mergeStructureIntoWorld(this.chunks, [4, 0, 4], plat)
