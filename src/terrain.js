@@ -30,7 +30,7 @@ export default class Terrain extends Thing {
     dirt: [[0.33, 0.27, 0.22]],
     sand: [[0.78, 0.78, 0.48]],
     stone: [[0.42, 0.42, 0.45]],
-    stoneBrick: [[0.32, 0.32, 0.37]],
+    stoneBricks: [[0.32, 0.32, 0.37]],
     stoneAccent: [[0.15, 0.14, 0.38]],
     stoneAccent2: [[0.53, 0.13, 0.14]],
     stoneRoof: [[0.38, 0.15, 0.14]],
@@ -51,26 +51,24 @@ export default class Terrain extends Thing {
     let plat = procbasics.generateRectangularPrism({
       length: 25,
       width: 25,
-      colorIndex: 2,
+      voxel: {material: 'structure', solid: true},
     })
     plat = procbasics.applyPattern(plat, {
-      colorMask: 2,
       pattern: 'checker',
-      color1: 30,
-      color2: 24,
+      voxel1: {material: 'wood', solid: true},
+      voxel2: {material: 'woodPlanks', solid: true},
     })
 
     let wall = procbasics.generateRectangularPrism({
       width: 25,
       length: 1,
       height: 6,
-      colorIndex: 2,
+      voxel: {material: 'structure', solid: true},
     })
     wall = procbasics.applyPattern(wall, {
-      colorMask: 2,
       pattern: 'checker',
-      color1: 31,
-      color2: 25,
+      voxel1: {material: 'stone', solid: true},
+      voxel2: {material: 'stoneBricks', solid: true},
     })
 
     vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 3], wall)
@@ -81,17 +79,18 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, [4, 0, 4], plat)
     vox.mergeStructureIntoWorld(this.chunks, [9, 4, 5], plat)
 
-    vox.setVoxel(this.chunks, [1, 0, 6], 13)
-    vox.setVoxel(this.chunks, [2, 0, 6], 13)
-    vox.setVoxel(this.chunks, [3, 0, 6], 13)
-    vox.setVoxel(this.chunks, [4, 0, 6], 13)
-    vox.setVoxel(this.chunks, [5, 0, 6], 13)
-    vox.setVoxel(this.chunks, [6, 0, 6], 13)
-    vox.setVoxel(this.chunks, [0, 0, 5], 13)
-    vox.setVoxel(this.chunks, [-1, 0, 4], 13)
-    vox.setVoxel(this.chunks, [-2, 0, 3], 13)
-    vox.setVoxel(this.chunks, [-3, 0, 2], 13)
-    vox.setVoxel(this.chunks, [-4, 0, 1], 13)
+    const v1 = {material: 'bone', solid: true}
+    vox.setVoxel(this.chunks, [1, 0, 6], v1)
+    vox.setVoxel(this.chunks, [2, 0, 6], v1)
+    vox.setVoxel(this.chunks, [3, 0, 6], v1)
+    vox.setVoxel(this.chunks, [4, 0, 6], v1)
+    vox.setVoxel(this.chunks, [5, 0, 6], v1)
+    vox.setVoxel(this.chunks, [6, 0, 6], v1)
+    vox.setVoxel(this.chunks, [0, 0, 5], v1)
+    vox.setVoxel(this.chunks, [-1, 0, 4], v1)
+    vox.setVoxel(this.chunks, [-2, 0, 3], v1)
+    vox.setVoxel(this.chunks, [-3, 0, 2], v1)
+    vox.setVoxel(this.chunks, [-4, 0, 1], v1)
   }
 
   update () {
@@ -101,28 +100,7 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-      let coord = [
-        Math.floor((Math.random()-0.5) * 20),
-        Math.floor((Math.random()-0.5) * 20),
-        Math.floor((Math.random()-0.5) * 3) - 8,
-      ]
-      const color1 = Math.floor(Math.random()*254 + 2)
-      const color2 = Math.floor(Math.random()*254 + 2)
 
-      let plat = procbasics.generateRectangularPrism({
-        length: 5,
-        width: 5,
-        colorIndex: 2,
-      })
-
-      plat = procbasics.applyPattern(plat, {
-        colorMask: 2,
-        pattern: 'checker',
-        color1: color1,
-        color2: color2,
-      })
-
-      vox.mergeStructureIntoWorld(this.chunks, coord, plat)
     }
   }
 
@@ -149,33 +127,36 @@ export default class Terrain extends Thing {
           const position = vox.getWorldPosition(chunkKey, [x, y, z])
 
           // If the voxel is not air, add its faces
-          const colorIndex = vox.getVoxel(this.chunks, position)
-          if (colorIndex > 1) {
+          const voxel = vox.getVoxel(this.chunks, position)
+          if (voxel.solid) {
+            // Get voxel material
+            const palette = this.palette[voxel.material]
+
             // Check for adjacent voxels so we don't render faces that are hidden by other voxels
 
             // +X
-            if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [1, 0, 0])))) {
-              faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], colorIndex])
+            if (!vox.getVoxel(this.chunks, vec3.add(position, [1, 0, 0])).solid) {
+              faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], pal.getColor(palette, voxel.shades[3])])
             }
             // -X
-            if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [-1, 0, 0])))) {
-              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x - 0.5, y - 0.5, z + 0.5], [-1, 0, 0], colorIndex])
+            if (!vox.getVoxel(this.chunks, vec3.add(position, [-1, 0, 0])).solid) {
+              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x - 0.5, y - 0.5, z + 0.5], [-1, 0, 0], pal.getColor(palette, voxel.shades[0])])
             }
             // +Y
-            if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, 1, 0])))) {
-              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 1, 0], colorIndex])
+            if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 1, 0])).solid) {
+              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 1, 0], pal.getColor(palette, voxel.shades[4])])
             }
             // -Y
-            if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, -1, 0])))) {
-              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, -1, 0], colorIndex])
+            if (!vox.getVoxel(this.chunks, vec3.add(position, [0, -1, 0])).solid) {
+              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, -1, 0], pal.getColor(palette, voxel.shades[1])])
             }
             // +Z
-            if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, 0, 1])))) {
-              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 0, 1], colorIndex])
+            if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 0, 1])).solid) {
+              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 0, 1], pal.getColor(palette, voxel.shades[5])])
             }
             // -Z
-            if (!vox.isSolid(vox.getVoxel(this.chunks, vec3.add(position, [0, 0, -1])))) {
-              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, 0, -1], colorIndex])
+            if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 0, -1])).solid) {
+              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, 0, -1], pal.getColor(palette, voxel.shades[2])])
             }
           }
         }
@@ -185,10 +166,10 @@ export default class Terrain extends Thing {
     // TODO: Merge faces together to optimize the mesh
 
     // Add triangles to the mesh
-    const addFace = (v1, v2, normal, colorIndex) => {
-      const addTriangle = (v1, v2, v3, normal, colorIndex) => {
+    const addFace = (v1, v2, normal, rgb) => {
+      const addTriangle = (v1, v2, v3, normal, rgb) => {
         const vertices = [v1, v2, v3]
-        const [u, v] = pal.getPaletteCoords(colorIndex)
+        const [u, v] = pal.getColorMapCoords(rgb)
         let verts = []
 
         for (const [x, y, z] of vertices) {
@@ -232,14 +213,14 @@ export default class Terrain extends Thing {
         v2,
         v3,
         normal,
-        colorIndex
+        rgb
       )
       const t2 = addTriangle(
         v2,
         v1,
         v4,
         normal,
-        colorIndex
+        rgb
       )
 
       return [...t1, ...t2]

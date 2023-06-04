@@ -57,9 +57,18 @@ export function chunkIndexToChunkPosition(index) {
   return [x, y, z]
 }
 
+export function emptyVoxel() {
+  return {
+    material: 'structure',
+    shades: [0.8, 0.9, 1.0, 0.6, 0.5, 0.4],
+    solid: false,
+    reserveState: 0,
+  }
+}
+
 export function emptyChunk() {
   let zeros
-  (zeros = []).length = CHUNKVOLUME; zeros.fill(0);
+  (zeros = []).length = CHUNKVOLUME; zeros.fill(emptyVoxel());
   return {
     voxels: zeros,
     things: [],
@@ -75,7 +84,7 @@ export function getVoxel(chunks, position) {
   let chunk = chunks[chunkPosition]
   // If the chunk doesn't exist, all voxels there are assumed to be zero
   if (!chunk) {
-    return 0
+    return emptyVoxel()
   }
 
   // Convert world position to the index within the chunk
@@ -85,7 +94,7 @@ export function getVoxel(chunks, position) {
   return chunk.voxels[indexInChunk]
 }
 
-export function setVoxel(chunks, position, index) {
+export function setVoxel(chunks, position, voxel) {
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkPosition = positionToChunkKey(position)
 
@@ -93,11 +102,6 @@ export function setVoxel(chunks, position, index) {
   let chunk = chunks[chunkPosition]
   // If the chunk doesn't exist, create it and edit the voxel
   if (!chunk) {
-    // If the index is zero, early exit since this operation wouldn't have any effect on the world state.
-    if (index === 0) {
-      return
-    }
-
     // Set the chunk to a new empty chunk
     chunks[chunkPosition] = emptyChunk()
     chunk = chunks[chunkPosition]
@@ -106,20 +110,21 @@ export function setVoxel(chunks, position, index) {
   // Convert world position to the index within the chunk
   let indexInChunk = chunkPositionToChunkIndex(positionToChunkPosition(position))
 
-  // Change the voxel
-  chunk.voxels[indexInChunk] = index
+  // Merge the new data into the voxel
+  chunk.voxels[indexInChunk] = {...chunk.voxels[indexInChunk], ...voxel}
 
   // Mark this chunk as modified so the renderer knows to rebuild it
   chunk.modified = true
 }
 
-export function mergeStructureIntoWorld(chunks, position, structure, airMask=true) {
+export function mergeStructureIntoWorld(chunks, position, structure, globalVoxel = {}) {
+  // Global voxel is used to override certain properties of the structure's voxels
+
+  // Iterate over voxels in structure
   for (const sPos in structure) {
-    const colorIndex = structure[sPos]
-    if (colorIndex > 1 || !airMask) {
-      const deltaPos = vec3.add(position, stringToArray(sPos))
-      setVoxel(chunks, deltaPos, colorIndex)
-    }
+    const voxel = structure[sPos]
+    const deltaPos = vec3.add(position, stringToArray(sPos))
+    setVoxel(chunks, deltaPos, {...voxel, ...globalVoxel})
   }
 }
 
@@ -132,23 +137,19 @@ export function listVoxels(chunks) {
     // Iterate over voxels in chunk
     for (let i = 0; i < CHUNKVOLUME; i ++) {
       // Get voxel color at this index
-      const colorIndex = chunk.voxels[i]
+      const voxel = chunk.voxels[i]
 
       // If this voxel is not air, list it
-      if (isSolid(colorIndex)) {
+      if (voxel.solid) {
         const chunkPosition = chunkIndexToChunkPosition(i)
         const worldPosition = getWorldPosition(chunkKey, chunkPosition)
         ret.push({
           position: worldPosition,
-          color: colorIndex,
+          voxel: voxel,
         })
       }
     }
   }
 
   return ret
-}
-
-export function isSolid(colorIndex) {
-  return colorIndex > 1 && colorIndex < 255
 }

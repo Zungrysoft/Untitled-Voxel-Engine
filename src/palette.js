@@ -41,7 +41,7 @@ export function hsvToRgb(hsv) {
 
 export function getColor(palette, shade) {
     shade = u.clamp(shade, 0, 0.99999)
-    shadeIndex = Math.floor(shade * palette.length)
+    const shadeIndex = Math.floor(shade * palette.length)
     return palette[shadeIndex]
 }
 
