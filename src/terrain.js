@@ -10,23 +10,49 @@ import * as pal from './palette.js'
 import * as procbasics from './procbasics.js'
 import Thing from './core/thing.js'
 import { assets } from './core/game.js'
+import SpatialHash from './core/spatialhash.js'
 
 export default class Terrain extends Thing {
   time = 0
   chunks = {}
   chunkMeshes = {}
   chunkGeneratorData = {}
+  chunkSpatialHashes = {}
   fogColor = [1, 1, 1]
-
-  // TEMP
-  viewAngle = [Math.PI/2, Math.PI*(1/4)]
-  viewAngleTarget = this.viewAngle
-  viewDistance = 4
-  viewPosition = [0, 0, 0]
 
   constructor () {
     super()
     game.setThingName(this, 'terrain')
+
+
+    let plat = procbasics.generateRectangularPrism({
+      length: 25,
+      width: 25,
+      colorIndex: 2,
+    })
+
+    plat = procbasics.applyPattern(plat, {
+      colorMask: 2,
+      pattern: 'checker',
+      color1: 30,
+      color2: 24,
+    })
+
+    vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 2], plat)
+    vox.mergeStructureIntoWorld(this.chunks, [0, 0, 3], plat)
+    vox.mergeStructureIntoWorld(this.chunks, [4, 0, 5], plat)
+
+    vox.setVoxel(this.chunks, [1, 0, 6], 13)
+    vox.setVoxel(this.chunks, [2, 0, 6], 13)
+    vox.setVoxel(this.chunks, [3, 0, 6], 13)
+    vox.setVoxel(this.chunks, [4, 0, 6], 13)
+    vox.setVoxel(this.chunks, [5, 0, 6], 13)
+    vox.setVoxel(this.chunks, [6, 0, 6], 13)
+    vox.setVoxel(this.chunks, [0, 0, 5], 13)
+    vox.setVoxel(this.chunks, [-1, 0, 4], 13)
+    vox.setVoxel(this.chunks, [-2, 0, 3], 13)
+    vox.setVoxel(this.chunks, [-3, 0, 2], 13)
+    vox.setVoxel(this.chunks, [-4, 0, 1], 13)
   }
 
   update () {
@@ -59,35 +85,6 @@ export default class Terrain extends Thing {
 
       vox.mergeStructureIntoWorld(this.chunks, coord, plat)
     }
-
-    // TEMP
-    // Camera controls
-    if (game.keysPressed.ArrowRight || game.buttonsPressed[15]) {
-      this.viewAngleTarget[0] -= Math.PI/4
-    }
-    if (game.keysPressed.ArrowLeft || game.buttonsPressed[14]) {
-      this.viewAngleTarget[0] += Math.PI/4
-    }
-    if (game.keysPressed.ArrowUp || game.buttonsPressed[12]) {
-      this.viewAngleTarget[1] += Math.PI/8
-    }
-    if (game.keysPressed.ArrowDown || game.buttonsPressed[13]) {
-      this.viewAngleTarget[1] -= Math.PI/8
-    }
-    this.viewAngleTarget[1] = u.clamp(this.viewAngleTarget[1], 0, Math.PI/2)
-    this.viewAngle = vec2.lerp(this.viewAngle, this.viewAngleTarget, 0.2)
-    this.updateCamera()
-  }
-
-  // TEMP
-  updateCamera() {
-    // Set up 3D camera
-    const cam = game.getCamera3D()
-    cam.position[0] = Math.cos(this.viewAngle[0]) * Math.cos(this.viewAngle[1]) * this.viewDistance
-    cam.position[1] = Math.sin(this.viewAngle[0]) * Math.cos(this.viewAngle[1]) * this.viewDistance
-    cam.position[2] = Math.sin(this.viewAngle[1]) * this.viewDistance + 1
-    cam.position = vec3.add(cam.position, this.viewPosition)
-    cam.lookVector = vec3.anglesToVector(this.viewAngle[0], this.viewAngle[1])
   }
 
   rebuildChunkMeshes() {
@@ -101,8 +98,8 @@ export default class Terrain extends Thing {
   }
 
   rebuildChunkMesh(chunkKey) {
-    // Remove this chunk's mesh so we may rebuild it
-    delete this.chunkMeshes[chunkKey]
+    // Clear this chunk's spatial hash so we can rebuild it
+    this.chunkSpatialHashes[chunkKey] = new SpatialHash()
 
     // Build list of faces this chunk needs to render
     let faces = []
@@ -163,7 +160,7 @@ export default class Terrain extends Thing {
           )
         }
 
-        // if (solid) this.addToSpatialHash(p1, p2, p3, { material: texture })
+        this.addToSpatialHash(v1, v2, v3, chunkKey)
 
         return verts
       }
@@ -217,6 +214,41 @@ export default class Terrain extends Thing {
 
     // Build the mesh
     this.chunkMeshes[chunkKey] = gfx.createMesh(verts)
+  }
+
+  addToSpatialHash (v1, v2, v3, chunkKey) {
+    // Find the bounding box of this tri
+    const x = [v1, v2, v3].reduce((prev, now) => Math.min(prev, now[0]), Infinity)
+    const y = [v1, v2, v3].reduce((prev, now) => Math.min(prev, now[1]), Infinity)
+    const w = [v1, v2, v3].reduce((prev, now) => Math.max(prev, now[0] - x), 1)
+    const h = [v1, v2, v3].reduce((prev, now) => Math.max(prev, now[1] - y), 1)
+
+    let normal = vec3.getNormalOf(v1, v2, v3)
+    if (normal[2] > 0.99) {
+      normal = [0, 0, 1]
+    }
+
+    const midpoint = vec3.scale(vec3.add(vec3.add(v1, v2), v3), 1 / 3)
+
+    const tri = {
+      points: [v1, v2, v3],
+      midpoint: midpoint,
+      normal: normal,
+      material: 'voxel'
+    }
+
+    this.chunkSpatialHashes[chunkKey].add(tri, x, y, w, h)
+
+    return tri
+  }
+
+  query (x, y, w, h) {
+    let ret = []
+    for (const chunkKey in this.chunkSpatialHashes) {
+      const chunkList = this.chunkSpatialHashes[chunkKey].query(x, y, w, h)
+      ret.push(...chunkList)
+    }
+    return ret
   }
 
   draw () {

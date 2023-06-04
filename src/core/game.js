@@ -326,6 +326,7 @@ window.oncontextmenu = (event) => {
 }
 
 canvas2d.onmousemove = (e) => {
+  console.log("YSSSS")
   const aspect = Math.min(canvas2d.offsetWidth / config.width, canvas2d.offsetHeight / config.height)
   mouse.position[0] = u.map(
     e.offsetX,
