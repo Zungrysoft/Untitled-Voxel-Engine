@@ -21,7 +21,7 @@ export default class Player extends Thing {
   cameraLookAhead = 64
   moveDirection = [1, 0, 0]
   forward = [1, 0, 0]
-  width = 1.8
+  width = 0.8
   canDash = true
   wannaJump = 0
   coyoteFrames = 0

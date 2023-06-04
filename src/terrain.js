@@ -30,7 +30,6 @@ export default class Terrain extends Thing {
       width: 25,
       colorIndex: 2,
     })
-
     plat = procbasics.applyPattern(plat, {
       colorMask: 2,
       pattern: 'checker',
@@ -42,7 +41,13 @@ export default class Terrain extends Thing {
       width: 25,
       length: 1,
       height: 6,
-      colorIndex: 88,
+      colorIndex: 2,
+    })
+    wall = procbasics.applyPattern(wall, {
+      colorMask: 2,
+      pattern: 'checker',
+      color1: 31,
+      color2: 25,
     })
 
     vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 3], wall)
