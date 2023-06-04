@@ -40,7 +40,8 @@ export default class Terrain extends Thing {
 
     vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 2], plat)
     vox.mergeStructureIntoWorld(this.chunks, [0, 0, 3], plat)
-    vox.mergeStructureIntoWorld(this.chunks, [4, 0, 5], plat)
+    vox.mergeStructureIntoWorld(this.chunks, [4, 0, 4], plat)
+    vox.mergeStructureIntoWorld(this.chunks, [9, 4, 5], plat)
 
     vox.setVoxel(this.chunks, [1, 0, 6], 13)
     vox.setVoxel(this.chunks, [2, 0, 6], 13)
@@ -219,7 +220,7 @@ export default class Terrain extends Thing {
     this.chunkMeshes[chunkKey] = gfx.createMesh(verts)
   }
 
-  addToSpatialHash (v1, v2, v3, chunkKey) {
+  addToSpatialHash (v3, v2, v1, chunkKey) {
     // Find the bounding box of this tri
     const x = [v1, v2, v3].reduce((prev, now) => Math.min(prev, now[0]), Infinity)
     const y = [v1, v2, v3].reduce((prev, now) => Math.min(prev, now[1]), Infinity)

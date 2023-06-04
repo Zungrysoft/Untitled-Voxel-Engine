@@ -186,7 +186,7 @@ export default class Player extends Thing {
     }
     this.wannaJump = Math.max(this.wannaJump - 1, 0)
     this.coyoteFrames = Math.max(this.coyoteFrames - 1, 0)
-    this.staircaseOffset = Math.max(this.staircaseOffset - 6, 0)
+    this.staircaseOffset = Math.max(this.staircaseOffset - 0.2, 0)
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
 
@@ -294,22 +294,22 @@ export default class Player extends Thing {
     }
 
     // step sounds
-    if (this.onGround) {
-      this.stepCounter += vec2.magnitude(this.velocity)
-      const interval = 150
-      if (this.stepCounter > interval) {
-        this.stepCounter -= interval
-        const sound = u.choose(
-          assets.sounds.footstep1,
-          assets.sounds.footstep2
-          // assets.sounds.footstep3
-        )
-        sound.playbackRate = u.random(0.9, 1.1)
-        sound.volume = 0.25
-        sound.currentTime = 0
-        sound.play()
-      }
-    }
+    // if (this.onGround) {
+    //   this.stepCounter += vec2.magnitude(this.velocity)
+    //   const interval = 150
+    //   if (this.stepCounter > interval) {
+    //     this.stepCounter -= interval
+    //     const sound = u.choose(
+    //       assets.sounds.footstep1,
+    //       assets.sounds.footstep2
+    //       // assets.sounds.footstep3
+    //     )
+    //     sound.playbackRate = u.random(0.9, 1.1)
+    //     sound.volume = 0.25
+    //     sound.currentTime = 0
+    //     sound.play()
+    //   }
+    // }
 
     this.moveAndCollide()
     this.updateTimers()
@@ -360,47 +360,47 @@ export default class Player extends Thing {
     }
 
     // Wall/ceiling collisions
-    // for (const collider of colliderList) {
-    //   const { normal, points } = collider
+    for (const collider of colliderList) {
+      const { normal, points } = collider
 
-    //   // Skip if not a wall/ceiling
-    //   if (normal[2] >= 0.7) {
-    //     continue
-    //   }
+      // Skip if not a wall/ceiling
+      if (normal[2] >= 0.7) {
+        continue
+      }
 
-    //   const fakeNormal = vec3.findMostSimilarVector(normal, [
-    //     [0, 0, -1],
-    //     [1, 0, 0],
-    //     [-1, 0, 0],
-    //     [0, 1, 0],
-    //     [0, -1, 0]
-    //   ])
+      const fakeNormal = vec3.findMostSimilarVector(normal, [
+        [0, 0, -1],
+        [1, 0, 0],
+        [-1, 0, 0],
+        [0, 1, 0],
+        [0, -1, 0]
+      ])
 
-    //   const stepHeight = this.onGround ? 1.5 : 0.5
-    //   for (let h = stepHeight; h <= 2; h += 0.5) {
-    //     const position = [...this.position]
-    //     position[2] += h - this.height
+      const stepHeight = this.onGround ? 1.5 : 0.5
+      for (let h = stepHeight; h <= 2; h += 0.5) {
+        const position = [...this.position]
+        position[2] += h - this.height
 
-    //     if (!vec3.isInsideTriangle(...points, fakeNormal, position)) {
-    //       continue
-    //     }
+        if (!vec3.isInsideTriangle(...points, fakeNormal, position)) {
+          continue
+        }
 
-    //     const distance = vec3.distanceToTriangle(points[0], normal, position)
-    //     if (distance > this.width) continue
-    //     if (distance < -1 * this.width) continue
+        const distance = vec3.distanceToTriangle(points[0], normal, position)
+        if (distance > this.width) continue
+        if (distance < -1 * this.width) continue
 
-    //     const dot = vec3.dotProduct(this.velocity, normal)
-    //     if (dot < 0) {
-    //       this.velocity[0] -= dot * normal[0]
-    //       this.velocity[1] -= dot * normal[1]
-    //       this.velocity[2] -= dot * normal[2]
-    //     }
-    //     const push = (this.width - distance) / 10
-    //     this.position[0] += normal[0] * push
-    //     this.position[1] += normal[1] * push
-    //     this.position[2] += normal[2] * push
-    //   }
-    // }
+        const dot = vec3.dotProduct(this.velocity, normal)
+        if (dot < 0) {
+          this.velocity[0] -= dot * normal[0]
+          this.velocity[1] -= dot * normal[1]
+          this.velocity[2] -= dot * normal[2]
+        }
+        const push = (this.width - distance) / 10
+        this.position[0] += normal[0] * push
+        this.position[1] += normal[1] * push
+        this.position[2] += normal[2] * push
+      }
+    }
   }
 
   getClosestWall () {
