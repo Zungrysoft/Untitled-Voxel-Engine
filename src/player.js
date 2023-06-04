@@ -152,14 +152,14 @@ export default class Player extends Thing {
     }
 
     const jump = () => {
-      this.velocity[2] = 10
+      this.velocity[2] = 0.32
       this.wannaJump = 0
       this.coyoteFrames = 0
-      const sound = assets.sounds.playerJump
-      sound.volume = 0.2
-      sound.playbackRate = u.random(1, 1.2)
-      sound.currentTime = 0
-      sound.play()
+      // const sound = assets.sounds.playerJump
+      // sound.volume = 0.2
+      // sound.playbackRate = u.random(1, 1.2)
+      // sound.currentTime = 0
+      // sound.play()
     }
 
     if (this.wannaJump && this.coyoteFrames) {
