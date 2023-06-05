@@ -40,7 +40,7 @@ export default class Terrain extends Thing {
     rune: [[0.95, 0.04, 0.04]],
     bone: [[0.90, 0.91, 0.79]],
     crystal: [[0.87, 0.13, 0.97]],
-    structure: [[0.05, 0.04, 0.95]],
+    structure: pal.generatePalette(0.027, 0.5, 0.8, 0.137),
   }
 
   constructor () {
@@ -91,6 +91,13 @@ export default class Terrain extends Thing {
     vox.setVoxel(this.chunks, [-2, 0, 3], v1)
     vox.setVoxel(this.chunks, [-3, 0, 2], v1)
     vox.setVoxel(this.chunks, [-4, 0, 1], v1)
+
+    // Palette test
+    for (let i = 0; i < 16; i ++) {
+      const s = u.map(i, 0, 16-1, 0, 1.0)
+      const v2 = {material: 'structure', solid: true, shades: [s, s, s, s, s, s]}
+      vox.setVoxel(this.chunks, [-7 + i, -6, 3], v2)
+    }
   }
 
   update () {
@@ -100,7 +107,7 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-
+      console.log(pal.generatePalette(0.027, 0.5, 0.8, 0.137))
     }
   }
 
@@ -120,9 +127,9 @@ export default class Terrain extends Thing {
 
     // Build list of faces this chunk needs to render
     let faces = []
-    for (let x = 0; x < vox.CHUNKSIZE; x ++) {
-      for (let y = 0; y < vox.CHUNKSIZE; y ++) {
-        for (let z = 0; z < vox.CHUNKSIZE; z ++) {
+    for (let x = 0; x < vox.CHUNK_SIZE; x ++) {
+      for (let y = 0; y < vox.CHUNK_SIZE; y ++) {
+        for (let z = 0; z < vox.CHUNK_SIZE; z ++) {
           // Position
           const position = vox.getWorldPosition(chunkKey, [x, y, z])
 

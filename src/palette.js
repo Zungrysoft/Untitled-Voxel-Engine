@@ -1,6 +1,8 @@
 import * as u from './core/utils.js'
 
-export const COLORMAPWIDTH = 32
+export const COLOR_MAP_WIDTH = 32
+
+export const PALETTE_ROW_SIZE = 12
 
 export function hsvToRgb(hsv) {
     let [h, s, v] = hsv
@@ -33,12 +35,40 @@ export function getColor(palette, shade) {
 export function getColorMapCoords(rgb) {
     const [r, g, b] = rgb
 
-    const rPix = Math.floor(r * 0.99999 * COLORMAPWIDTH)
-    const gPix = Math.floor(g * 0.99999 * COLORMAPWIDTH)
-    const bPix = Math.floor(b * 0.99999 * COLORMAPWIDTH) * COLORMAPWIDTH
+    const rPix = Math.floor(r * 0.99999 * COLOR_MAP_WIDTH)
+    const gPix = Math.floor(g * 0.99999 * COLOR_MAP_WIDTH)
+    const bPix = Math.floor(b * 0.99999 * COLOR_MAP_WIDTH) * COLOR_MAP_WIDTH
 
-    const x = (rPix + 0.5) / COLORMAPWIDTH
-    const y = (gPix + bPix + 0.5) / (COLORMAPWIDTH*COLORMAPWIDTH)
+    const x = (rPix + 0.5) / COLOR_MAP_WIDTH
+    const y = (gPix + bPix + 0.5) / (COLOR_MAP_WIDTH*COLOR_MAP_WIDTH)
 
     return [x, y]
+}
+
+export function generatePalette(h, s = 1.0, v = 1.0, hRange = 0.0) {
+    // Determine how many colors we will generate
+    const numColors = Math.floor(PALETTE_ROW_SIZE * v * 0.99999) + 1
+
+    // Set up ranges
+    // Hue goes plus or minus hRange, moving toward warmer colors at higher value
+    const hDir = (h < 0.2 || h > 0.77) ? 1 : -1
+    const hMin = h - hRange*hDir
+    const hMax = h + hRange*hDir
+    // Saturation is higher at lower value
+    const sMin = 1.0
+    const sMax = s
+    // Value goes from near-black to the specified value
+    const vMin = 0.05
+    const vMax = v
+
+    // Iterate over colors
+    let ret = []
+    for (let i = 0; i < numColors; i ++) {
+        const hCur = u.map(i, 0, numColors-1, hMin, hMax)
+        const sCur = u.map(i, 0, numColors-1, sMin, sMax)
+        const vCur = u.map(i, 0, numColors-1, vMin, vMax)
+        ret.push(hsvToRgb([u.mod(hCur, 1.0), sCur, vCur]))
+    }
+
+    return ret
 }

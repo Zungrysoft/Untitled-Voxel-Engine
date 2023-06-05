@@ -1,8 +1,8 @@
 import * as u from './core/utils.js'
 import * as vec3 from './core/vector3.js'
 
-export const CHUNKSIZE = 32
-export const CHUNKVOLUME = CHUNKSIZE*CHUNKSIZE*CHUNKSIZE
+export const CHUNK_SIZE = 32
+export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 
 export function stringToArray(s) {
   return s.split(',').map(x => parseInt(x))
@@ -10,17 +10,17 @@ export function stringToArray(s) {
 
 export function positionToChunkKey(position) {
   return [
-    Math.floor(position[0] / CHUNKSIZE),
-    Math.floor(position[1] / CHUNKSIZE),
-    Math.floor(position[2] / CHUNKSIZE),
+    Math.floor(position[0] / CHUNK_SIZE),
+    Math.floor(position[1] / CHUNK_SIZE),
+    Math.floor(position[2] / CHUNK_SIZE),
   ]
 }
 
 export function positionToChunkPosition(position) {
   return [
-    u.mod(position[0], CHUNKSIZE),
-    u.mod(position[1], CHUNKSIZE),
-    u.mod(position[2], CHUNKSIZE),
+    u.mod(position[0], CHUNK_SIZE),
+    u.mod(position[1], CHUNK_SIZE),
+    u.mod(position[2], CHUNK_SIZE),
   ]
 }
 
@@ -31,26 +31,26 @@ export function getWorldPosition(chunkKey, chunkPosition) {
   }
 
   return [
-    chunkKey[0] * CHUNKSIZE + chunkPosition[0],
-    chunkKey[1] * CHUNKSIZE + chunkPosition[1],
-    chunkKey[2] * CHUNKSIZE + chunkPosition[2],
+    chunkKey[0] * CHUNK_SIZE + chunkPosition[0],
+    chunkKey[1] * CHUNK_SIZE + chunkPosition[1],
+    chunkKey[2] * CHUNK_SIZE + chunkPosition[2],
   ]
 }
 
 export function chunkPositionToChunkIndex(position) {
-  return position[0] + position[1]*CHUNKSIZE + position[2]*CHUNKSIZE*CHUNKSIZE
+  return position[0] + position[1]*CHUNK_SIZE + position[2]*CHUNK_SIZE*CHUNK_SIZE
 }
 
 export function chunkIndexToChunkPosition(index) {
   // X
-  const x = u.mod(index, CHUNKSIZE)
+  const x = u.mod(index, CHUNK_SIZE)
 
   // Y
-  index = Math.floor(index / CHUNKSIZE)
-  const y = u.mod(index, CHUNKSIZE)
+  index = Math.floor(index / CHUNK_SIZE)
+  const y = u.mod(index, CHUNK_SIZE)
 
   // Z
-  index = Math.floor(index / CHUNKSIZE)
+  index = Math.floor(index / CHUNK_SIZE)
   const z = index
 
   // Return
@@ -68,7 +68,7 @@ export function emptyVoxel() {
 
 export function emptyChunk() {
   let zeros
-  (zeros = []).length = CHUNKVOLUME; zeros.fill(emptyVoxel());
+  (zeros = []).length = CHUNK_VOLUME; zeros.fill(emptyVoxel());
   return {
     voxels: zeros,
     things: [],
@@ -135,7 +135,7 @@ export function listVoxels(chunks) {
   for (const chunkKey in chunks) {
     const chunk = chunks[chunkKey]
     // Iterate over voxels in chunk
-    for (let i = 0; i < CHUNKVOLUME; i ++) {
+    for (let i = 0; i < CHUNK_VOLUME; i ++) {
       // Get voxel color at this index
       const voxel = chunk.voxels[i]
 

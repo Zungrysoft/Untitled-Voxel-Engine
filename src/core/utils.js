@@ -2,6 +2,38 @@ export function lerp (a, b, t) {
   return (1 - t) * a + t * b
 }
 
+export function lerpWrap(a, b, t, wrap = 1) {
+  // Bind angles to be from 0 to wrap
+  a = a % wrap
+  b = b % wrap
+
+  // Determine which direction to lerp yaw in
+  let minMode = 0
+  let minDist = Math.abs(a - b)
+
+  const d1 = Math.abs((a + wrap) - b)
+  if (d1 < minDist) {
+    minDist = d1
+    minMode = 1
+  }
+
+  const d2 = Math.abs((a - wrap) - b)
+  if (d2 < minDist) {
+    minDist = d2
+    minMode = 2
+  }
+
+  // Apply mode
+  if (minMode === 1) {
+    a += wrap
+  }
+  else if (minMode === 2) {
+    a -= wrap
+  }
+
+  return (1 - t) * a + t * b
+}
+
 export function clamp (n, min, max) {
   if (min < max) {
     return Math.min(Math.max(n, min), max)
@@ -11,6 +43,10 @@ export function clamp (n, min, max) {
 }
 
 export function map (n, start1, stop1, start2, stop2, withinBounds = false) {
+  if (stop1 === start1) {
+    return (start2 + stop2) / 2
+  }
+
   const newval = (n - start1) / (stop1 - start1) * (stop2 - start2) + start2
 
   if (!withinBounds) {
