@@ -10,14 +10,9 @@ export function generateDungeon({
   height=1,
   beamWidth=7,
 }) {
-  let ret = {}
-  for (let x = 0; x < width; x ++) {
-    for (let y = 0; y < length; y ++) {
-      for (let z = 0; z < height; z ++) {
-        ret[[x, y, z]] = voxel
-      }
-    }
-  }
-  return ret
+
+
+
+
 }
 
