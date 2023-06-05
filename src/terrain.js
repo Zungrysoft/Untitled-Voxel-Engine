@@ -92,6 +92,22 @@ export default class Terrain extends Thing {
     vox.setVoxel(this.chunks, [-3, 0, 2], v1)
     vox.setVoxel(this.chunks, [-4, 0, 1], v1)
 
+    let room = procbasics.generateRoom({
+      width: 8,
+      length: 8,
+      height: 6,
+      wallThickness: 1,
+      floorThickness: 3,
+      ceilingThickness: 0,
+      voxel: {material: 'structure', solid: true},
+    })
+    room = procbasics.applyPattern(room, {
+      pattern: 'checker',
+      voxel1: {material: 'stone', solid: true},
+      voxel2: {material: 'stoneAccent', solid: true},
+    })
+    vox.mergeStructureIntoWorld(this.chunks, [17, -7, -5], room)
+
     // Palette test
     for (let i = 0; i < 16; i ++) {
       const s = u.map(i, 0, 16-1, 0, 1.0)
