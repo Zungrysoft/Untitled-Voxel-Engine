@@ -25,16 +25,16 @@ export default class Terrain extends Thing {
     vines: [[0.16, 0.9, 0.38]],
     fruit: [[1, 0, 0]],
     flower: [[0, 0, 1]],
-    wood: [[0.47, 0.35, 0.25]],
-    woodPlanks: [[0.63, 0.43, 0.26]],
+    bark: [[0.47, 0.35, 0.25]],
+    wood: [[0.63, 0.43, 0.26]],
     dirt: [[0.33, 0.27, 0.22]],
     sand: [[0.78, 0.78, 0.48]],
     stone: [[0.42, 0.42, 0.45]],
-    stoneBricks: [[0.32, 0.32, 0.37]],
     stoneAccent: [[0.15, 0.14, 0.38]],
     stoneAccent2: [[0.53, 0.13, 0.14]],
     stoneRoof: [[0.38, 0.15, 0.14]],
     metal: [[0.41, 0.40, 0.41]],
+    metalAccent: [[0.33, 0.31, 0.33]],
     sign: [[0.87, 0.84, 0.73]],
     signText: [[0.68, 0.21, 0.16]],
     rune: [[0.95, 0.04, 0.04]],
@@ -56,7 +56,7 @@ export default class Terrain extends Thing {
     plat = procbasics.applyPattern(plat, {
       pattern: 'checker',
       voxel1: {material: 'wood', solid: true},
-      voxel2: {material: 'woodPlanks', solid: true},
+      voxel2: {material: 'bark', solid: true},
     })
 
     let wall = procbasics.generateRectangularPrism({
@@ -68,7 +68,7 @@ export default class Terrain extends Thing {
     wall = procbasics.applyPattern(wall, {
       pattern: 'checker',
       voxel1: {material: 'stone', solid: true},
-      voxel2: {material: 'stoneBricks', solid: true},
+      voxel2: {material: 'stoneAccent', solid: true},
     })
 
     vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 3], wall)
