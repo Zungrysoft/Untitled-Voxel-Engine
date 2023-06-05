@@ -12,7 +12,6 @@ await game.loadAssets({
   images: {
     background: 'images/bg1.png',
     square: 'images/square.png',
-    palette: 'images/palette.png',
     colorMap: 'images/color_map.png',
   },
 
