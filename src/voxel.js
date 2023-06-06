@@ -5,7 +5,7 @@ export const CHUNK_SIZE = 32
 export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 
 export function stringToArray(s) {
-  return s.split(',').map(x => parseInt(x))
+  return s.split(',').map(x => Number(x))
 }
 
 export function positionToChunkKey(position) {
