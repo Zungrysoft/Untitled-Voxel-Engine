@@ -3,8 +3,8 @@ import * as gfx from './core/webgl.js'
 import Terrain from './terrain.js'
 import Player from './player.js'
 
-game.config.width = 1920
-game.config.height = 1080
+game.config.width = 640
+game.config.height = 360
 //game.config.isWebglEnabled = false
 document.title = 'Untitled Voxel Shooter'
 

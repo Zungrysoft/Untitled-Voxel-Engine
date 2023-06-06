@@ -62,7 +62,7 @@ export function emptyVoxel() {
     material: 'structure',
     shades: [0.8, 0.9, 1.0, 0.6, 0.5, 0.4],
     solid: false,
-    reserveState: 0,
+    generatorData: {},
   }
 }
 
@@ -73,6 +73,22 @@ export function emptyChunk() {
     voxels: zeros,
     things: [],
     modified: false,
+  }
+}
+
+export function emptyStructure() {
+  return {
+    voxels: {},
+    things: [],
+    doorways: [],
+  }
+}
+
+export function copyStructure(structure) {
+  return {
+    voxels: {...structure.voxels},
+    things: [...structure.things],
+    doorways: [...structure.doorways],
   }
 }
 
@@ -121,11 +137,142 @@ export function mergeStructureIntoWorld(chunks, position, structure, globalVoxel
   // Global voxel is used to override certain properties of the structure's voxels
 
   // Iterate over voxels in structure
-  for (const sPos in structure) {
-    const voxel = structure[sPos]
+  for (const sPos in structure.voxels) {
+    const voxel = structure.voxels[sPos]
     const deltaPos = vec3.add(position, stringToArray(sPos))
     setVoxel(chunks, deltaPos, {...voxel, ...globalVoxel})
   }
+}
+
+export function mergeStructureIntoStructure(mainStructure, structure, position = [0, 0, 0]) {
+  // Offset
+  structure = shiftStructure(structure, position)
+
+  // Merge
+  const ret = emptyStructure()
+  ret.voxels = {...mainStructure.voxels, ...structure.voxels}
+  ret.things = [...mainStructure.things, ...structure.things]
+  ret.doorways = [...mainStructure.doorways, ...structure.doorways]
+
+  // Return
+  return ret
+}
+
+export function equals(voxel1, voxel2) {
+  // Material
+  if ('material' in voxel1 && 'material' in voxel2 && voxel1.material !== voxel2.material) {
+    return false
+  }
+
+  // Shades
+  if ('shades' in voxel1 && 'shades' in voxel2) {
+    for (let i = 0; i < 6; i ++) {
+      if (voxel1.shades[i] !== voxel2.shades[i]) {
+        return false
+      }
+    }
+  }
+
+  // Material
+  if ('solid' in voxel1 && 'solid' in voxel2 && voxel1.solid !== voxel2.solid) {
+    return false
+  }
+
+  // Generator data
+  if ('generatorData' in voxel1 && 'generatorData' in voxel2) {
+    if (!compareGeneratorData(voxel1.generatorData, voxel2.generatorData)) {
+      return false
+    }
+    if (!compareGeneratorData(voxel2.generatorData, voxel1.generatorData)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export function compareGeneratorData(generatorData, compare) {
+  for (const key in compare) {
+    // This key is good if both keys are falsy/nonexistant
+    if (!generatorData[key] && !compare[key]) {
+      continue
+    }
+    // This key is good if they're equal
+    if (generatorData[key] === compare[key]) {
+      continue
+    }
+    // This key is bad, return false
+    return false
+  }
+  // All keys are good, return true
+  return true
+}
+
+export function checkReservedInWorld(chunks, position, structure) {
+  // Iterate over voxels in structure
+  for (const sPos in structure.voxels) {
+    const deltaPos = vec3.add(stringToArray(sPos), position)
+    const voxel = getVoxel(chunks, deltaPos)
+    const compare = {
+      reserved: true
+    }
+
+    // Check if the voxel is reserved
+    if (compareGeneratorData(voxel.generatorData, compare)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+export function checkReservedInStructure(mainStructure, position, structure) {
+  // Iterate over voxels in structure
+  for (const sPos in structure.voxels) {
+    const deltaPos = vec3.add(stringToArray(sPos), position)
+    const voxel = mainStructure.voxels[deltaPos]
+    if (voxel) {
+      const compare = {
+        reserved: true
+      }
+
+      // Check if the voxel is reserved
+      if (compareGeneratorData(voxel.generatorData, compare)) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+export function shiftStructure(structure, offset) {
+  // Early exit if there is nothing to offset
+  if (vec3.equals(offset, [0, 0, 0])) {
+    return copyStructure(structure)
+  }
+
+  let ret = emptyStructure()
+
+  // Voxels
+  for (const sPos in structure.voxels) {
+    const newPos = vec3.add(stringToArray(sPos), offset)
+    ret.voxels[newPos] = structure.voxels[sPos]
+  }
+
+  // Things
+  ret.things = [...structure.things]
+  for (const thing of ret.things) {
+    thing.position = vec3.add(thing.position, offset)
+  }
+
+  // Doorways
+  ret.doorways = [...structure.doorways]
+  for (const doorway of ret.doorways) {
+    doorway.position = vec3.add(doorway.position, offset)
+  }
+
+  return ret
 }
 
 export function listVoxels(chunks) {

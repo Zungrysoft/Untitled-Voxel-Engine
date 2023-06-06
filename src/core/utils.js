@@ -262,7 +262,7 @@ export function toTimeString (time, precision = 1) {
 }
 
 // in-place array shuffle
-export function shuffle (array, rand = random) {
+export function shuffle (array, rand = Math.random) {
   let currentIndex = array.length
 
   // While there remain elements to shuffle.

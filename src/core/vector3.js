@@ -123,6 +123,18 @@ export function lerpAngles(v1, v2, t) {
   ]
 }
 
+export function directionToVector(d) {
+  const map = {
+    up: [0, 0, 1],
+    down: [0, 0, -1],
+    north: [0, -1, 0],
+    south: [0, 1, 0],
+    east: [1, 0, 0],
+    west: [-1, 0, 0],
+  }
+  return map[d] || [1, 0, 0]
+}
+
 function triEdge (p1, p2, position, normal) {
   const s1x = p2[0] - p1[0]
   const s1y = p2[1] - p1[1]

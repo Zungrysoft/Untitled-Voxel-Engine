@@ -7,7 +7,8 @@ import * as vec2 from './core/vector2.js'
 import * as vec3 from './core/vector3.js'
 import * as vox from './voxel.js'
 import * as pal from './palette.js'
-import * as procbasics from './procbasics.js'
+import * as procBasics from './procbasics.js'
+import * as procDungeon from './procdungeon.js'
 import Thing from './core/thing.js'
 import { assets } from './core/game.js'
 import SpatialHash from './core/spatialhash.js'
@@ -47,25 +48,29 @@ export default class Terrain extends Thing {
     super()
     game.setThingName(this, 'terrain')
 
-
-    let plat = procbasics.generateRectangularPrism({
+    let plat = procBasics.generateRectangularPrism({
       length: 25,
       width: 25,
       voxel: {material: 'structure', solid: true},
     })
-    plat = procbasics.applyPattern(plat, {
+    let plat2 = procBasics.applyPattern(plat, {
+      pattern: 'checker',
+      voxel1: {material: 'vines', solid: true},
+      voxel2: {material: 'grass', solid: true},
+    })
+    plat = procBasics.applyPattern(plat, {
       pattern: 'checker',
       voxel1: {material: 'wood', solid: true},
       voxel2: {material: 'bark', solid: true},
     })
 
-    let wall = procbasics.generateRectangularPrism({
+    let wall = procBasics.generateRectangularPrism({
       width: 25,
       length: 1,
       height: 6,
       voxel: {material: 'structure', solid: true},
     })
-    wall = procbasics.applyPattern(wall, {
+    wall = procBasics.applyPattern(wall, {
       pattern: 'checker',
       voxel1: {material: 'stone', solid: true},
       voxel2: {material: 'stoneAccent', solid: true},
@@ -74,10 +79,12 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 3], wall)
     vox.mergeStructureIntoWorld(this.chunks, [-7, -7, 3], wall)
 
-    vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 2], plat)
+    vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 2], plat2)
     vox.mergeStructureIntoWorld(this.chunks, [0, 0, 3], plat)
     vox.mergeStructureIntoWorld(this.chunks, [4, 0, 4], plat)
     vox.mergeStructureIntoWorld(this.chunks, [9, 4, 5], plat)
+
+
 
     const v1 = {material: 'bone', solid: true}
     vox.setVoxel(this.chunks, [1, 0, 6], v1)
@@ -92,7 +99,7 @@ export default class Terrain extends Thing {
     vox.setVoxel(this.chunks, [-3, 0, 2], v1)
     vox.setVoxel(this.chunks, [-4, 0, 1], v1)
 
-    let room = procbasics.generateRoom({
+    let room = procBasics.generateRoom({
       width: 8,
       length: 8,
       height: 6,
@@ -101,7 +108,7 @@ export default class Terrain extends Thing {
       ceilingThickness: 0,
       voxel: {material: 'structure', solid: true},
     })
-    room = procbasics.applyPattern(room, {
+    room = procBasics.applyPattern(room, {
       pattern: 'checker',
       voxel1: {material: 'stone', solid: true},
       voxel2: {material: 'stoneAccent', solid: true},
@@ -123,7 +130,13 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-      console.log(pal.generatePalette(0.027, 0.5, 0.8, 0.137))
+      const dungeon = procDungeon.generateDungeon(this.chunks, {
+        position: [25, 30, 4],
+        rooms: 6,
+        voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
+      })
+      console.log(dungeon)
+      vox.mergeStructureIntoWorld(this.chunks, [0, 0, 0], dungeon)
     }
   }
 
@@ -140,6 +153,8 @@ export default class Terrain extends Thing {
   rebuildChunkMesh(chunkKey) {
     // Clear this chunk's spatial hash so we can rebuild it
     this.chunkSpatialHashes[chunkKey] = new SpatialHash()
+
+    console.log("Rebuilding mesh for chunk " + chunkKey)
 
     // Build list of faces this chunk needs to render
     let faces = []
