@@ -84,8 +84,6 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, [4, 0, 4], plat)
     vox.mergeStructureIntoWorld(this.chunks, [9, 4, 5], plat)
 
-
-
     const v1 = {material: 'bone', solid: true}
     vox.setVoxel(this.chunks, [1, 0, 6], v1)
     vox.setVoxel(this.chunks, [2, 0, 6], v1)
@@ -121,6 +119,20 @@ export default class Terrain extends Thing {
       const v2 = {material: 'structure', solid: true, shades: [s, s, s, s, s, s]}
       vox.setVoxel(this.chunks, [-7 + i, -6, 3], v2)
     }
+
+    // Generate mountain
+    for (let i = 0; i < 300; i ++) {
+      let m = procBasics.generateRectangularPrism({
+        width: Math.floor(Math.random()*6),
+        length: Math.floor(Math.random()*6),
+        height: Math.floor(Math.random()*10 + 10),
+        voxel: {solid: true, material: 0.5 > Math.random() ? 'stone' : 'stoneRoof'},
+      })
+      const x = Math.floor(Math.random()*40 - 40)
+      const y = Math.floor(Math.random()*120 - 40)
+      const z = -10
+      vox.mergeStructureIntoWorld(this.chunks, [x, y, z], m)
+    }
   }
 
   update () {
@@ -130,13 +142,18 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-      const dungeon = procDungeon.generateDungeon(this.chunks, {
-        position: [25, 30, 4],
-        rooms: 6,
-        voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
-      })
-      console.log(dungeon)
-      vox.mergeStructureIntoWorld(this.chunks, [0, 0, 0], dungeon)
+      // const dungeon = procDungeon.generateDungeon(this.chunks, {
+      //   position: [25, 30, 4],
+      //   rooms: 6,
+      //   voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
+      // })
+      // console.log(dungeon)
+      // vox.mergeStructureIntoWorld(this.chunks, [0, 0, 0], dungeon)
+      let y = 0
+      for (let i = 0; i < Math.pow(vox.CHUNK_SIZE, 3); i ++) {
+        y += Math.random()
+      }
+      console.log(y)
     }
   }
 
@@ -269,7 +286,7 @@ export default class Terrain extends Thing {
       const newVerts = addFace(...face)
 
       // Add to vertices
-      verts = [...verts, ...newVerts]
+      verts.push(...newVerts)
     }
 
     // Build the mesh
@@ -302,11 +319,28 @@ export default class Terrain extends Thing {
     return tri
   }
 
-  query (x, y, w, h) {
+  query (x, y, z, w, l, h) {
+
+    // TODO: Deal with the case where w and/or h are larger than 32
+
+    // Get all chunkKeys the query might be part of
+    let chunkKeys = new Set()
+    const positions = [
+      [x, y, z], [x, y+l, z], [x+w, y, z], [x+w, y+l, z],
+      [x, y, z+h], [x, y+l, z+h], [x+w, y, z+h], [x+w, y+l, z+h],
+    ]
+    for (const position of positions) {
+      chunkKeys.add(vox.positionToChunkKey(position).toString())
+    }
+
+    // Send all chunks
     let ret = []
-    for (const chunkKey in this.chunkSpatialHashes) {
-      const chunkList = this.chunkSpatialHashes[chunkKey].query(x, y, w, h)
-      ret.push(...chunkList)
+    for (const chunkKey of chunkKeys) {
+      const chunk =this.chunkSpatialHashes[chunkKey]
+      if (chunk) {
+        const spatialHash = chunk.query(x, y, w, l)
+        ret.push(...spatialHash)
+      }
     }
     return ret
   }

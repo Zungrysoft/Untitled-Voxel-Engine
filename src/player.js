@@ -56,6 +56,12 @@ export default class Player extends Thing {
   update () {
     this.time ++
 
+    // TEMP Put the player back on top of the level if they fall off
+    if (this.position[2] < this.spawnPosition[2] - 50) {
+      this.position = [...this.spawnPosition]
+      this.velocity = [0, 0, 0]
+    }
+
     // Walking
     let dx = !!game.keysDown.KeyD - !!game.keysDown.KeyA
     let dy = !!game.keysDown.KeyS - !!game.keysDown.KeyW
@@ -144,7 +150,7 @@ export default class Player extends Thing {
     }
 
     // falling and jumping
-    if (game.keysDown.Space) {
+    if (game.keysPressed.Space) {
       this.wannaJump = 6
     }
     if (this.onGround) {
@@ -324,7 +330,7 @@ export default class Player extends Thing {
     this.onGround = false
 
     // Get all colliders near the player
-    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, 4, 4)
+    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, this.position[2] - 2, 4, 4, 4)
 
     // Floor collisions
     for (const collider of colliderList) {
