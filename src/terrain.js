@@ -76,13 +76,13 @@ export default class Terrain extends Thing {
       voxel2: {material: 'stoneAccent', solid: true},
     })
 
-    vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 3], wall)
-    vox.mergeStructureIntoWorld(this.chunks, [-7, -7, 3], wall)
+    vox.mergeStructureIntoWorld(this.chunks, wall, [-10, -10, 3])
+    vox.mergeStructureIntoWorld(this.chunks, wall, [-7, -7, 3])
 
-    vox.mergeStructureIntoWorld(this.chunks, [-10, -10, 2], plat2)
-    vox.mergeStructureIntoWorld(this.chunks, [0, 0, 3], plat)
-    vox.mergeStructureIntoWorld(this.chunks, [4, 0, 4], plat)
-    vox.mergeStructureIntoWorld(this.chunks, [9, 4, 5], plat)
+    vox.mergeStructureIntoWorld(this.chunks, plat2, [-10, -10, 2])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [0, 0, 3])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 4])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 5])
 
     const v1 = {material: 'bone', solid: true}
     vox.setVoxel(this.chunks, [1, 0, 6], v1)
@@ -111,7 +111,7 @@ export default class Terrain extends Thing {
       voxel1: {material: 'stone', solid: true},
       voxel2: {material: 'stoneAccent', solid: true},
     })
-    vox.mergeStructureIntoWorld(this.chunks, [17, -7, -5], room)
+    vox.mergeStructureIntoWorld(this.chunks, room, [17, -7, -5])
 
     // Palette test
     for (let i = 0; i < 16; i ++) {
@@ -131,7 +131,7 @@ export default class Terrain extends Thing {
       const x = Math.floor(Math.random()*40 - 40)
       const y = Math.floor(Math.random()*120 - 40)
       const z = -10
-      vox.mergeStructureIntoWorld(this.chunks, [x, y, z], m)
+      vox.mergeStructureIntoWorld(this.chunks, m, [x, y, z])
     }
   }
 
@@ -148,7 +148,7 @@ export default class Terrain extends Thing {
       //   voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
       // })
       // console.log(dungeon)
-      // vox.mergeStructureIntoWorld(this.chunks, [0, 0, 0], dungeon)
+      // vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
       let y = 0
       for (let i = 0; i < Math.pow(vox.CHUNK_SIZE, 3); i ++) {
         y += Math.random()

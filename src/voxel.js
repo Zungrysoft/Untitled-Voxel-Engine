@@ -133,7 +133,7 @@ export function setVoxel(chunks, position, voxel) {
   chunk.modified = true
 }
 
-export function mergeStructureIntoWorld(chunks, position, structure, globalVoxel = {}) {
+export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], globalVoxel = {}) {
   // Global voxel is used to override certain properties of the structure's voxels
 
   // Iterate over voxels in structure
