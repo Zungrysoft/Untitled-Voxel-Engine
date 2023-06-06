@@ -51,12 +51,12 @@ export default class Terrain extends Thing {
     let plat = procBasics.generateRectangularPrism({
       length: 25,
       width: 25,
+      height: 2,
       voxel: {material: 'structure', solid: true},
     })
     let plat2 = procBasics.applyPattern(plat, {
-      pattern: 'checker',
+      pattern: 'flat',
       voxel1: {material: 'vines', solid: true},
-      voxel2: {material: 'grass', solid: true},
     })
     plat = procBasics.applyPattern(plat, {
       pattern: 'checker',
@@ -79,10 +79,10 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, wall, [-10, -10, 3])
     vox.mergeStructureIntoWorld(this.chunks, wall, [-7, -7, 3])
 
-    vox.mergeStructureIntoWorld(this.chunks, plat2, [-10, -10, 2])
-    vox.mergeStructureIntoWorld(this.chunks, plat, [0, 0, 3])
-    vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 4])
-    vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 5])
+    vox.mergeStructureIntoWorld(this.chunks, plat2, [-10, -10, 1])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [0, 0, 2])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 3])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 4])
 
     const v1 = {material: 'bone', solid: true}
     vox.setVoxel(this.chunks, [1, 0, 6], v1)
@@ -174,7 +174,20 @@ export default class Terrain extends Thing {
     console.log("Rebuilding mesh for chunk " + chunkKey)
 
     // Build list of faces this chunk needs to render
-    let faces = []
+    let faces = {
+      north: {},
+      northKeys: [],
+      south: {},
+      southKeys: [],
+      west: {},
+      westKeys: [],
+      east: {},
+      eastKeys: [],
+      up: {},
+      upKeys: [],
+      down: {},
+      downKeys: [],
+    }
     for (let x = 0; x < vox.CHUNK_SIZE; x ++) {
       for (let y = 0; y < vox.CHUNK_SIZE; y ++) {
         for (let z = 0; z < vox.CHUNK_SIZE; z ++) {
@@ -188,39 +201,128 @@ export default class Terrain extends Thing {
             const palette = this.palette[voxel.material]
 
             // Check for adjacent voxels so we don't render faces that are hidden by other voxels
-            // +X
+            // East
             if (!vox.getVoxel(this.chunks, vec3.add(position, [1, 0, 0])).solid) {
-              faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], pal.getColor(palette, voxel.shades[3])])
+              faces.eastKeys.push(position)
+              faces.east[position] = [[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[3])]
             }
-            // -X
+            // West
             if (!vox.getVoxel(this.chunks, vec3.add(position, [-1, 0, 0])).solid) {
-              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x - 0.5, y - 0.5, z + 0.5], [-1, 0, 0], pal.getColor(palette, voxel.shades[0])])
+              faces.westKeys.push(position)
+              faces.west[position] = [[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[0])]
             }
-            // +Y
+            // South
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 1, 0])).solid) {
-              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 1, 0], pal.getColor(palette, voxel.shades[4])])
+              faces.southKeys.push(position)
+              faces.south[position] = [[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[4])]
             }
-            // -Y
+            // North
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, -1, 0])).solid) {
-              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, -1, 0], pal.getColor(palette, voxel.shades[1])])
+              faces.northKeys.push(position)
+              faces.north[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], pal.getColor(palette, voxel.shades[1])]
             }
-            // +Z
+            // Up
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 0, 1])).solid) {
-              faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 0, 1], pal.getColor(palette, voxel.shades[5])])
+              faces.upKeys.push(position)
+              faces.up[position] = [[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[5])]
             }
-            // -Z
+            // Down
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 0, -1])).solid) {
-              faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y - 0.5, z - 0.5], [0, 0, -1], pal.getColor(palette, voxel.shades[2])])
+              faces.downKeys.push(position)
+              faces.down[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], pal.getColor(palette, voxel.shades[2])]
             }
           }
         }
       }
     }
 
-    // TODO: Merge faces together to optimize the mesh
+    // Merge faces together to optimize the mesh
+    for (const direction of ['east', 'south', 'down', 'west', 'north', 'up']) {
+      // Loop over the three dimensions (X, Y, and Z) for adjacent faces to merge
+
+      // X
+      if (direction !== 'east' && direction !== 'west') {
+        for (const key of faces[direction + 'Keys']) {
+          // Check if the face still exists (it may have been removed by an earlier step)
+          const face = faces[direction][key]
+          if (face) {
+            for (let x = 1; true; x ++) {
+              const mergeKey = vec3.add(key, [x, 0, 0])
+              const mergeFace = faces[direction][mergeKey]
+              // Check that the merge face exists and is of the same color
+              if (mergeFace && vec3.equals(face[2], mergeFace[2])) {
+                // Delete merged face (since it's being merged in)
+                delete faces[direction][mergeKey]
+
+                // Extend the original face to cover the area lost from the deleted face
+                faces[direction][key][1][0] += 1
+              }
+              else {
+                break
+              }
+            }
+          }
+        }
+      }
+
+      // Y
+      if (direction !== 'south' && direction !== 'north') {
+        for (const key of faces[direction + 'Keys']) {
+          // Check if the face still exists (it may have been removed by an earlier step)
+          const face = faces[direction][key]
+          if (face) {
+            for (let y = 1; true; y ++) {
+              const mergeKey = vec3.add(key, [0, y, 0])
+              const mergeFace = faces[direction][mergeKey]
+              // Check that the merge face exists and is of the same color
+              // Also check that the faces are of the same length in the X direction
+              // since the lengths may have changed in the X step
+              if (mergeFace && vec3.equals(face[2], mergeFace[2]) && face[1][0] === mergeFace[1][0]) {
+                // Delete merged face (since it's being merged in)
+                delete faces[direction][mergeKey]
+
+                // Extend the original face to cover the area lost from the deleted face
+                faces[direction][key][1][1] += 1
+              }
+              else {
+                break
+              }
+            }
+          }
+        }
+      }
+
+      // Z
+      if (direction !== 'down' && direction !== 'up') {
+        for (const key of faces[direction + 'Keys']) {
+          // Check if the face still exists (it may have been removed by an earlier step)
+          const face = faces[direction][key]
+          if (face) {
+            for (let z = 1; true; z ++) {
+              const mergeKey = vec3.add(key, [0, 0, z])
+              const mergeFace = faces[direction][mergeKey]
+              // Check that the merge face exists and is of the same color
+              // Also check that the faces are of the same length in the X and Y directions
+              // since the lengths may have changed in the X step
+              if (mergeFace && vec3.equals(face[2], mergeFace[2]) && face[1][0] === mergeFace[1][0] && face[1][1] === mergeFace[1][1]) {
+                // Delete merged face (since it's being merged in)
+                delete faces[direction][mergeKey]
+
+                // Extend the original face to cover the area lost from the deleted face
+                faces[direction][key][1][2] += 1
+              }
+              else {
+                break
+              }
+            }
+          }
+        }
+      }
+    }
+
 
     // Add triangles to the mesh
-    const addFace = (v1, v2, normal, rgb) => {
+    const addFace = (v1, v2, rgb, normal, flip) => {
       const addTriangle = (v1, v2, v3, normal, rgb) => {
         const vertices = [v1, v2, v3]
         const [u, v] = pal.getColorMapCoords(rgb)
@@ -261,32 +363,45 @@ export default class Terrain extends Thing {
         v4[1] = v2[1]
       }
 
+      // Flip direction
+      if (flip) {
+        const swapper = v3
+        v3 = v4
+        v4 = swapper
+      }
+
       // Two triangles
       const t1 = addTriangle(
         v1,
         v2,
         v3,
         normal,
-        rgb
+        rgb,
       )
       const t2 = addTriangle(
         v2,
         v1,
         v4,
         normal,
-        rgb
+        rgb,
+        // [rgb[0]+0.05, rgb[1]+0.05, rgb[2]+0.05],
       )
 
       return [...t1, ...t2]
     }
 
     let verts = []
-    for (const face of faces) {
-      // Render face
-      const newVerts = addFace(...face)
+    for (const direction of ['north', 'south', 'east', 'west', 'up', 'down']) {
+      for (const key in faces[direction]) {
+        const face = faces[direction][key]
 
-      // Add to vertices
-      verts.push(...newVerts)
+        // Render face
+        const flip = ['north', 'west', 'down'].includes(direction)
+        const newVerts = addFace(...face, vec3.directionToVector(direction), flip)
+
+        // Add to vertices
+        verts.push(...newVerts)
+      }
     }
 
     // Build the mesh
