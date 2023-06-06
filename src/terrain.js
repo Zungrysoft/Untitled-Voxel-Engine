@@ -389,8 +389,8 @@ export default class Terrain extends Thing {
         v1,
         v4,
         normal,
-        // rgb,
-        [rgb[0]+0.05, rgb[1]+0.05, rgb[2]+0.05],
+        rgb,
+        // [rgb[0]+0.05, rgb[1]+0.05, rgb[2]+0.05],
       )
 
       return [...t1, ...t2]
