@@ -13,6 +13,7 @@ await game.loadAssets({
     background: 'images/bg1.png',
     square: 'images/square.png',
     colorMap: 'images/color_map.png',
+    crosshair: 'images/crosshair.png',
   },
 
   sounds: {
@@ -37,6 +38,7 @@ await game.loadAssets({
   models: {
     cube: 'models/cube.obj',
     skybox: 'models/skybox.obj',
+    chunkOutline: 'models/chunk_outline.obj',
   }
 })
 

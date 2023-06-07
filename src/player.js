@@ -158,7 +158,7 @@ export default class Player extends Thing {
     }
 
     const jump = () => {
-      this.velocity[2] = 0.32
+      this.velocity[2] = 0.29
       this.wannaJump = 0
       this.coyoteFrames = 0
       // const sound = assets.sounds.playerJump
@@ -317,6 +317,11 @@ export default class Player extends Thing {
     //   }
     // }
 
+    // Debug mode
+    if (game.keysPressed.Backslash) {
+      game.globals.debugMode = !game.globals.debugMode
+    }
+
     this.moveAndCollide()
     this.updateTimers()
     this.cameraUpdate()
@@ -330,7 +335,7 @@ export default class Player extends Thing {
     this.onGround = false
 
     // Get all colliders near the player
-    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, this.position[2] - 2, 4, 4, 4)
+    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, this.position[2] - this.height, 4, 4, this.height + 4)
 
     // Floor collisions
     for (const collider of colliderList) {
@@ -539,11 +544,11 @@ export default class Player extends Thing {
   //   }
   // }
 
-  guiDraw () {
+  postDraw () {
     // Exit if GUI should be hidden
-    if (!this.showGui) {
-      return
-    }
+    // if (!this.showGui) {
+    //   return
+    // }
 
     // Get screen width and height
     const width = game.config.width
@@ -552,16 +557,16 @@ export default class Player extends Thing {
     // Crosshair
     ctx.drawImage(assets.images.crosshair, width / 2 - 16, height / 2 - 16)
 
-    // Life and Level display
+    // Coordinates
     ctx.save()
     ctx.translate(32, height - 48)
-    ctx.font = 'italic 32px Times New Roman'
+    ctx.font = 'italic 16px Times New Roman'
     {
-      const str = 'Health: ' + this.health
+      const str = 'Position: [' + this.position[0].toFixed(2) + ', ' + this.position[1].toFixed(2) + ', ' + this.position[2].toFixed(2) + ']'
       ctx.fillStyle = 'darkBlue'
       ctx.fillText(str, 0, 0)
       ctx.fillStyle = 'white'
-      ctx.fillText(str, 4, -4)
+      ctx.fillText(str, 2, -2)
     }
     ctx.restore()
   }

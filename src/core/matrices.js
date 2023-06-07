@@ -1,6 +1,6 @@
 import { normalize, dotProduct, crossProduct } from './vector3.js'
 
-export function getPerspective ({ fov = 1.57, aspect = 1, near = 0.1, far = 10000 } = {}) {
+export function getPerspective ({ fov = 1.57, aspect = 1, near = 0.1, far = 5000 } = {}) {
   const f = 1.0 / Math.tan(fov / 2)
   const nf = 1 / (near - far)
   return [

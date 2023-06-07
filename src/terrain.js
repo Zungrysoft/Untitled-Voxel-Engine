@@ -84,6 +84,14 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 3])
     vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 4])
 
+    // Generate mountain
+    for (let i = 0; i < 30; i ++) {
+      const x = i*5
+      const y = 30
+      const z = 4 - i
+      vox.mergeStructureIntoWorld(this.chunks, plat, [x, y, z])
+    }
+
     const v1 = {material: 'bone', solid: true}
     vox.setVoxel(this.chunks, [1, 0, 6], v1)
     vox.setVoxel(this.chunks, [2, 0, 6], v1)
@@ -144,7 +152,7 @@ export default class Terrain extends Thing {
     if (game.keysPressed.KeyJ) {
       const dungeon = procDungeon.generateDungeon(this.chunks, {
         position: [25, 30, 4],
-        rooms: 6,
+        rooms: 30,
         voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
       })
       console.log(dungeon)
@@ -541,14 +549,23 @@ export default class Terrain extends Thing {
     // Chunk meshes
     for (const chunkKey in this.chunkMeshes) {
       const chunkMesh = this.chunkMeshes[chunkKey]
+      const position = vox.getWorldPosition(chunkKey, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
       gfx.set('emission', 0.0)
       gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
-        translation: vox.getWorldPosition(chunkKey, [0, 0, 0]),
+        translation: position,
       }))
       gfx.drawMesh(chunkMesh)
+
+      if (game.globals.debugMode) {
+        gfx.set('modelMatrix', mat.getTransformation({
+          translation: vec3.add(position, [-0.5, -0.5, vox.CHUNK_SIZE-0.5]),
+          scale: vox.CHUNK_SIZE,
+        }))
+        gfx.drawMesh(assets.meshes.chunkOutline)
+      }
     }
 
     // gfx teardown

@@ -88,6 +88,7 @@ export function checkRoom(chunks, dungeon, doorway, voxel) {
     // Merge
     let possibility = copyDungeon(dungeon)
     possibility.structure = vox.mergeStructureIntoStructure(dungeon.structure, room)
+    possibility.doorways = []
 
     // Add doorways
     for (const dir of ['north', 'south', 'east', 'west']) {
