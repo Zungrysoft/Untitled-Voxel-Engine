@@ -11,6 +11,7 @@ import * as u from './core/utils.js'
 import { assets } from './core/game.js'
 import * as vec3 from './core/vector3.js'
 import * as vec2 from './core/vector2.js'
+import * as vox from './voxel.js'
 
 export default class Player extends Thing {
   height = 3.6
@@ -560,12 +561,13 @@ export default class Player extends Thing {
     // Coordinates
     if (game.globals.debugMode) {
       const margin = 16
-      const pos = vec3.add(this.position, [0, 0, -this.height-this.width])
+      const pos = vec3.add(this.position, [0, 0, -this.height])
+      const vPos = pos.map(x => Math.round(x))
       ctx.save()
       ctx.translate(margin, height - margin)
       ctx.font = 'italic 16px Times New Roman'
       {
-        const str = 'Position: [' + pos[0].toFixed(2) + ', ' + pos[1].toFixed(2) + ', ' + pos[2].toFixed(2) + ']'
+        const str = 'Chunk: [' + vox.positionToChunkKey(vPos) + ']'
         ctx.fillStyle = 'darkBlue'
         ctx.fillText(str, 0, 0)
         ctx.fillStyle = 'white'
@@ -573,7 +575,15 @@ export default class Player extends Thing {
       }
       ctx.translate(0, -margin)
       {
-        const str = 'Voxel: [' + Math.round(pos[0]) + ', ' + Math.round(pos[1]) + ', ' + Math.round(pos[2]) + ']'
+        const str = 'Voxel: [' + vPos + ']'
+        ctx.fillStyle = 'darkBlue'
+        ctx.fillText(str, 0, 0)
+        ctx.fillStyle = 'white'
+        ctx.fillText(str, 2, -2)
+      }
+      ctx.translate(0, -margin)
+      {
+        const str = 'Position: [' + pos[0].toFixed(2) + ', ' + pos[1].toFixed(2) + ', ' + pos[2].toFixed(2) + ']'
         ctx.fillStyle = 'darkBlue'
         ctx.fillText(str, 0, 0)
         ctx.fillStyle = 'white'

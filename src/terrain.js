@@ -84,7 +84,7 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 3])
     vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 4])
 
-    // Generate mountain
+    // Generate hill
     for (let i = 0; i < 30; i ++) {
       const x = i*5
       const y = 30
@@ -129,18 +129,32 @@ export default class Terrain extends Thing {
     }
 
     // Generate mountain
-    for (let i = 0; i < 300; i ++) {
+    for (let i = 0; i < 700; i ++) {
       let m = procBasics.generateRectangularPrism({
         width: Math.floor(Math.random()*6),
         length: Math.floor(Math.random()*6),
         height: Math.floor(Math.random()*10 + 10),
         voxel: {solid: true, material: 0.5 > Math.random() ? 'stone' : 'stoneRoof'},
       })
-      const x = Math.floor(Math.random()*40 - 40)
+      const x = Math.floor(Math.random()*40 - 50)
       const y = Math.floor(Math.random()*120 - 40)
       const z = -10
       vox.mergeStructureIntoWorld(this.chunks, m, [x, y, z])
     }
+
+    // Chunk plat
+    let plat3 = procBasics.generateRectangularPrism({
+      length: 32,
+      width: 32,
+      height: 1,
+      voxel: {material: 'structure', solid: true},
+    })
+    plat3 = procBasics.applyPattern(plat3, {
+      pattern: 'checker',
+      voxel1: {material: 'vines', solid: true},
+      voxel2: {material: 'grass', solid: true},
+    })
+    vox.mergeStructureIntoWorld(this.chunks, plat3, [0, 0, -1])
   }
 
   update () {
