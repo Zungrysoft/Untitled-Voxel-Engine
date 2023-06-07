@@ -558,17 +558,29 @@ export default class Player extends Thing {
     ctx.drawImage(assets.images.crosshair, width / 2 - 16, height / 2 - 16)
 
     // Coordinates
-    ctx.save()
-    ctx.translate(32, height - 48)
-    ctx.font = 'italic 16px Times New Roman'
-    {
-      const str = 'Position: [' + this.position[0].toFixed(2) + ', ' + this.position[1].toFixed(2) + ', ' + this.position[2].toFixed(2) + ']'
-      ctx.fillStyle = 'darkBlue'
-      ctx.fillText(str, 0, 0)
-      ctx.fillStyle = 'white'
-      ctx.fillText(str, 2, -2)
+    if (game.globals.debugMode) {
+      const margin = 16
+      const pos = vec3.add(this.position, [0, 0, -this.height-this.width])
+      ctx.save()
+      ctx.translate(margin, height - margin)
+      ctx.font = 'italic 16px Times New Roman'
+      {
+        const str = 'Position: [' + pos[0].toFixed(2) + ', ' + pos[1].toFixed(2) + ', ' + pos[2].toFixed(2) + ']'
+        ctx.fillStyle = 'darkBlue'
+        ctx.fillText(str, 0, 0)
+        ctx.fillStyle = 'white'
+        ctx.fillText(str, 2, -2)
+      }
+      ctx.translate(0, -margin)
+      {
+        const str = 'Voxel: [' + Math.round(pos[0]) + ', ' + Math.round(pos[1]) + ', ' + Math.round(pos[2]) + ']'
+        ctx.fillStyle = 'darkBlue'
+        ctx.fillText(str, 0, 0)
+        ctx.fillStyle = 'white'
+        ctx.fillText(str, 2, -2)
+      }
+      ctx.restore()
     }
-    ctx.restore()
   }
 
   // TODO: Finish this
