@@ -214,37 +214,37 @@ export default class Terrain extends Thing {
             if (!vox.getVoxel(this.chunks, vec3.add(position, [1, 0, 0])).solid) {
               faces.eastKeys.push(position)
               faces.east[position] = [[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[3])]
-              faces.eastCollision[position] = [[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[3])]
+              faces.eastCollision[position] = [[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5]]
             }
             // West
             if (!vox.getVoxel(this.chunks, vec3.add(position, [-1, 0, 0])).solid) {
               faces.westKeys.push(position)
               faces.west[position] = [[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[0])]
-              faces.westCollision[position] = [[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[0])]
+              faces.westCollision[position] = [[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5]]
             }
             // South
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 1, 0])).solid) {
               faces.southKeys.push(position)
               faces.south[position] = [[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[4])]
-              faces.southCollision[position] = [[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[4])]
+              faces.southCollision[position] = [[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5]]
             }
             // North
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, -1, 0])).solid) {
               faces.northKeys.push(position)
               faces.north[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], pal.getColor(palette, voxel.shades[1])]
-              faces.northCollision[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], pal.getColor(palette, voxel.shades[1])]
+              faces.northCollision[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5]]
             }
             // Up
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 0, 1])).solid) {
               faces.upKeys.push(position)
               faces.up[position] = [[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[5])]
-              faces.upCollision[position] = [[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(palette, voxel.shades[5])]
+              faces.upCollision[position] = [[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5]]
             }
             // Down
             if (!vox.getVoxel(this.chunks, vec3.add(position, [0, 0, -1])).solid) {
               faces.downKeys.push(position)
               faces.down[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], pal.getColor(palette, voxel.shades[2])]
-              faces.downCollision[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], pal.getColor(palette, voxel.shades[2])]
+              faces.downCollision[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5]]
             }
           }
         }
@@ -472,7 +472,7 @@ export default class Terrain extends Thing {
         const face = faces[direction+'Collision'][key]
 
         // Add face
-        addCollisionFace(face[0], face[1], flip)
+        addCollisionFace(...face, flip)
       }
     }
 
