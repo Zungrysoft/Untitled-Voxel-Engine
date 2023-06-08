@@ -197,6 +197,22 @@ export default class Player extends Thing {
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
 
+    // Test voxel creation and destruction
+    if (game.keysPressed.KeyE) {
+      const terrain = game.getThing("terrain")
+      const pos = game.getCamera3D().position
+      const ang = game.getCamera3D().lookVector
+      const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 32)))
+      vox.setVoxel(terrain.chunks, hitData.voxel, {solid: false})
+    }
+    if (game.keysPressed.KeyQ) {
+      const terrain = game.getThing("terrain")
+      const pos = game.getCamera3D().position
+      const ang = game.getCamera3D().lookVector
+      const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 32)))
+      vox.setVoxel(terrain.chunks, vec3.add(hitData.voxel, [0, 0, 1]), {solid: true})
+    }
+
     // shooting
     if (mouse.leftClick && !this.timer('shoot') && false) {
       this.after(16, () => {}, 'shoot')
@@ -564,16 +580,16 @@ export default class Player extends Thing {
       const pos = vec3.add(this.position, [0, 0, -this.height])
       const vPos = pos.map(x => Math.round(x))
       ctx.save()
-      ctx.translate(margin, height - margin)
       ctx.font = 'italic 16px Times New Roman'
+      ctx.translate(margin, margin)
       {
-        const str = 'Chunk: [' + vox.positionToChunkKey(vPos) + ']'
+        const str = 'Position: [' + pos[0].toFixed(2) + ', ' + pos[1].toFixed(2) + ', ' + pos[2].toFixed(2) + ']'
         ctx.fillStyle = 'darkBlue'
         ctx.fillText(str, 0, 0)
         ctx.fillStyle = 'white'
         ctx.fillText(str, 2, -2)
       }
-      ctx.translate(0, -margin)
+      ctx.translate(0, margin)
       {
         const str = 'Voxel: [' + vPos + ']'
         ctx.fillStyle = 'darkBlue'
@@ -581,9 +597,18 @@ export default class Player extends Thing {
         ctx.fillStyle = 'white'
         ctx.fillText(str, 2, -2)
       }
-      ctx.translate(0, -margin)
+      ctx.translate(0, margin)
       {
-        const str = 'Position: [' + pos[0].toFixed(2) + ', ' + pos[1].toFixed(2) + ', ' + pos[2].toFixed(2) + ']'
+        const str = 'Chunk: [' + vox.positionToChunkKey(vPos) + ']'
+        ctx.fillStyle = 'darkBlue'
+        ctx.fillText(str, 0, 0)
+        ctx.fillStyle = 'white'
+        ctx.fillText(str, 2, -2)
+      }
+      ctx.translate(0, margin)
+      {
+        const ang = game.getCamera3D().lookVector
+        const str = 'lookVector: [' + ang[0].toFixed(2) + ', ' + ang[1].toFixed(2) + ', ' + ang[2].toFixed(2) + ']'
         ctx.fillStyle = 'darkBlue'
         ctx.fillText(str, 0, 0)
         ctx.fillStyle = 'white'

@@ -174,6 +174,31 @@ export default class Terrain extends Thing {
     }
   }
 
+  // TODO: Optimize this function so that it doesn't have to step through the world
+  traceLine(traceStart, traceEnd) {
+    const step = 0.05/vec3.distance(traceStart, traceEnd)
+    for (let f = 0; f <= 1.0; f += step) {
+      const tPos = vec3.lerp(traceStart, traceEnd, f)
+      const vPos = tPos.map(x => Math.round(x))
+      if (vox.getVoxel(this.chunks, vPos).solid) {
+        return {
+          voxel: vPos,
+          position: tPos,
+          normal: [0, 0, 1],
+          hit: true
+        }
+      }
+    }
+
+    // Base case if it hit nothing
+    return {
+      voxel: traceEnd.map(x => Math.round(x)),
+      position: traceEnd,
+      normal: [0, 0, 1],
+      hit: false
+    }
+  }
+
   rebuildChunkMeshes() {
     // Iterate over chunks and rebuild all marked "modified"
     for (const chunkKey in this.chunks) {
