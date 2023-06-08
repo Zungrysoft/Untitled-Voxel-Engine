@@ -202,7 +202,7 @@ export default class Player extends Thing {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
-      const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 32)))
+      const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 128)))
       // console.log (hitData)
       vox.setVoxel(terrain.chunks, hitData.voxel, {solid: false})
     }
@@ -210,7 +210,7 @@ export default class Player extends Thing {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
-      const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 32)))
+      const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 128)))
       // console.log (hitData)
       vox.setVoxel(terrain.chunks, vec3.add(hitData.voxel, hitData.normal), {solid: true})
     }

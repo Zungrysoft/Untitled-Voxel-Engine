@@ -9,6 +9,7 @@ import * as vox from './voxel.js'
 import * as pal from './palette.js'
 import * as procBasics from './procbasics.js'
 import * as procDungeon from './procdungeon.js'
+import * as procTerrain from './procterrain.js'
 import Thing from './core/thing.js'
 import { assets } from './core/game.js'
 import SpatialHash from './core/spatialhash.js'
@@ -41,7 +42,7 @@ export default class Terrain extends Thing {
     rune: [[0.95, 0.04, 0.04]],
     bone: [[0.90, 0.91, 0.79]],
     crystal: [[0.87, 0.13, 0.97]],
-    structure: pal.generatePalette(0.027, 0.5, 0.8, 0.137),
+    structure: pal.generatePalette(0.027, 0.5, 0.8, 0.13),
   }
 
   constructor () {
@@ -84,7 +85,7 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 3])
     vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 4])
 
-    // Generate hill
+    // Generate slope
     for (let i = 0; i < 30; i ++) {
       const x = i*5
       const y = 30
@@ -155,6 +156,15 @@ export default class Terrain extends Thing {
       voxel2: {material: 'grass', solid: true},
     })
     vox.mergeStructureIntoWorld(this.chunks, plat3, [0, 0, -1])
+
+    // Terrain
+    let terrainTest = procTerrain.generateTerrain({
+      length: 65,
+      width: 65,
+      height: 5,
+      voxel: {material: 'grass', solid: true},
+    })
+    vox.mergeStructureIntoWorld(this.chunks, terrainTest, [27, 55, 1])
   }
 
   update () {
@@ -646,7 +656,7 @@ export default class Terrain extends Thing {
       const position = vox.getWorldPosition(chunkKey, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
-      gfx.set('emission', 1.0)
+      gfx.set('emission', 0.0)
       gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: position,
