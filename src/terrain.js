@@ -225,17 +225,18 @@ export default class Terrain extends Thing {
       }
 
       // Move
-      curPos = vec3.add(curPos, vec3.scale(moveVector, moveDistance))
+      const hitPos = vec3.add(curPos, vec3.scale(moveVector, moveDistance))
+      curPos = vec3.add(hitPos, vec3.scale(normal, -0.0001)) // We move forward a tiny bit on the crossed axis to cross into the next voxel
       d += moveDistance
 
-      // Get the position of the voxel we hit
-      const hitVoxel = vec3.add(curPos, vec3.scale(normal, -0.001)).map(x => Math.round(x))
+      // Get the voxel at this position
+      const hitVoxel = curPos.map(x => Math.round(x))
 
       // Check if the hit voxel is solid
       if (vox.getVoxel(this.chunks, hitVoxel).solid) {
         return {
           voxel: hitVoxel,
-          position: curPos,
+          position: hitPos,
           normal: normal,
           distance: d,
           hit: true
@@ -491,7 +492,7 @@ export default class Terrain extends Thing {
         v4,
         normal,
         rgb,
-        // [rgb[0]+0.05, rgb[1]+0.05, rgb[2]+0.05],
+        // rgb.map(x => x+0.05),
       )
 
       return [...t1, ...t2]
@@ -645,7 +646,7 @@ export default class Terrain extends Thing {
       const position = vox.getWorldPosition(chunkKey, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
-      gfx.set('emission', 0.0)
+      gfx.set('emission', 1.0)
       gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: position,
