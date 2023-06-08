@@ -1,7 +1,7 @@
 import * as u from './core/utils.js'
 import * as vec3 from './core/vector3.js'
 
-export const CHUNK_SIZE = 32
+export const CHUNK_SIZE = 16
 export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 
 export function stringToArray(s) {
@@ -112,25 +112,78 @@ export function getVoxel(chunks, position) {
 
 export function setVoxel(chunks, position, voxel) {
   // Convert world position to chunk coordinate (key to access chunk)
-  let chunkPosition = positionToChunkKey(position)
+  let chunkKey = positionToChunkKey(position)
 
   // Get the chunk
-  let chunk = chunks[chunkPosition]
+  let chunk = chunks[chunkKey]
   // If the chunk doesn't exist, create it and edit the voxel
   if (!chunk) {
     // Set the chunk to a new empty chunk
-    chunks[chunkPosition] = emptyChunk()
-    chunk = chunks[chunkPosition]
+    chunks[chunkKey] = emptyChunk()
+    chunk = chunks[chunkKey]
   }
 
   // Convert world position to the index within the chunk
-  let indexInChunk = chunkPositionToChunkIndex(positionToChunkPosition(position))
+  let chunkPosition = positionToChunkPosition(position)
+  let indexInChunk = chunkPositionToChunkIndex(chunkPosition)
 
   // Merge the new data into the voxel
+  const beforeVoxel = chunk.voxels[indexInChunk]
   chunk.voxels[indexInChunk] = {...chunk.voxels[indexInChunk], ...voxel}
+  const afterVoxel = chunk.voxels[indexInChunk]
 
-  // Mark this chunk as modified so the renderer knows to rebuild it
-  chunk.modified = true
+  // Determine whether we should mark this chunk as modified (so it can be re-meshed)
+  // If the voxel has changed solidity...
+  if (beforeVoxel.solid !== afterVoxel.solid) {
+    chunk.modified = true
+  }
+  // If the voxel is solid and has changed color...
+  else if (afterVoxel.solid) {
+    if (beforeVoxel.material !== afterVoxel.material || beforeVoxel.shades !== afterVoxel.shades) {
+      chunk.modified = true
+    }
+  }
+
+  // If we removed an edge voxel, we may need to re-mesh adjacent voxels as well
+  if (beforeVoxel.solid && !afterVoxel.solid) {
+    if (chunkPosition[0] === 0) {
+      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [-1, 0, 0]))]
+      if (adjChunk) {
+        adjChunk.modified = true
+      }
+    }
+    if (chunkPosition[1] === 0) {
+      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, -1, 0]))]
+      if (adjChunk) {
+        adjChunk.modified = true
+      }
+    }
+    if (chunkPosition[2] === 0) {
+      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, 0, -1]))]
+      if (adjChunk) {
+        adjChunk.modified = true
+      }
+    }
+
+    if (chunkPosition[0] === CHUNK_SIZE-1) {
+      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [1, 0, 0]))]
+      if (adjChunk) {
+        adjChunk.modified = true
+      }
+    }
+    if (chunkPosition[1] === CHUNK_SIZE-1) {
+      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, 1, 0]))]
+      if (adjChunk) {
+        adjChunk.modified = true
+      }
+    }
+    if (chunkPosition[2] === CHUNK_SIZE-1) {
+      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, 0, 1]))]
+      if (adjChunk) {
+        adjChunk.modified = true
+      }
+    }
+  }
 }
 
 export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], globalVoxel = {}) {
