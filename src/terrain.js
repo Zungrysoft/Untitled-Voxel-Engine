@@ -1,12 +1,11 @@
 import * as game from './core/game.js'
 import * as u from './core/utils.js'
-import * as soundmanager from './core/soundmanager.js'
 import * as gfx from './core/webgl.js'
 import * as mat from './core/matrices.js'
-import * as vec2 from './core/vector2.js'
 import * as vec3 from './core/vector3.js'
 import * as vox from './voxel.js'
 import * as pal from './palette.js'
+import * as lit from './lighting.js'
 import * as procBasics from './procbasics.js'
 import * as procDungeon from './procdungeon.js'
 import * as procTerrain from './procterrain.js'
@@ -31,7 +30,7 @@ export default class Terrain extends Thing {
     wood: [[0.63, 0.43, 0.26]],
     dirt: [[0.33, 0.27, 0.22]],
     sand: [[0.78, 0.78, 0.48]],
-    stone: [[0.42, 0.42, 0.45]],
+    stone: pal.generatePalette(0.66, 0.06, 0.54, 0.05),
     stoneAccent: [[0.15, 0.14, 0.38]],
     stoneAccent2: [[0.53, 0.13, 0.14]],
     stoneRoof: [[0.38, 0.15, 0.14]],
@@ -125,8 +124,10 @@ export default class Terrain extends Thing {
     // Palette test
     for (let i = 0; i < 16; i ++) {
       const s = u.map(i, 0, 16-1, 0, 1.0)
-      const v2 = {material: 'structure', solid: true, shades: [s, s, s, s, s, s]}
-      vox.setVoxel(this.chunks, [-7 + i, -6, 3], v2)
+      const v1 = {material: 'structure', solid: true, shades: [s, s, s, s, s, s]}
+      const v2 = {material: 'stone', solid: true, shades: [s, s, s, s, s, s]}
+      vox.setVoxel(this.chunks, [-7 + i, -6, 3], v1)
+      vox.setVoxel(this.chunks, [-7 + i, -6, 4], v2)
     }
 
     // Generate mountain
@@ -159,12 +160,31 @@ export default class Terrain extends Thing {
 
     // Terrain
     let terrainTest = procTerrain.generateTerrain({
-      length: 65,
       width: 65,
+      length: 65,
       height: 5,
       voxel: {material: 'grass', solid: true},
     })
     vox.mergeStructureIntoWorld(this.chunks, terrainTest, [27, 55, 1])
+
+    // Lighting test room
+    let litRoom = procBasics.generateRoom({
+      width: 20,
+      length: 20,
+      height: 11,
+      wallThickness: 1,
+      floorThickness: 1,
+      ceilingThickness: 1,
+      voxel: {material: 'stone', solid: true},
+    })
+    let doorway = procBasics.generateRectangularPrism({
+      width: 1,
+      length: 2,
+      height: 4,
+      voxel: {solid: false},
+    })
+    vox.mergeStructureIntoWorld(this.chunks, litRoom, [34, 5, 5])
+    vox.mergeStructureIntoWorld(this.chunks, doorway, [34, 10, 6])
   }
 
   update () {
@@ -181,6 +201,11 @@ export default class Terrain extends Thing {
       // })
       // console.log(dungeon)
       // vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
+
+      lit.lightingPass({
+        position: [43, 15, 10],
+        brightness: 30,
+      })
     }
   }
 
@@ -191,9 +216,9 @@ export default class Terrain extends Thing {
     const moveVector = vec3.normalize(vec3.subtract(traceEnd, traceStart))
 
     const totalDistance = vec3.distance(traceStart, traceEnd)
-    let d = 0 // Distance travelled so far
+    let distanceLeft = totalDistance // Distance left to travel
     let curPos = [...traceStart]
-    while (d <= totalDistance) {
+    while (distanceLeft > 0) {
       // Figure out how far away the next voxel face is for each axis
       let xDist = Math.abs(((xSign ? 1 : 0) - u.mod(curPos[0]+0.5, 1.0)) / moveVector[0])
       let yDist = Math.abs(((ySign ? 1 : 0) - u.mod(curPos[1]+0.5, 1.0)) / moveVector[1])
@@ -234,10 +259,13 @@ export default class Terrain extends Thing {
         }
       }
 
+      // Limit movement distance so it doesn't go past traceEnd
+      moveDistance = Math.min(moveDistance, distanceLeft)
+      distanceLeft -= moveDistance
+
       // Move
       const hitPos = vec3.add(curPos, vec3.scale(moveVector, moveDistance))
       curPos = vec3.add(hitPos, vec3.scale(normal, -0.0001)) // We move forward a tiny bit on the crossed axis to cross into the next voxel
-      d += moveDistance
 
       // Get the voxel at this position
       const hitVoxel = curPos.map(x => Math.round(x))
@@ -248,7 +276,7 @@ export default class Terrain extends Thing {
           voxel: hitVoxel,
           position: hitPos,
           normal: normal,
-          distance: d,
+          distance: totalDistance - distanceLeft,
           hit: true
         }
       }
@@ -656,7 +684,7 @@ export default class Terrain extends Thing {
       const position = vox.getWorldPosition(chunkKey, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
-      gfx.set('emission', 0.0)
+      gfx.set('emission', 1.0)
       gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: position,

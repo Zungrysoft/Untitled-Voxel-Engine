@@ -2,7 +2,7 @@ import * as u from './core/utils.js'
 
 export const COLOR_MAP_WIDTH = 32
 
-export const PALETTE_ROW_SIZE = 12
+export const PALETTE_ROW_SIZE = 16
 
 export function hsvToRgb(hsv) {
     let [h, s, v] = hsv

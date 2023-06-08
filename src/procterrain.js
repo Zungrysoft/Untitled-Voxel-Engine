@@ -42,7 +42,6 @@ export function generateTerrain ({width=10, length=10, height=1, variance=14, ro
 
   // Smoothing step to prevent one-tile holes
   smooth(terrainLeveled, SMOOTHING_ITERATIONS)
-  console.log(terrainLeveled)
 
   // Convert the 2D heightmap into actual terrain
   let ret = vox.emptyStructure()

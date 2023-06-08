@@ -60,7 +60,7 @@ export function chunkIndexToChunkPosition(index) {
 export function emptyVoxel() {
   return {
     material: 'structure',
-    shades: [0.5, 0.3, 0.2, 0.7, 0.9, 1.0],
+    shades: [0.6, 0.5, 0.4, 0.7, 0.8, 1.0],
     solid: false,
     generatorData: {},
   }
