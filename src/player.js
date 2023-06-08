@@ -203,6 +203,7 @@ export default class Player extends Thing {
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
       const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 32)))
+      // console.log (hitData)
       vox.setVoxel(terrain.chunks, hitData.voxel, {solid: false})
     }
     if (game.keysPressed.KeyQ) {
@@ -210,7 +211,8 @@ export default class Player extends Thing {
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
       const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 32)))
-      vox.setVoxel(terrain.chunks, vec3.add(hitData.voxel, [0, 0, 1]), {solid: true})
+      // console.log (hitData)
+      vox.setVoxel(terrain.chunks, vec3.add(hitData.voxel, hitData.normal), {solid: true})
     }
 
     // shooting

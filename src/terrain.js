@@ -164,27 +164,80 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-      const dungeon = procDungeon.generateDungeon(this.chunks, {
-        position: [25, 30, 4],
-        rooms: 30,
-        voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
-      })
-      console.log(dungeon)
-      vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
+      // const dungeon = procDungeon.generateDungeon(this.chunks, {
+      //   position: [25, 30, 4],
+      //   rooms: 30,
+      //   voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
+      // })
+      // console.log(dungeon)
+      // vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
     }
   }
 
-  // TODO: Optimize this function so that it doesn't have to step through the world
   traceLine(traceStart, traceEnd) {
-    const step = 0.05/vec3.distance(traceStart, traceEnd)
-    for (let f = 0; f <= 1.0; f += step) {
-      const tPos = vec3.lerp(traceStart, traceEnd, f)
-      const vPos = tPos.map(x => Math.round(x))
-      if (vox.getVoxel(this.chunks, vPos).solid) {
+    const xSign = traceEnd[0] > traceStart[0]
+    const ySign = traceEnd[1] > traceStart[1]
+    const zSign = traceEnd[2] > traceStart[2]
+    const moveVector = vec3.normalize(vec3.subtract(traceEnd, traceStart))
+
+    const totalDistance = vec3.distance(traceStart, traceEnd)
+    let d = 0 // Distance travelled so far
+    let curPos = [...traceStart]
+    while (d <= totalDistance) {
+      // Figure out how far away the next voxel face is for each axis
+      let xDist = Math.abs(((xSign ? 1 : 0) - u.mod(curPos[0]+0.5, 1.0)) / moveVector[0])
+      let yDist = Math.abs(((ySign ? 1 : 0) - u.mod(curPos[1]+0.5, 1.0)) / moveVector[1])
+      let zDist = Math.abs(((zSign ? 1 : 0) - u.mod(curPos[2]+0.5, 1.0)) / moveVector[2])
+
+      // Handles special cases such an axis's direction being zero
+      if (!xDist || xDist < 0.000001) {
+        xDist = Infinity
+      }
+      if (!yDist || yDist < 0.000001) {
+        yDist = Infinity
+      }
+      if (!zDist || zDist < 0.000001) {
+        zDist = Infinity
+      }
+
+      // Set move distance based on which voxel face was next
+      let moveDistance = 0
+      let normal = [0, 0, 0]
+      if (xDist < yDist) {
+        if (xDist < zDist) {
+          moveDistance = xDist
+          normal = [xSign ? -1 : 1, 0, 0]
+        }
+        else {
+          moveDistance = zDist
+          normal = [0, 0, zSign ? -1 : 1]
+        }
+      }
+      else {
+        if (yDist < zDist) {
+          moveDistance = yDist
+          normal = [0, ySign ? -1 : 1, 0]
+        }
+        else {
+          moveDistance = zDist
+          normal = [0, 0, zSign ? -1 : 1]
+        }
+      }
+
+      // Move
+      curPos = vec3.add(curPos, vec3.scale(moveVector, moveDistance))
+      d += moveDistance
+
+      // Get the position of the voxel we hit
+      const hitVoxel = vec3.add(curPos, vec3.scale(normal, -0.001)).map(x => Math.round(x))
+
+      // Check if the hit voxel is solid
+      if (vox.getVoxel(this.chunks, hitVoxel).solid) {
         return {
-          voxel: vPos,
-          position: tPos,
-          normal: [0, 0, 1],
+          voxel: hitVoxel,
+          position: curPos,
+          normal: normal,
+          distance: d,
           hit: true
         }
       }
@@ -194,8 +247,9 @@ export default class Terrain extends Thing {
     return {
       voxel: traceEnd.map(x => Math.round(x)),
       position: traceEnd,
-      normal: [0, 0, 1],
-      hit: false
+      normal: [0, 0, 0],
+      distance: totalDistance,
+      hit: false,
     }
   }
 
