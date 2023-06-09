@@ -25,7 +25,7 @@ export function lightingPass(light) {
           // +X
           if (x + 0.5 < px) {
             const fPos = vec3.add(pos, [0.55, 0, 0])
-            const trace = terrain.traceLine(light.position, fPos)
+            const trace = terrain.traceLine(fPos, light.position)
             if (!trace.hit) {
               const incidence = vec3.dotProduct([1, 0, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
@@ -35,7 +35,7 @@ export function lightingPass(light) {
           // -X
           if (x - 0.5 > px) {
             const fPos = vec3.add(pos, [-0.55, 0, 0])
-            const trace = terrain.traceLine(light.position, fPos)
+            const trace = terrain.traceLine(fPos, light.position)
             if (!trace.hit) {
               const incidence = vec3.dotProduct([-1, 0, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
@@ -46,7 +46,7 @@ export function lightingPass(light) {
           // +Y
           if (y + 0.5 < py) {
             const fPos = vec3.add(pos, [0, 0.55, 0])
-            const trace = terrain.traceLine(light.position, fPos)
+            const trace = terrain.traceLine(fPos, light.position)
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, 1, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
@@ -56,7 +56,7 @@ export function lightingPass(light) {
           // -Y
           if (y - 0.5 > py) {
             const fPos = vec3.add(pos, [0, -0.55, 0])
-            const trace = terrain.traceLine(light.position, fPos)
+            const trace = terrain.traceLine(fPos, light.position)
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, -1, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
@@ -67,7 +67,7 @@ export function lightingPass(light) {
           // +Z
           if (z + 0.5 < pz) {
             const fPos = vec3.add(pos, [0, 0, 0.55])
-            const trace = terrain.traceLine(light.position, fPos)
+            const trace = terrain.traceLine(fPos, light.position)
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, 0, 1], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
@@ -77,7 +77,7 @@ export function lightingPass(light) {
           // -Z
           if (z - 0.5 > pz) {
             const fPos = vec3.add(pos, [0, 0, -0.55])
-            const trace = terrain.traceLine(light.position, fPos)
+            const trace = terrain.traceLine(fPos, light.position)
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, 0, -1], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)

@@ -2,7 +2,7 @@ import * as u from './core/utils.js'
 
 export const COLOR_MAP_WIDTH = 32
 
-export const PALETTE_ROW_SIZE = 16
+export const PALETTE_ROW_SIZE = 20
 
 export function hsvToRgb(hsv) {
     let [h, s, v] = hsv
@@ -47,7 +47,7 @@ export function getColorMapCoords(rgb) {
 
 export function generatePalette(h, s = 1.0, v = 1.0, hRange = 0.0) {
     // Determine how many colors we will generate
-    const numColors = Math.floor(PALETTE_ROW_SIZE * v * 0.99999) + 1
+    const numColors = Math.floor(PALETTE_ROW_SIZE * v * 0.99999 * u.map(s, 0.0, 1.0, 1.0, 0.5, true)) + 1
 
     // Set up ranges
     // Hue goes plus or minus hRange, moving toward warmer colors at higher value

@@ -206,7 +206,7 @@ export default class Terrain extends Thing {
 
       lit.lightingPass({
         position: [43, 15, 10],
-        brightness: 30,
+        brightness: 35,
       })
     }
   }
