@@ -55,7 +55,7 @@ export function generatePalette(h, s = 1.0, v = 1.0, hRange = 0.0) {
     const hMin = h - hRange*hDir
     const hMax = h + hRange*hDir
     // Saturation is higher at lower value
-    const sMin = 1.0
+    const sMin = 1-((1-s)/3)
     const sMax = s
     // Value goes from near-black to the specified value
     const vMin = 0.05

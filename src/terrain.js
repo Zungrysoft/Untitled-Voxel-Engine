@@ -21,26 +21,26 @@ export default class Terrain extends Thing {
   chunkSpatialHashes = {}
   fogColor = [1, 1, 1]
   palette = {
-    grass: [[0.16, 0.7, 0.38]],
-    leaves: [[0.16, 0.8, 0.38]],
-    vines: [[0.16, 0.9, 0.38]],
-    fruit: [[1, 0, 0]],
-    flower: [[0, 0, 1]],
-    bark: [[0.47, 0.35, 0.25]],
-    wood: [[0.63, 0.43, 0.26]],
-    dirt: [[0.33, 0.27, 0.22]],
-    sand: [[0.78, 0.78, 0.48]],
+    grass: pal.generatePalette(0.33, 0.48, 0.67, 0.05),
+    leaves: pal.generatePalette(0.31, 0.65, 0.84, 0.1),
+    vines: pal.generatePalette(0.35, 0.87, 0.89, 0.02),
+    fruit: pal.generatePalette(0.03, 0.74, 0.83, 0.03),
+    flower: pal.generatePalette(0.65, 0.60, 0.85, 0.03),
+    bark: pal.generatePalette(0.08, 0.45, 0.54, 0.05),
+    wood: pal.generatePalette(0.11, 0.40, 0.73, 0.05),
+    dirt: pal.generatePalette(0.12, 0.33, 0.51, 0.02),
+    sand: pal.generatePalette(0.16, 0.42, 0.86, 0.02),
     stone: pal.generatePalette(0.66, 0.06, 0.54, 0.05),
-    stoneAccent: [[0.15, 0.14, 0.38]],
-    stoneAccent2: [[0.53, 0.13, 0.14]],
-    stoneRoof: [[0.38, 0.15, 0.14]],
-    metal: [[0.41, 0.40, 0.41]],
-    metalAccent: [[0.33, 0.31, 0.33]],
-    sign: [[0.87, 0.84, 0.73]],
-    signText: [[0.68, 0.21, 0.16]],
-    rune: [[0.95, 0.04, 0.04]],
-    bone: [[0.90, 0.91, 0.79]],
-    crystal: [[0.87, 0.13, 0.97]],
+    stoneAccent: pal.generatePalette(0.67, 0.64, 0.38, 0.03),
+    stoneAccent2: pal.generatePalette(0.99, 0.76, 0.61, 0.03),
+    stoneRoof: pal.generatePalette(0.99, 0.76, 0.45, 0.03),
+    metal: pal.generatePalette(0.83, 0.02, 0.45, 0.03),
+    metalAccent: pal.generatePalette(0.83, 0.02, 0.31, 0.03),
+    sign: pal.generatePalette(0.13, 0.16, 0.87, 0.03),
+    signText: pal.generatePalette(0.03, 0.74, 0.83, 0.03),
+    rune: pal.generatePalette(0.96, 1.0, 0.94, 0.03),
+    bone: pal.generatePalette(0.18, 0.13, 0.91, 0.01),
+    crystal: pal.generatePalette(0.83, 1.0, 0.94, 0.03),
     structure: pal.generatePalette(0.027, 0.5, 0.8, 0.13),
   }
 
@@ -122,12 +122,14 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, room, [17, -7, -5])
 
     // Palette test
-    for (let i = 0; i < 16; i ++) {
-      const s = u.map(i, 0, 16-1, 0, 1.0)
-      const v1 = {material: 'structure', solid: true, shades: [s, s, s, s, s, s]}
-      const v2 = {material: 'stone', solid: true, shades: [s, s, s, s, s, s]}
-      vox.setVoxel(this.chunks, [-7 + i, -6, 3], v1)
-      vox.setVoxel(this.chunks, [-7 + i, -6, 4], v2)
+    let keyZ = 0
+    for (const key in this.palette) {
+      for (let i = 0; i < 16; i ++) {
+        const s = u.map(i, 0, 16-1, 0, 1.0)
+        const v1 = {material: key, solid: true, shades: [s, s, s, s, s, s]}
+        vox.setVoxel(this.chunks, [27 + i, -keyZ-6, 3], v1)
+      }
+      keyZ ++
     }
 
     // Generate mountain
@@ -671,7 +673,7 @@ export default class Terrain extends Thing {
     this.rebuildChunkMeshes()
 
     // gfx setup
-    gfx.setShader(assets.shaders.shaded)
+    gfx.setShader(assets.shaders.voxel)
     game.getCamera3D().setUniforms()
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.BACK)
@@ -684,7 +686,7 @@ export default class Terrain extends Thing {
       const position = vox.getWorldPosition(chunkKey, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
-      gfx.set('emission', 1.0)
+      gfx.set('emission', 0.0)
       gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: position,

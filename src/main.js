@@ -31,8 +31,8 @@ await game.loadAssets({
     defaultFrag: 'shaders/default.frag',
     defaultVert: 'shaders/default.vert',
 
-    shadedFrag: 'shaders/shaded.frag',
-    shadedVert: 'shaders/shaded.vert',
+    voxelFrag: 'shaders/voxel.frag',
+    voxelVert: 'shaders/voxel.vert',
   },
 
   models: {
@@ -49,9 +49,9 @@ assets.shaders = {
     assets.shaderSources.defaultVert,
     assets.shaderSources.defaultFrag
   ),
-  shaded: gfx.createShader(
-    assets.shaderSources.shadedVert,
-    assets.shaderSources.shadedFrag
+  voxel: gfx.createShader(
+    assets.shaderSources.voxelVert,
+    assets.shaderSources.voxelFrag
   ),
 }
 

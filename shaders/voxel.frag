@@ -17,9 +17,6 @@ void main() {
     vec4 diffuse = texture2D(texture, uv);
     if (diffuse.a == 0.0) { discard; }
 
-    // Apply basic shading
-    vec4 shaded = vec4(diffuse.rgb * max(origNormal.z, mix(0.25, 1.0, origNormal.x/2.0 + 0.5)), diffuse.a);
-
     // Calculate the distance from the camera to the fragment position
     float distance = length(viewPosition.xyz);
 
@@ -33,7 +30,7 @@ void main() {
 
     // Apply the fog effect by blending the fragment color with the fog color
     vec4 fogColor = vec4(fogColor.rgb, 1.0);
-    vec4 result = mix(shaded, fogColor, fogFactor);
+    vec4 result = mix(diffuse, fogColor, fogFactor);
 
     // Apply emission
     result = mix(result, diffuse, emission);

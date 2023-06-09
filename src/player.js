@@ -507,7 +507,7 @@ export default class Player extends Thing {
 
   // draw () {
   //   // Viewmodel
-  //   gfx.setShader(assets.shaders.shaded)
+  //   gfx.setShader(assets.shaders.voxel)
   //   gfx.set('viewMatrix', [
   //     1, 0, 0, 0,
   //     0, 0, 2, 0,
