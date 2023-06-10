@@ -601,8 +601,18 @@ export default class Player extends Thing {
       }
       ctx.translate(0, margin)
       {
+        // Look direction
+        const possibilities = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]
+        const mapping = {
+          "1,0,0": "East (+X)",
+          "-1,0,0": "West (-X)",
+          "0,1,0": "South (+Y)",
+          "0,-1,0": "North (-Y)",
+          "0,0,1": "Up (+Z)",
+          "0,0,-1": "Down (-Z)",
+        }
         const ang = game.getCamera3D().lookVector
-        const str = 'lookVector: [' + ang[0].toFixed(2) + ', ' + ang[1].toFixed(2) + ', ' + ang[2].toFixed(2) + ']'
+        const str = "Facing " + mapping[vec3.findMostSimilarVector(vec3.scale(game.getCamera3D().lookVector, -1), possibilities)]
         ctx.fillStyle = 'darkBlue'
         ctx.fillText(str, 0, 0)
         ctx.fillStyle = 'white'

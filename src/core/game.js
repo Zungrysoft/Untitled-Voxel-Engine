@@ -380,7 +380,7 @@ export function resetScene () {
 }
 
 // load an object into the game.assets object
-export async function loadAssets ({ images, sounds, ...rest }) {
+export async function loadAssets ({ images, sounds, json, ...rest }) {
   handleCanvasResize()
   const loadImage = location => {
     if (location[0] === '#') {
@@ -451,6 +451,19 @@ export async function loadAssets ({ images, sounds, ...rest }) {
       })
     ))
   )
+
+  // JSON data
+  if (json) {
+    announce('Loading JSON data...')
+    assets.json = assets.json || {}
+    for (const [name, source] of Object.entries(json)) {
+      assets.json[name] = (
+        source[0] === '#'
+        ? document.querySelector(source)
+        : (await (await fetch(source)).json())
+      )
+    }
+  }
 
   /* all fields not named images or sound are treated as text files */
   for (const field in rest) {

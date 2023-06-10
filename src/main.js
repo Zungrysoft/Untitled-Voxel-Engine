@@ -39,7 +39,14 @@ await game.loadAssets({
     cube: 'models/cube.obj',
     skybox: 'models/skybox.obj',
     chunkOutline: 'models/chunk_outline.obj',
-  }
+  },
+
+  json: {
+    structurePearlArchQuad: 'data/structures/pearl_arch_quad.json',
+    structurePearlArchTee: 'data/structures/pearl_arch_tee.json',
+    structurePearlArchStraight: 'data/structures/pearl_arch_straight.json',
+    structurePearlArchTurn: 'data/structures/pearl_arch_turn.json',
+  },
 })
 
 
