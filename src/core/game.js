@@ -32,7 +32,8 @@ export const mouse = {
   rightButton: false,
   rightClick: false,
   lock () {
-    document.body.requestPointerLock()
+    // document.body.requestPointerLock()
+    document.querySelector('#canvas2d').requestPointerLock()
   },
   unlock () {
     document.exitPointerLock()

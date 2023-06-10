@@ -198,7 +198,7 @@ export default class Player extends Thing {
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
 
     // Test voxel creation and destruction
-    if (game.keysPressed.KeyE) {
+    if (mouse.leftClick) {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
@@ -206,7 +206,7 @@ export default class Player extends Thing {
       // console.log (hitData)
       vox.setVoxel(terrain.chunks, hitData.voxel, {solid: false})
     }
-    if (game.keysPressed.KeyQ) {
+    if (mouse.rightClick) {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
@@ -473,26 +473,12 @@ export default class Player extends Thing {
     // Camera control
     if (mouse.isLocked()) {
       const sensRange = 1.3
-      const sens = 0.002 * Math.pow(sensRange, (globals.mouseSensitivity||0)-5)
+      const sens = 0.002 * Math.pow(sensRange, (globals.mouseSensitivity||5)-5)
 
       let yaw, pitch
       ;[yaw, pitch] = vec3.vectorToAngles(game.getCamera3D().lookVector)
       yaw += mouse.delta[0] * sens
       pitch += mouse.delta[1] * sens
-
-      // TODO: Fix mouse control and remove arrow key controls
-      if (game.keysDown.ArrowDown) {
-        pitch += 0.03
-      }
-      if (game.keysDown.ArrowUp) {
-        pitch -= 0.03
-      }
-      if (game.keysDown.ArrowLeft) {
-        yaw -= 0.05
-      }
-      if (game.keysDown.ArrowRight) {
-        yaw += 0.05
-      }
 
       game.getCamera3D().lookVector = vec3.anglesToVector(yaw, pitch)
     }

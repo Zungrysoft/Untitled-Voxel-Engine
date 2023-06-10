@@ -135,8 +135,8 @@ export default class Terrain extends Thing {
     // Generate mountain
     for (let i = 0; i < 700; i ++) {
       let m = procBasics.generateRectangularPrism({
-        width: Math.floor(Math.random()*6),
-        length: Math.floor(Math.random()*6),
+        width: Math.floor(Math.random()*12),
+        length: Math.floor(Math.random()*12),
         height: Math.floor(Math.random()*10 + 10),
         voxel: {solid: true, material: 0.5 > Math.random() ? 'stone' : 'stoneRoof'},
       })
