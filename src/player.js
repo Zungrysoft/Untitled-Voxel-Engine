@@ -57,6 +57,17 @@ export default class Player extends Thing {
   update () {
     this.time ++
 
+    // Lock the mouse (allow mouse control of camera) if the user clicks
+    let leftClicked = false
+    if (mouse.leftClick) {
+      if (!mouse.isLocked()) {
+        mouse.lock()
+      }
+      else {
+        leftClicked = true
+      }
+    }
+
     // TEMP Put the player back on top of the level if they fall off
     if (this.position[2] < this.spawnPosition[2] - 50) {
       this.position = [...this.spawnPosition]
@@ -198,7 +209,7 @@ export default class Player extends Thing {
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
 
     // Test voxel creation and destruction
-    if (mouse.leftClick) {
+    if (leftClicked) {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
@@ -216,7 +227,7 @@ export default class Player extends Thing {
     }
 
     // shooting
-    if (mouse.leftClick && !this.timer('shoot') && false) {
+    if (leftClicked && !this.timer('shoot') && false) {
       this.after(16, () => {}, 'shoot')
       this.after(12, () => {}, 'fire')
       const look = vec3.scale(game.getCamera3D().lookVector, -1)
@@ -465,11 +476,6 @@ export default class Player extends Thing {
   }
 
   cameraUpdate () {
-    // Lock the mouse (allow mouse control of camera) if the user clicks
-    if (mouse.leftClick) {
-      mouse.lock()
-    }
-
     // Camera control
     if (mouse.isLocked()) {
       const sensRange = 1.3
