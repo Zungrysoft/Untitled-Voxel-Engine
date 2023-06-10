@@ -33,7 +33,7 @@ export const mouse = {
   rightClick: false,
   lock () {
     // document.body.requestPointerLock()
-    document.querySelector('#canvas2d').requestPointerLock()
+    document.querySelector('#canvas2d').requestPointerLock({unadjustedMovement: true})
   },
   unlock () {
     document.exitPointerLock()
