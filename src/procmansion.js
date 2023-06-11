@@ -75,19 +75,45 @@ function attemptMansion(roomsX, roomsY, roomsZ, possibilities, mustSucceed=true)
   }
 
   // Remove structures that are disallowed by the edge
-  // const edgePattern = ['', '', 'flat', '', '', '']
-  // for (let x = 0; x < roomsX; x ++) {
-  //   for (let y = 0; y < roomsY; y ++) {
-  //     for (let z = 0; z < roomsZ; z ++) {
-  //       grid.cells[[x, y, z]] = [...possibilities]
-
-
-  //       if (x === 0) {
-
-  //       }
-  //     }
-  //   }
-  // }
+  const matchOnSide = (possibilities, face, pattern) => {
+    for (let i = possibilities.length-1; i >= 0; i --) {
+      if (possibilities[i].connections[face] !== pattern) {
+        possibilities.splice(i, 1)
+      }
+    }
+  }
+  const edgePattern = ['', '', '', '', '', 'flat']
+  for (let x = 0; x < roomsX; x ++) {
+    for (let y = 0; y < roomsY; y ++) {
+      for (let z = 0; z < roomsZ; z ++) {
+        const position = [x, y, z]
+        if (x === 0) {
+          matchOnSide(grid.cells[position].possibilities, 0, edgePattern[3])
+          propagateChanges(grid, position)
+        }
+        if (y === 0) {
+          matchOnSide(grid.cells[position].possibilities, 1, edgePattern[4])
+          propagateChanges(grid, position)
+        }
+        if (z === 0) {
+          matchOnSide(grid.cells[position].possibilities, 2, edgePattern[5])
+          propagateChanges(grid, position)
+        }
+        if (x === roomsX-1) {
+          matchOnSide(grid.cells[position].possibilities, 3, edgePattern[0])
+          propagateChanges(grid, position)
+        }
+        if (y === roomsY-1) {
+          matchOnSide(grid.cells[position].possibilities, 4, edgePattern[1])
+          propagateChanges(grid, position)
+        }
+        if (z === roomsZ-1) {
+          matchOnSide(grid.cells[position].possibilities, 5, edgePattern[2])
+          propagateChanges(grid, position)
+        }
+      }
+    }
+  }
 
   // Run the algorithm
   const iterations = roomsX * roomsY * roomsZ
