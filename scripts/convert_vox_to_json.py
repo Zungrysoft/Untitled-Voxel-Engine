@@ -158,6 +158,8 @@ def write_vox_file(filename, size_x, size_y, size_z, voxels, palette):
 
 def index_to_material(index):
     mapping = [
+        "structure",
+        "structure",
         "grass",
         "leaves",
         "vines",
@@ -175,8 +177,8 @@ def index_to_material(index):
         "metalAccent",
         "sign",
         "signText",
-        "rune",
         "bone",
+        "rune",
         "crystal",
     ]
     if index < len(mapping) and index >= 0:
@@ -196,7 +198,7 @@ def convert_vox_to_json(input_filename, output_filename):
     # Put new voxel data into structure
     data["voxels"] = {}
     for x, y, z, color_index in voxels:
-        data["voxels"][f"{x},{y},{z}"] = {
+        data["voxels"][f"{x},{(size_y-1)-y},{z}"] = {
             "material": index_to_material(color_index),
             "solid": True,
         }

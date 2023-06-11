@@ -22,6 +22,7 @@ export default class Terrain extends Thing {
   chunkSpatialHashes = {}
   fogColor = [1, 1, 1]
   palette = {
+    structure: pal.generatePalette(0.027, 0.5, 0.8, 0.13),
     grass: pal.generatePalette(0.33, 0.48, 0.67, 0.05),
     leaves: pal.generatePalette(0.31, 0.65, 0.84, 0.1),
     vines: pal.generatePalette(0.35, 0.87, 0.89, 0.02),
@@ -42,7 +43,6 @@ export default class Terrain extends Thing {
     rune: pal.generatePalette(0.96, 1.0, 0.94, 0.03),
     bone: pal.generatePalette(0.18, 0.13, 0.91, 0.01),
     crystal: pal.generatePalette(0.83, 1.0, 0.94, 0.03),
-    structure: pal.generatePalette(0.027, 0.5, 0.8, 0.13),
   }
 
   constructor () {
