@@ -135,6 +135,46 @@ export function directionToVector(d) {
   return map[d] || [1, 0, 0]
 }
 
+export function directionToIndex(d) {
+  const map = {
+    up: 5,
+    down: 2,
+    north: 1,
+    south: 4,
+    east: 3,
+    west: 0,
+  }
+  return map[d] || 0
+}
+
+export function oppositeDirection(d) {
+  const map = {
+    up: 'down',
+    down: 'up',
+    north: 'south',
+    south: 'north',
+    east: 'west',
+    west: 'east',
+  }
+  return map[d] || 'down'
+}
+
+export function allDirections() {
+  return ['west', 'north', 'down', 'east', 'south', 'up']
+}
+
+export function withinBounds(position, bounds1, bounds2) {
+  for (let i = 0; i < 3; i ++) {
+    if (position[i] >= Math.max(bounds1[i], bounds2[i])) {
+      return false
+    }
+    if (position[i] < Math.min(bounds1[i], bounds2[i])) {
+      return false
+    }
+  }
+  return true
+}
+
 function triEdge (p1, p2, position, normal) {
   const s1x = p2[0] - p1[0]
   const s1y = p2[1] - p1[1]

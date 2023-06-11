@@ -46,6 +46,7 @@ await game.loadAssets({
     structurePearlArchTee: 'json/structures/pearl_arch_tee.json',
     structurePearlArchStraight: 'json/structures/pearl_arch_straight.json',
     structurePearlArchTurn: 'json/structures/pearl_arch_turn.json',
+    structurePearlArchEnd: 'json/structures/pearl_arch_end.json',
   },
 })
 

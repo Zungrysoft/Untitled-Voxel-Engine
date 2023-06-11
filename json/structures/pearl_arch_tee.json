@@ -4,7 +4,20 @@
     "height": 9,
     "weight": 100,
     "things": [],
-    "connections:": [],
+    "connections": ["arch", "arch", "flat", "arch", "", ""],
     "doorways": [],
-    "voxels": {}
+    "voxels": {
+        "0,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,0,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "10,5,0": {
+            "solid": true,
+            "material": "stone"
+        }
+    }
 }

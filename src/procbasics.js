@@ -88,3 +88,30 @@ export function applyPattern(structure, {materialMask=undefined, pattern='flat',
   return ret
 }
 
+export function pickStructure(list) {
+  // If list is empty, return an empty structure
+  if (list.length === 0) {
+    return vox.emptyStructure()
+  }
+
+  // Determine the total weight
+  let total = 0
+  for (const structure of list) {
+    total += structure.weight
+  }
+
+  // Generate a random number based on the total
+  let selection = Math.random() * total
+
+  // Use the random number to make a selection
+  for (const structure of list) {
+    selection -= structure.weight
+    if (selection < 0) {
+      return structure
+    }
+  }
+
+  // Default return; shouldn't be needed
+  return list[0]
+}
+

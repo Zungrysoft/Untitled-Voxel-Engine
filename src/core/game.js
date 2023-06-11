@@ -457,11 +457,8 @@ export async function loadAssets ({ images, sounds, json, ...rest }) {
     announce('Loading JSON data...')
     assets.json = assets.json || {}
     for (const [name, source] of Object.entries(json)) {
-      assets.json[name] = (
-        source[0] === '#'
-        ? document.querySelector(source)
-        : (await (await fetch(source)).json())
-      )
+      assets.json[name] = await (await fetch(source)).json()
+      assets.json[name].assetName = name
     }
   }
 

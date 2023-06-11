@@ -81,6 +81,9 @@ export function emptyStructure() {
     voxels: {},
     things: [],
     doorways: [],
+    connections: ['', '', '', '', '', ''],
+    weight: 0.0,
+    assetName: "UNNAMED",
   }
 }
 
