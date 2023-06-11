@@ -302,6 +302,140 @@ export function checkReservedInStructure(mainStructure, position, structure) {
   return false
 }
 
+export function transformPosition(position, transformations) {
+  let ret = [...position]
+  for (const t of transformations) {
+    if (t.mode === 'translate' && t.offset) {
+      ret = vec3.add(ret, t.offset)
+    }
+    else if (t.mode === 'mirror' && t.axis) {
+      const origin = t.origin || [0, 0, 0]
+      if (axis === 'x') {
+        ret[0] = ((ret[0] - origin[0]) * -1) + origin[0]
+      }
+      else if (axis === 'y') {
+        ret[1] = ((ret[1] - origin[1]) * -1) + origin[1]
+      }
+      else if (axis === 'z') {
+        ret[2] = ((ret[2] - origin[2]) * -1) + origin[2]
+      }
+    }
+    else if (t.mode === 'rotate' && t.amount) {
+      const origin = t.origin || [0, 0, 0]
+      const amount = t.amount % 4
+      let a = 0
+      let b = 1
+      if (t.axis === 'x') {
+        a = 1
+        b = 2
+      }
+      else if (t.axis === 'y') {
+        a = 0
+        b = 2
+      }
+      if (amount === 1) {
+        const sa = ret[a]
+        const sb = ret[b]
+        ret[a] = ((sb - origin[a]) * -1) + origin[b]
+        ret[b] = ((sa - origin[a]) + origin[b])
+      }
+      else if (amount === 2) {
+        ret[a] = ((ret[a] - origin[a]) * -1) + origin[a]
+        ret[b] = ((ret[b] - origin[b]) * -1) + origin[b]
+      }
+      else if (amount === 3) {
+        const sa = ret[a]
+        const sb = ret[b]
+        ret[a] = ((sb - origin[b]) + origin[a])
+        ret[b] = ((sa - origin[b]) * -1) + origin[a]
+      }
+    }
+  }
+  return ret
+}
+
+export function transformConnections(connections, transformations) {
+  let ret = [...connections]
+  for (const t of transformations) {
+    if (t.mode === 'mirror' && t.axis) {
+      if (t.axis === 'x') {
+        const swapper = ret[0]
+        ret[0] = ret[3]
+        ret[3] = swapper
+      }
+      else if (t.axis === 'y') {
+        const swapper = ret[1]
+        ret[1] = ret[4]
+        ret[4] = swapper
+      }
+      else if (axis === 'z') {
+        const swapper = ret[2]
+        ret[2] = ret[5]
+        ret[5] = swapper
+      }
+    }
+    else if (t.mode === 'rotate' && t.amount) {
+      const amount = t.amount % 4
+      let a = 0
+      let b = 1
+      let c = 3
+      let d = 4
+      if (t.axis === 'x') {
+        a = 1
+        b = 2
+        c = 4
+        d = 5
+      }
+      else if (t.axis === 'y') {
+        a = 0
+        b = 2
+        c = 3
+        d = 5
+      }
+      // TODO: Implement amount
+      const swapper = ret[d]
+      ret[d] = ret[c]
+      ret[c] = ret[b]
+      ret[b] = ret[a]
+      ret[a] = swapper
+    }
+  }
+  return ret
+}
+
+export function transformStructure(structure, transformations) {
+  let ret = emptyStructure()
+
+  // Voxels
+  for (const sPos in structure.voxels) {
+    const newPos = transformPosition(stringToArray(sPos), transformations)
+    ret.voxels[newPos] = structure.voxels[sPos]
+  }
+
+  // Things
+  ret.things = [...structure.things]
+  for (const thing of ret.things) {
+    thing.position = transformPosition(thing.position, transformations)
+  }
+
+  // Doorways
+  ret.doorways = [...structure.doorways]
+  for (const doorway of ret.doorways) {
+    doorway.position = transformPosition(doorway.position, transformations)
+  }
+
+  // Connections
+  ret.connections = transformConnections(structure.connections, transformations)
+
+  // Asset name
+  ret.assetName = structure.assetName + "TRANSFORMED"
+
+  // Weight
+  ret.weight = structure.weight
+
+  return ret
+}
+
 export function shiftStructure(structure, offset) {
   // Early exit if there is nothing to offset
   if (vec3.equals(offset, [0, 0, 0])) {

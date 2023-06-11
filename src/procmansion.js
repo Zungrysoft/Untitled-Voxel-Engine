@@ -1,6 +1,5 @@
 import * as vox from './voxel.js'
 import * as vec3 from './core/vector3.js'
-import Queue from './queue.js'
 import * as procBasics from './procbasics.js'
 
 export const MANSION_ATTEMPTS = 10
@@ -20,8 +19,7 @@ export function generateMansion({
   const roomsZ = Math.floor(height/roomHeight)
 
   // Create more possibilities by rotating and flipping existing possibilites
-  // const expandedPossibilities = expandPossibilities(possibilities)
-  const expandedPossibilities = possibilities
+  const expandedPossibilities = expandPossibilities(possibilities)
 
   // Solve the mansion
   let attemptResult = false
@@ -223,4 +221,19 @@ function pickNextCell(grid) {
 
   // Return the best one found
   return bestPos
+}
+
+function expandPossibilities(possibilities) {
+  let ret = []
+  for (const possibility of possibilities) {
+    ret.push(possibility)
+    ret.push(vox.transformStructure(possibility, [
+      {
+        mode: 'rotate',
+        origin: [5, 5, 0],
+        amount: 1,
+      }
+    ]))
+  }
+  return ret
 }

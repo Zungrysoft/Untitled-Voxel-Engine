@@ -166,6 +166,7 @@ export default class Terrain extends Thing {
       width: 65,
       length: 65,
       height: 5,
+      variance: 40,
       voxel: {material: 'grass', solid: true},
     })
     vox.mergeStructureIntoWorld(this.chunks, terrainTest, [27, 55, 1])
@@ -211,8 +212,8 @@ export default class Terrain extends Thing {
       // })
 
       const mansion = procMansion.generateMansion({
-        width: 35,
-        length: 35,
+        width: 111,
+        length: 111,
         height: 12,
         possibilities: [
           assets.json.structurePearlArchQuad,
