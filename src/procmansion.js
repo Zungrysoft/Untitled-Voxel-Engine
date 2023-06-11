@@ -234,6 +234,20 @@ function expandPossibilities(possibilities) {
         amount: 1,
       }
     ]))
+    ret.push(vox.transformStructure(possibility, [
+      {
+        mode: 'rotate',
+        origin: [5, 5, 0],
+        amount: 2,
+      }
+    ]))
+    ret.push(vox.transformStructure(possibility, [
+      {
+        mode: 'rotate',
+        origin: [5, 5, 0],
+        amount: 3,
+      }
+    ]))
   }
   return ret
 }

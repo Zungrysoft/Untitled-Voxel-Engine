@@ -392,12 +392,29 @@ export function transformConnections(connections, transformations) {
         c = 3
         d = 5
       }
-      // TODO: Implement amount
-      const swapper = ret[d]
-      ret[d] = ret[c]
-      ret[c] = ret[b]
-      ret[b] = ret[a]
-      ret[a] = swapper
+      if (amount === 1) {
+        const swapper = ret[d]
+        ret[d] = ret[c]
+        ret[c] = ret[b]
+        ret[b] = ret[a]
+        ret[a] = swapper
+      }
+      else if (amount === 2) {
+        const swapper = ret[a]
+        ret[a] = ret[c]
+        ret[c] = swapper
+
+        const swapper2 = ret[b]
+        ret[b] = ret[d]
+        ret[d] = swapper2
+      }
+      else if (amount === 3) {
+        const swapper = ret[a]
+        ret[a] = ret[b]
+        ret[b] = ret[c]
+        ret[c] = ret[d]
+        ret[d] = swapper
+      }
     }
   }
   return ret

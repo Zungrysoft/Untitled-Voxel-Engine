@@ -2,7 +2,7 @@
     "width": 11,
     "length": 11,
     "height": 9,
-    "weight": 100,
+    "weight": 130,
     "things": [],
     "connections": ["arch", "arch", "flat", "", "", ""],
     "doorways": [],
