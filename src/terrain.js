@@ -189,6 +189,32 @@ export default class Terrain extends Thing {
     })
     vox.mergeStructureIntoWorld(this.chunks, litRoom, [34, 5, 5])
     vox.mergeStructureIntoWorld(this.chunks, doorway, [34, 10, 6])
+
+    // Mansion
+    const mansion = procMansion.generateMansion({
+      width: 111,
+      length: 111,
+      height: 12,
+      possibilities: [
+        assets.json.structurePearlArchQuad,
+        assets.json.structurePearlArchTee,
+        assets.json.structurePearlArchStraight,
+        assets.json.structurePearlArchTurn,
+        assets.json.structurePearlArchEnd,
+      ],
+    })
+    vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, 2])
+    for (let x = 0; x < 15; x ++) {
+      for (let y = 0; y < 15; y ++) {
+        let mansionPlat = procBasics.generateRectangularPrism({
+          width: 11,
+          length: 11,
+          height: 1,
+          voxel: {material: x%2 === y%2 ? 'grass' : 'leaves', solid: true},
+        })
+        vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, 1], vec3.scale([x, y, 0], 11)))
+      }
+    }
   }
 
   update () {
@@ -211,32 +237,7 @@ export default class Terrain extends Thing {
       //   brightness: 35,
       // })
 
-      const mansion = procMansion.generateMansion({
-        width: 111,
-        length: 111,
-        height: 12,
-        possibilities: [
-          assets.json.structurePearlArchQuad,
-          assets.json.structurePearlArchTee,
-          assets.json.structurePearlArchStraight,
-          assets.json.structurePearlArchTurn,
-          assets.json.structurePearlArchEnd,
-        ],
-      })
-      vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, 2])
 
-      // Platform
-      for (let x = 0; x < 15; x ++) {
-        for (let y = 0; y < 15; y ++) {
-          let mansionPlat = procBasics.generateRectangularPrism({
-            width: 11,
-            length: 11,
-            height: 1,
-            voxel: {material: x%2 === y%2 ? 'grass' : 'leaves', solid: true},
-          })
-          vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, 1], vec3.scale([x, y, 0], 11)))
-        }
-      }
     }
   }
 

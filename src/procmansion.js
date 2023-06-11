@@ -125,7 +125,7 @@ function attemptMansion(roomsX, roomsY, roomsZ, possibilities, mustSucceed=true)
     // Pick a structure at that cell
     const pickedStructure = procBasics.pickStructure(grid.cells[position].possibilities)
     grid.cells[position].possibilities = [pickedStructure]
-    console.log("Picked " + pickedStructure.assetName + " at " + position)
+    // console.log("Picked " + pickedStructure.assetName + " at " + position)
 
     // Propagate this cell's changes
     propagateChanges(grid, position)
@@ -140,7 +140,7 @@ function propagateChanges(grid, position) {
   if (!vec3.withinBounds(position, [0, 0, 0], [grid.width, grid.length, grid.height])) {
     return
   }
-  console.log("Propagating changes from " + position)
+  // console.log("Propagating changes from " + position)
 
   // Iterate over directions to propagate to
   for (const direction of vec3.allDirections()) {
@@ -195,7 +195,7 @@ function removeFromNeighbor(grid, position, direction) {
     // If we didn't find any matches for this structure, remove it
     // But don't remove it if it's the only possibility left
     if (!found && grid.cells[neighborPos].possibilities.length > 1) {
-      console.log("Removed possibility " + grid.cells[neighborPos].possibilities[i].assetName + " at position " + neighborPos)
+      // console.log("Removed possibility " + grid.cells[neighborPos].possibilities[i].assetName + " at position " + neighborPos)
       grid.cells[neighborPos].possibilities.splice(i, 1)
       changesMade ++
     }
