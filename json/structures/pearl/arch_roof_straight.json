@@ -1,5 +1,5 @@
 {
-  "weight": 10,
+  "weight": 0,
   "things": [],
   "connections": [
     {
@@ -21,16 +21,16 @@
       ]
     },
     {
-      "type": "archRoofEnd",
+      "type": "archRoofStraight",
       "symmetry": [
         0,
         1,
-        2,
+        0,
         1
       ]
     },
     {
-      "type": "air",
+      "type": "",
       "symmetry": [
         0,
         0,
@@ -59,127 +59,19 @@
   ],
   "doorways": [],
   "voxels": {
-    "8,7,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,6,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,8,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,5,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,9,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,4,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,10,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,3,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,11,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,7,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,6,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,8,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,5,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,9,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,4,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,10,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,3,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "3,11,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "12,7,3": {
+    "11,9,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "12,6,3": {
+    "11,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "12,8,3": {
+    "3,9,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "12,5,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "12,9,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "12,4,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "12,10,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "12,3,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "12,11,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "11,4,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "11,10,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "11,3,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "11,11,2": {
+    "3,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -191,7 +83,15 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "8,7,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "5,7,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,7,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -199,7 +99,15 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "10,7,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "3,7,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,7,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -207,7 +115,15 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "12,7,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "1,7,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,7,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -215,31 +131,7 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "10,6,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "10,8,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,6,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,8,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,6,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,8,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "7,6,3": {
+    "14,7,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -247,7 +139,7 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "6,6,3": {
+    "7,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -255,7 +147,15 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "5,6,3": {
+    "6,6,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "8,8,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "8,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -263,7 +163,15 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "4,6,3": {
+    "5,6,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,8,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -271,7 +179,15 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "3,6,3": {
+    "4,6,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,8,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -279,7 +195,15 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "2,6,3": {
+    "3,6,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,8,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -287,7 +211,15 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "1,6,3": {
+    "2,6,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,8,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -295,7 +227,15 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "0,6,3": {
+    "1,6,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,8,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -303,35 +243,23 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "10,5,3": {
+    "0,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,9,3": {
+    "14,8,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "9,5,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,9,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,5,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,9,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "7,5,3": {
+    "14,6,3": {
       "material": "stoneRoof",
       "solid": true
     },
     "7,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "7,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -343,11 +271,27 @@
       "material": "stone",
       "solid": true
     },
+    "14,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "14,2,0": {
+      "material": "stone",
+      "solid": true
+    },
     "1,12,0": {
       "material": "stone",
       "solid": true
     },
     "1,2,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "13,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "13,2,0": {
       "material": "stone",
       "solid": true
     },
@@ -359,67 +303,19 @@
       "material": "stone",
       "solid": true
     },
+    "12,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "12,2,0": {
+      "material": "stone",
+      "solid": true
+    },
     "3,12,0": {
       "material": "stone",
       "solid": true
     },
     "3,2,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "4,12,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "4,2,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "5,12,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "5,2,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "6,12,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "6,2,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "7,12,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "7,2,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,12,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "8,2,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,10,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,4,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,11,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,3,0": {
       "material": "stone",
       "solid": true
     },
@@ -431,11 +327,27 @@
       "material": "stone",
       "solid": true
     },
+    "4,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "4,2,0": {
+      "material": "stone",
+      "solid": true
+    },
     "10,12,0": {
       "material": "stone",
       "solid": true
     },
     "10,2,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "5,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "5,2,0": {
       "material": "stone",
       "solid": true
     },
@@ -447,35 +359,43 @@
       "material": "stone",
       "solid": true
     },
-    "11,13,0": {
+    "6,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "6,2,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "8,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "8,2,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "7,12,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "7,2,0": {
+      "material": "stone",
+      "solid": true
+    },
+    "4,9,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,1,0": {
+    "4,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,13,0": {
+    "8,9,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,1,0": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,13,0": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,1,0": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,13,0": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,1,0": {
+    "8,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -495,11 +415,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "8,13,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "8,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "5,13,0": {
       "material": "stoneRoof",
       "solid": true
     },
     "5,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,13,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,1,0": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -511,11 +447,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "10,13,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "3,13,0": {
       "material": "stoneRoof",
       "solid": true
     },
     "3,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,13,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,1,0": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -527,11 +479,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "12,13,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "1,13,0": {
       "material": "stoneRoof",
       "solid": true
     },
     "1,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,13,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,1,0": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -543,31 +511,43 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "11,9,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,5,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,8,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,6,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,7,0": {
-      "material": "stone",
-      "solid": true
-    },
-    "12,13,0": {
+    "14,13,0": {
       "material": "stoneRoof",
       "solid": true
     },
-    "12,1,0": {
+    "14,1,0": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "6,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "6,5,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,5,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "5,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "5,5,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -579,11 +559,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "14,12,1": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "14,2,1": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "1,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
     "1,2,1": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,12,1": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -595,67 +591,19 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "12,12,1": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,2,1": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "3,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
     "3,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "4,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "4,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "5,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "5,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "6,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "6,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "7,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "7,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,2,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "10,12,1": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "10,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -667,127 +615,59 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "12,12,1": {
+    "4,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "12,2,1": {
+    "4,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,11,1": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,3,1": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,10,1": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,4,1": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,9,1": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,5,1": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,8,1": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,6,1": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,7,1": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,9,2": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,5,2": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,8,2": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,6,2": {
-      "material": "stone",
-      "solid": true
-    },
-    "11,7,2": {
-      "material": "stone",
-      "solid": true
-    },
-    "9,7,3": {
+    "10,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "8,7,3": {
+    "10,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,7,3": {
+    "5,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,8,3": {
+    "5,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,6,3": {
+    "9,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,9,3": {
+    "9,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "11,5,3": {
+    "6,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,11,2": {
+    "6,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,3,2": {
+    "8,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,10,2": {
+    "8,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "10,4,2": {
+    "7,12,1": {
       "material": "stoneRoof",
       "solid": true
     },
-    "9,10,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "9,4,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,10,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,4,2": {
+    "7,2,1": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -807,11 +687,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "8,10,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "8,4,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "5,10,2": {
       "material": "stoneRoof",
       "solid": true
     },
     "5,4,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,10,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,4,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -823,11 +719,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "10,10,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,4,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "3,10,2": {
       "material": "stoneRoof",
       "solid": true
     },
     "3,4,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,10,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,4,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -839,11 +751,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "12,10,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,4,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "1,10,2": {
       "material": "stoneRoof",
       "solid": true
     },
     "1,4,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,10,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,4,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -855,19 +783,11 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "9,11,2": {
+    "14,10,2": {
       "material": "stoneRoof",
       "solid": true
     },
-    "9,3,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,11,2": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "8,3,2": {
+    "14,4,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -887,11 +807,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "8,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "8,3,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "0,11,2": {
       "material": "stoneRoof",
       "solid": true
     },
     "0,3,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "14,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "14,3,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -903,11 +839,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "9,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "9,3,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "4,11,2": {
       "material": "stoneRoof",
       "solid": true
     },
     "4,3,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "10,3,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -919,11 +871,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "11,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "11,3,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "2,11,2": {
       "material": "stoneRoof",
       "solid": true
     },
     "2,3,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "12,3,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -935,7 +903,11 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "10,7,3": {
+    "13,11,2": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,3,2": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -947,11 +919,27 @@
       "material": "stoneRoof",
       "solid": true
     },
+    "14,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "14,5,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
     "1,9,3": {
       "material": "stoneRoof",
       "solid": true
     },
     "1,5,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,9,3": {
+      "material": "stoneRoof",
+      "solid": true
+    },
+    "13,5,3": {
       "material": "stoneRoof",
       "solid": true
     },
@@ -963,128 +951,12 @@
       "material": "stoneRoof",
       "solid": true
     },
-    "3,9,3": {
+    "12,9,3": {
       "material": "stoneRoof",
       "solid": true
     },
-    "3,5,3": {
+    "12,5,3": {
       "material": "stoneRoof",
-      "solid": true
-    },
-    "4,9,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "4,5,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "5,9,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "5,5,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "6,9,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "6,5,3": {
-      "material": "stoneRoof",
-      "solid": true
-    },
-    "10,8,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,8,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "10,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "10,6,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,6,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "10,7,5": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,7,5": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "12,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "12,7,5": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "11,7,6": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "12,7,6": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "13,7,5": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "13,7,6": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "14,7,6": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "2,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "3,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "4,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "5,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "6,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "7,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "8,7,4": {
-      "material": "stoneAccent",
-      "solid": true
-    },
-    "9,7,4": {
-      "material": "stoneAccent",
       "solid": true
     }
   }

@@ -196,11 +196,12 @@ export default class Terrain extends Thing {
       length: 120,
       height: 50,
       possibilities: [
-        assets.json.structurePearlArchQuad,
         assets.json.structurePearlArchTee,
         assets.json.structurePearlArchStraight,
         assets.json.structurePearlArchTurn,
         assets.json.structurePearlArchEnd,
+        assets.json.structurePearlArchRoofTee,
+        assets.json.structurePearlArchRoofStraight,
         assets.json.structurePearlArchRoofEnd,
         assets.json.structureAir,
       ],
