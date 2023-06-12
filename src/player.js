@@ -418,7 +418,7 @@ export default class Player extends Thing {
       ])
 
       const stepHeight = this.onGround ? 1.5 : 0.5
-      for (let h = stepHeight; h <= 2; h += 0.5) {
+      for (let h = stepHeight; h <= 3; h += 0.5) {
         const position = [...this.position]
         position[2] += h - this.height
 
