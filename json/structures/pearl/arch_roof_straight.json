@@ -3,22 +3,10 @@
   "things": [],
   "connections": [
     {
-      "type": "",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": ""
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
       "type": "archRoofStraight",
@@ -30,31 +18,13 @@
       ]
     },
     {
-      "type": "",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": ""
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     }
   ],
   "doorways": [],

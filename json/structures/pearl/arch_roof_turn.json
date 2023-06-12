@@ -3,22 +3,10 @@
   "things": [],
   "connections": [
     {
-      "type": "",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": ""
     },
     {
-      "type": "",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": ""
     },
     {
       "type": "archRoofTurn",
@@ -30,31 +18,13 @@
       ]
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     }
   ],
   "doorways": [],

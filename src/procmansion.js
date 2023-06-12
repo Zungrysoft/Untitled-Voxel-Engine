@@ -224,6 +224,13 @@ function connectionMatches(a, b) {
     return false
   }
 
+  // Confirm plug modes are different
+  if (a.mode && b.mode) {
+    if (a.mode !== b.mode) {
+      return false
+    }
+  }
+
   // Confirm symmetry
   if (a.symmetry && b.symmetry) {
     for (let i = 0; i < 4; i ++) {

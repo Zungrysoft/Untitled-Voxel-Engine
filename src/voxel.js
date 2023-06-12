@@ -82,12 +82,12 @@ export function emptyStructure() {
     things: [],
     doorways: [],
     connections: [
-      {type: '', symmetry: [0, 0, 0, 0]},
-      {type: '', symmetry: [0, 0, 0, 0]},
-      {type: '', symmetry: [0, 0, 0, 0]},
-      {type: '', symmetry: [0, 0, 0, 0]},
-      {type: '', symmetry: [0, 0, 0, 0]},
-      {type: '', symmetry: [0, 0, 0, 0]},
+      {type: ''},
+      {type: ''},
+      {type: ''},
+      {type: ''},
+      {type: ''},
+      {type: ''},
     ],
     weight: 0.0,
     assetName: "UNNAMED",
@@ -361,18 +361,27 @@ export function transformPosition(position, transformations) {
   return ret
 }
 
-// TODO: Implement connection transforms for transforms other than about the z axis
-export function transformConnections(connections, transformations) {
+export function copyConnections(connections) {
   // Deep-copy connection
   let ret = []
   for (const c of connections){
-    ret.push(
-      {
-        type: c.type,
-        symmetry: [...c.symmetry],
-      }
-    )
+    let newCon = {
+      type: c.type,
+    }
+    if (c.symmetry) {
+      newCon.symmetry = [...c.symmetry]
+    }
+    if (c.mode) {
+      newCon.mode = c.mode
+    }
+    ret.push(newCon)
   }
+  return ret
+}
+
+// TODO: Implement connection transforms for transforms other than about the z axis
+export function transformConnections(connections, transformations) {
+  let ret = copyConnections(connections)
 
   // Apply transformations
   for (const t of transformations) {
@@ -424,17 +433,20 @@ export function transformConnections(connections, transformations) {
           ret[a] = swapper
         }
         if (spinTopsTemp) {
-          const swapper = ret[2].symmetry[3]
-          ret[2].symmetry[3] = ret[2].symmetry[2]
-          ret[2].symmetry[2] = ret[2].symmetry[1]
-          ret[2].symmetry[1] = ret[2].symmetry[0]
-          ret[2].symmetry[0] = swapper
-
-          const swapper2 = ret[5].symmetry[3]
-          ret[5].symmetry[3] = ret[5].symmetry[2]
-          ret[5].symmetry[2] = ret[5].symmetry[1]
-          ret[5].symmetry[1] = ret[5].symmetry[0]
-          ret[5].symmetry[0] = swapper2
+          if (ret[2].symmetry) {
+            const swapper = ret[2].symmetry[3]
+            ret[2].symmetry[3] = ret[2].symmetry[2]
+            ret[2].symmetry[2] = ret[2].symmetry[1]
+            ret[2].symmetry[1] = ret[2].symmetry[0]
+            ret[2].symmetry[0] = swapper
+          }
+          if (ret[5].symmetry) {
+            const swapper2 = ret[5].symmetry[3]
+            ret[5].symmetry[3] = ret[5].symmetry[2]
+            ret[5].symmetry[2] = ret[5].symmetry[1]
+            ret[5].symmetry[1] = ret[5].symmetry[0]
+            ret[5].symmetry[0] = swapper2
+          }
         }
       }
       else if (amount === 2) {
@@ -447,21 +459,24 @@ export function transformConnections(connections, transformations) {
         ret[d] = swapper2
 
         if (spinTopsTemp) {
-          const swapper = ret[2].symmetry[0]
-          ret[2].symmetry[0] = ret[2].symmetry[2]
-          ret[2].symmetry[2] = swapper
+          if (ret[2].symmetry) {
+            const swapper = ret[2].symmetry[0]
+            ret[2].symmetry[0] = ret[2].symmetry[2]
+            ret[2].symmetry[2] = swapper
 
-          const swapper2 = ret[2].symmetry[1]
-          ret[2].symmetry[1] = ret[2].symmetry[3]
-          ret[2].symmetry[3] = swapper2
+            const swapper2 = ret[2].symmetry[1]
+            ret[2].symmetry[1] = ret[2].symmetry[3]
+            ret[2].symmetry[3] = swapper2
+          }
+          if (ret[5].symmetry) {
+            const swapper = ret[5].symmetry[0]
+            ret[5].symmetry[0] = ret[5].symmetry[2]
+            ret[5].symmetry[2] = swapper
 
-          const swapper3 = ret[5].symmetry[0]
-          ret[5].symmetry[0] = ret[5].symmetry[2]
-          ret[5].symmetry[2] = swapper3
-
-          const swapper4 = ret[5].symmetry[1]
-          ret[5].symmetry[1] = ret[5].symmetry[3]
-          ret[5].symmetry[3] = swapper4
+            const swapper2 = ret[5].symmetry[1]
+            ret[5].symmetry[1] = ret[5].symmetry[3]
+            ret[5].symmetry[3] = swapper2
+          }
         }
       }
       else if (amount === 3) {
@@ -472,17 +487,20 @@ export function transformConnections(connections, transformations) {
         ret[d] = swapper
 
         if (spinTopsTemp) {
-          const swapper = ret[2].symmetry[0]
-          ret[2].symmetry[0] = ret[2].symmetry[1]
-          ret[2].symmetry[1] = ret[2].symmetry[2]
-          ret[2].symmetry[2] = ret[2].symmetry[3]
-          ret[2].symmetry[3] = swapper
-
-          const swapper2 = ret[5].symmetry[0]
-          ret[5].symmetry[0] = ret[5].symmetry[1]
-          ret[5].symmetry[1] = ret[5].symmetry[2]
-          ret[5].symmetry[2] = ret[5].symmetry[3]
-          ret[5].symmetry[3] = swapper2
+          if (ret[2].symmetry) {
+            const swapper = ret[2].symmetry[0]
+            ret[2].symmetry[0] = ret[2].symmetry[1]
+            ret[2].symmetry[1] = ret[2].symmetry[2]
+            ret[2].symmetry[2] = ret[2].symmetry[3]
+            ret[2].symmetry[3] = swapper
+          }
+          if (ret[5].symmetry) {
+            const swapper = ret[5].symmetry[0]
+            ret[5].symmetry[0] = ret[5].symmetry[1]
+            ret[5].symmetry[1] = ret[5].symmetry[2]
+            ret[5].symmetry[2] = ret[5].symmetry[3]
+            ret[5].symmetry[3] = swapper
+          }
         }
       }
     }

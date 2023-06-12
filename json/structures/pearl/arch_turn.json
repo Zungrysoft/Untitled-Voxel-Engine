@@ -21,31 +21,13 @@
       ]
     },
     {
-      "type": "flat",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "flat"
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
       "type": "archRoofTurn",

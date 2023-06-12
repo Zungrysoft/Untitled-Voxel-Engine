@@ -12,22 +12,10 @@
       ]
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
-      "type": "flat",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "flat"
     },
     {
       "type": "arch",
@@ -39,13 +27,7 @@
       ]
     },
     {
-      "type": "air",
-      "symmetry": [
-        0,
-        0,
-        0,
-        0
-      ]
+      "type": "air"
     },
     {
       "type": "archRoofStraight",
