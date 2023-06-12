@@ -209,7 +209,7 @@ export default class Player extends Thing {
     this.disableAirControl = Math.max(this.disableAirControl - 1, 0)
 
     // Test voxel creation and destruction
-    if (leftClicked) {
+    if (mouse.rightClick) {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
@@ -217,7 +217,7 @@ export default class Player extends Thing {
       // console.log (hitData)
       vox.setVoxel(terrain.chunks, hitData.voxel, {solid: false})
     }
-    if (mouse.rightClick) {
+    if (leftClicked) {
       const terrain = game.getThing("terrain")
       const pos = game.getCamera3D().position
       const ang = game.getCamera3D().lookVector
