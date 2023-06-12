@@ -1,0 +1,119 @@
+{
+    "weight": 30,
+    "things": [],
+    "connections": [
+        {
+            "type": "arch",
+            "symmetry": [0, 1, 0, 2]
+        },
+        {
+            "type": "arch",
+            "symmetry": [0, 1, 0, 2]
+        },
+        {
+            "type": "flat",
+            "symmetry": [0, 0, 0, 0]
+        },
+        {
+            "type": "arch",
+            "symmetry": [0, 1, 0, 2]
+        },
+        {
+            "type": "arch",
+            "symmetry": [0, 1, 0, 2]
+        },
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        }
+    ],
+    "doorways": [],
+    "voxels": {
+        "5,0,0": {
+            "solid": true,
+            "material": "stoneAccent"
+        },
+        "5,1,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,2,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,3,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,4,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,6,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,7,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,8,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,9,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,10,0": {
+            "solid": true,
+            "material": "stoneAccent"
+        },
+
+
+        "0,5,0": {
+            "solid": true,
+            "material": "stoneAccent"
+        },
+        "1,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "2,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "3,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "4,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "5,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "6,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "7,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "8,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "9,5,0": {
+            "solid": true,
+            "material": "stone"
+        },
+        "10,5,0": {
+            "solid": true,
+            "material": "stoneAccent"
+        }
+    }
+}

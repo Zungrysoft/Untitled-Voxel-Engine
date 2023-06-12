@@ -192,27 +192,29 @@ export default class Terrain extends Thing {
 
     // Mansion
     const mansion = procMansion.generateMansion({
-      width: 111,
-      length: 111,
-      height: 12,
+      width: 120,
+      length: 120,
+      height: 50,
       possibilities: [
         assets.json.structurePearlArchQuad,
         assets.json.structurePearlArchTee,
         assets.json.structurePearlArchStraight,
         assets.json.structurePearlArchTurn,
         assets.json.structurePearlArchEnd,
+        assets.json.structurePearlArchRoofEnd,
+        assets.json.structureAir,
       ],
     })
-    vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, 2])
+    vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, -10])
     for (let x = 0; x < 15; x ++) {
       for (let y = 0; y < 15; y ++) {
         let mansionPlat = procBasics.generateRectangularPrism({
-          width: 11,
-          length: 11,
+          width: 15,
+          length: 15,
           height: 1,
           voxel: {material: x%2 === y%2 ? 'grass' : 'leaves', solid: true},
         })
-        vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, 1], vec3.scale([x, y, 0], 11)))
+        vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -11], vec3.scale([x, y, 0], 15)))
       }
     }
   }

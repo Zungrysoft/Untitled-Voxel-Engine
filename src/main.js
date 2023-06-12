@@ -42,11 +42,13 @@ await game.loadAssets({
   },
 
   json: {
-    structurePearlArchQuad: 'json/structures/pearl_arch_quad.json',
-    structurePearlArchTee: 'json/structures/pearl_arch_tee.json',
-    structurePearlArchStraight: 'json/structures/pearl_arch_straight.json',
-    structurePearlArchTurn: 'json/structures/pearl_arch_turn.json',
-    structurePearlArchEnd: 'json/structures/pearl_arch_end.json',
+    structurePearlArchQuad: 'json/structures/pearl/arch_quad.json',
+    structurePearlArchTee: 'json/structures/pearl/arch_tee.json',
+    structurePearlArchStraight: 'json/structures/pearl/arch_straight.json',
+    structurePearlArchTurn: 'json/structures/pearl/arch_turn.json',
+    structurePearlArchEnd: 'json/structures/pearl/arch_end.json',
+    structurePearlArchRoofEnd: 'json/structures/pearl/arch_roof_end.json',
+    structureAir: 'json/structures/util/air.json',
   },
 })
 

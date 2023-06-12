@@ -1,0 +1,32 @@
+{
+    "weight": 10,
+    "things": [],
+    "connections": [
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        },
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        },
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        },
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        },
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        },
+        {
+            "type": "air",
+            "symmetry": [0, 0, 0, 0]
+        }
+    ],
+    "doorways": [],
+    "voxels": {}
+}

@@ -81,7 +81,14 @@ export function emptyStructure() {
     voxels: {},
     things: [],
     doorways: [],
-    connections: ['', '', '', '', '', ''],
+    connections: [
+      {type: '', symmetry: [0, 0, 0, 0]},
+      {type: '', symmetry: [0, 0, 0, 0]},
+      {type: '', symmetry: [0, 0, 0, 0]},
+      {type: '', symmetry: [0, 0, 0, 0]},
+      {type: '', symmetry: [0, 0, 0, 0]},
+      {type: '', symmetry: [0, 0, 0, 0]},
+    ],
     weight: 0.0,
     assetName: "UNNAMED",
   }
@@ -354,8 +361,20 @@ export function transformPosition(position, transformations) {
   return ret
 }
 
+// TODO: Implement connection transforms for transforms other than about the z axis
 export function transformConnections(connections, transformations) {
-  let ret = [...connections]
+  // Deep-copy connection
+  let ret = []
+  for (const c of connections){
+    ret.push(
+      {
+        type: c.type,
+        symmetry: [...c.symmetry],
+      }
+    )
+  }
+
+  // Apply transformations
   for (const t of transformations) {
     if (t.mode === 'mirror' && t.axis) {
       if (t.axis === 'x') {
@@ -376,28 +395,47 @@ export function transformConnections(connections, transformations) {
     }
     else if (t.mode === 'rotate' && t.amount) {
       const amount = t.amount % 4
+      // Moved faces
       let a = 0
       let b = 1
       let c = 3
       let d = 4
+      let spinTopsTemp = true
       if (t.axis === 'x') {
         a = 1
         b = 2
         c = 4
         d = 5
+        spinTopsTemp = false
       }
       else if (t.axis === 'y') {
         a = 0
         b = 2
         c = 3
         d = 5
+        spinTopsTemp = false
       }
       if (amount === 1) {
-        const swapper = ret[d]
-        ret[d] = ret[c]
-        ret[c] = ret[b]
-        ret[b] = ret[a]
-        ret[a] = swapper
+        {
+          const swapper = ret[d]
+          ret[d] = ret[c]
+          ret[c] = ret[b]
+          ret[b] = ret[a]
+          ret[a] = swapper
+        }
+        if (spinTopsTemp) {
+          const swapper = ret[2].symmetry[3]
+          ret[2].symmetry[3] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[2].symmetry[0]
+          ret[2].symmetry[0] = swapper
+
+          const swapper2 = ret[5].symmetry[3]
+          ret[5].symmetry[3] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[0]
+          ret[5].symmetry[0] = swapper2
+        }
       }
       else if (amount === 2) {
         const swapper = ret[a]
@@ -407,6 +445,24 @@ export function transformConnections(connections, transformations) {
         const swapper2 = ret[b]
         ret[b] = ret[d]
         ret[d] = swapper2
+
+        if (spinTopsTemp) {
+          const swapper = ret[2].symmetry[0]
+          ret[2].symmetry[0] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = swapper
+
+          const swapper2 = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[2].symmetry[3]
+          ret[2].symmetry[3] = swapper2
+
+          const swapper3 = ret[5].symmetry[0]
+          ret[5].symmetry[0] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = swapper3
+
+          const swapper4 = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[3]
+          ret[5].symmetry[3] = swapper4
+        }
       }
       else if (amount === 3) {
         const swapper = ret[a]
@@ -414,6 +470,20 @@ export function transformConnections(connections, transformations) {
         ret[b] = ret[c]
         ret[c] = ret[d]
         ret[d] = swapper
+
+        if (spinTopsTemp) {
+          const swapper = ret[2].symmetry[0]
+          ret[2].symmetry[0] = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = ret[2].symmetry[3]
+          ret[2].symmetry[3] = swapper
+
+          const swapper2 = ret[5].symmetry[0]
+          ret[5].symmetry[0] = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = ret[5].symmetry[3]
+          ret[5].symmetry[3] = swapper2
+        }
       }
     }
   }

@@ -8,9 +8,9 @@ export function generateMansion({
   width=100,
   length=100,
   height=50,
-  roomWidth=11,
-  roomLength=11,
-  roomHeight=9,
+  roomWidth=15,
+  roomLength=15,
+  roomHeight=11,
   possibilities={}
 }) {
   // Figure out the number of rooms based on dimensions
@@ -76,13 +76,21 @@ function attemptMansion(roomsX, roomsY, roomsZ, possibilities, mustSucceed=true)
 
   // Remove structures that are disallowed by the edge
   const matchOnSide = (possibilities, face, pattern) => {
+    // Empty string always matches
+    if (pattern === '') {
+      return
+    }
+
     for (let i = possibilities.length-1; i >= 0; i --) {
-      if (possibilities[i].connections[face] !== pattern) {
-        possibilities.splice(i, 1)
+      if (possibilities[i].connections[face].type !== '') {
+        if (possibilities[i].connections[face].type !== pattern) {
+          // console.log("Removed possibility " + possibilities[i].assetName + possibilities[i].connections[face].type + pattern)
+          possibilities.splice(i, 1)
+        }
       }
     }
   }
-  const edgePattern = ['', '', '', '', '', 'flat']
+  const edgePattern = ['air', 'air', 'air', 'air', 'air', 'flat']
   for (let x = 0; x < roomsX; x ++) {
     for (let y = 0; y < roomsY; y ++) {
       for (let z = 0; z < roomsZ; z ++) {
@@ -186,7 +194,7 @@ function removeFromNeighbor(grid, position, direction) {
       // Check if these two structures have a matching connection
       const connectionTo = grid.cells[neighborPos].possibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))]
       const connectionFrom = grid.cells[position].possibilities[j].connections[vec3.directionToIndex(direction)]
-      if (connectionTo === connectionFrom) {
+      if (connectionMatches(connectionTo, connectionFrom)) {
         found = true
         break
       }
@@ -203,6 +211,28 @@ function removeFromNeighbor(grid, position, direction) {
 
   // Return number of possibilities removed
   return changesMade
+}
+
+function connectionMatches(a, b) {
+  // Empty string always matches
+  if (a.type === '' || b.type === '') {
+    return true
+  }
+
+  // Confirm the types match
+  if (a.type !== b.type) {
+    return false
+  }
+
+  // Confirm symmetry
+  if (a.symmetry && b.symmetry) {
+    for (let i = 0; i < 4; i ++) {
+      if (a.symmetry[i] !== b.symmetry[i]) {
+        return false
+      }
+    }
+  }
+  return true
 }
 
 function pickNextCell(grid) {
@@ -251,26 +281,28 @@ function pickNextCell(grid) {
 
 function expandPossibilities(possibilities) {
   let ret = []
+
+  // Include all four rotations of each structure
   for (const possibility of possibilities) {
     ret.push(possibility)
     ret.push(vox.transformStructure(possibility, [
       {
         mode: 'rotate',
-        origin: [5, 5, 0],
+        origin: [7, 7, 0],
         amount: 1,
       }
     ]))
     ret.push(vox.transformStructure(possibility, [
       {
         mode: 'rotate',
-        origin: [5, 5, 0],
+        origin: [7, 7, 0],
         amount: 2,
       }
     ]))
     ret.push(vox.transformStructure(possibility, [
       {
         mode: 'rotate',
-        origin: [5, 5, 0],
+        origin: [7, 7, 0],
         amount: 3,
       }
     ]))
