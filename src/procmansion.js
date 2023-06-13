@@ -183,8 +183,12 @@ function removeFromNeighbor(grid, position, direction) {
     return 0
   }
 
+  // Convert position and neighbor to strings that can be used as keys (for optimization)
+  const positionKey = position.toString()
+  const neighborPosKey = neighborPos.toString()
+
   // If the neighbor has already been picked, exit
-  if (grid.cells[neighborPos].picked) {
+  if (grid.cells[neighborPosKey].picked) {
     return 0
   }
 
@@ -192,13 +196,14 @@ function removeFromNeighbor(grid, position, direction) {
   let changesMade = 0
 
   // Iterate over possibilites in the neighbor cell
-  for (let i = grid.cells[neighborPos].possibilities.length-1; i >= 0; i --) {
+  for (let i = grid.cells[neighborPosKey].possibilities.length-1; i >= 0; i --) {
     // Loop over possibilites in this cell
     let found = false
-    for (let j = 0; j < grid.cells[position].possibilities.length; j ++) { // High load
+    const jLen = grid.cells[positionKey].possibilities.length
+    for (let j = 0; j < jLen; j ++) { // High load
       // Check if these two structures have a matching connection
-      const connectionTo = grid.cells[neighborPos].possibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))] // High load
-      const connectionFrom = grid.cells[position].possibilities[j].connections[vec3.directionToIndex(direction)] // High load
+      const connectionTo = grid.cells[neighborPosKey].possibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))] // High load
+      const connectionFrom = grid.cells[positionKey].possibilities[j].connections[vec3.directionToIndex(direction)] // High load
       if (connectionMatches(connectionTo, connectionFrom)) {
         found = true
         break
@@ -207,10 +212,10 @@ function removeFromNeighbor(grid, position, direction) {
 
     // If we didn't find any matches for this structure, remove it
     // But don't remove it if it's the only possibility left
-    if (!found && grid.cells[neighborPos].possibilities.length > 1) {
-      // console.log("Removed possibility " + grid.cells[neighborPos].possibilities[i].assetName + " at position " + neighborPos)
+    if (!found && grid.cells[neighborPosKey].possibilities.length > 1) {
+      // console.log("Removed possibility " + grid.cells[neighborPosKey].possibilities[i].assetName + " at position " + neighborPos)
 
-      grid.cells[neighborPos].possibilities.splice(i, 1)
+      grid.cells[neighborPosKey].possibilities.splice(i, 1)
       changesMade ++
     }
   }

@@ -224,7 +224,7 @@ export default class Terrain extends Thing {
         roomHeight: tileScale,
         possibilities: [
           assets.json.structureArchesBottomCenter,
-          assets.json.structureArchesBottomEdge,
+          // assets.json.structureArchesBottomEdge,
           assets.json.structureArchesBottomEdgePillar,
           assets.json.structureArchesBottomCornerPillar,
           assets.json.structureArchesBottomJunctionPillar,
