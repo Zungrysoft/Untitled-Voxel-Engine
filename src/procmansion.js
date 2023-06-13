@@ -195,10 +195,10 @@ function removeFromNeighbor(grid, position, direction) {
   for (let i = grid.cells[neighborPos].possibilities.length-1; i >= 0; i --) {
     // Loop over possibilites in this cell
     let found = false
-    for (let j = 0; j < grid.cells[position].possibilities.length; j ++) {
+    for (let j = 0; j < grid.cells[position].possibilities.length; j ++) { // High load
       // Check if these two structures have a matching connection
-      const connectionTo = grid.cells[neighborPos].possibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))]
-      const connectionFrom = grid.cells[position].possibilities[j].connections[vec3.directionToIndex(direction)]
+      const connectionTo = grid.cells[neighborPos].possibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))] // High load
+      const connectionFrom = grid.cells[position].possibilities[j].connections[vec3.directionToIndex(direction)] // High load
       if (connectionMatches(connectionTo, connectionFrom)) {
         found = true
         break
