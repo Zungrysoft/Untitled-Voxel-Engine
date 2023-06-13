@@ -1,2 +1,3 @@
 *.mtl
 *.png~
+*__pycache__*

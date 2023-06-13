@@ -191,31 +191,32 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, doorway, [34, 10, 6])
 
     // Mansion
+    const tileScale = 5
     const mansion = procMansion.generateMansion({
-      width: 120,
-      length: 120,
-      height: 50,
+      width: 50,
+      length: 50,
+      height: 5,
+      roomWidth: tileScale,
+      roomLength: tileScale,
+      roomHeight: tileScale,
       possibilities: [
-        assets.json.structurePearlArchTee,
-        assets.json.structurePearlArchStraight,
-        assets.json.structurePearlArchTurn,
-        assets.json.structurePearlArchEnd,
-        assets.json.structurePearlArchRoofTee,
-        assets.json.structurePearlArchRoofStraight,
-        assets.json.structurePearlArchRoofEnd,
+        assets.json.structureArchesBottomCenter,
+        assets.json.structureArchesBottomEdge,
+        assets.json.structureArchesBottomCorner,
         assets.json.structureAir,
+        assets.json.structureFlat,
       ],
     })
     vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, -10])
-    for (let x = 0; x < 15; x ++) {
-      for (let y = 0; y < 15; y ++) {
+    for (let x = 0; x < 35; x ++) {
+      for (let y = 0; y < 35; y ++) {
         let mansionPlat = procBasics.generateRectangularPrism({
-          width: 15,
-          length: 15,
+          width: tileScale,
+          length: tileScale,
           height: 1,
           voxel: {material: x%2 === y%2 ? 'grass' : 'leaves', solid: true},
         })
-        vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -11], vec3.scale([x, y, 0], 15)))
+        vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -10], vec3.scale([x, y, 0], tileScale)))
       }
     }
   }

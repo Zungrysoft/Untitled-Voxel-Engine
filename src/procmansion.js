@@ -84,7 +84,7 @@ function attemptMansion(roomsX, roomsY, roomsZ, possibilities, mustSucceed=true)
     for (let i = possibilities.length-1; i >= 0; i --) {
       if (possibilities[i].connections[face].type !== '') {
         if (possibilities[i].connections[face].type !== pattern) {
-          // console.log("Removed possibility " + possibilities[i].assetName + possibilities[i].connections[face].type + pattern)
+          // console.log("Removed possibility " + possibilities[i].assetName + " - " + possibilities[i].connections[face].type + " - " + pattern)
           possibilities.splice(i, 1)
         }
       }
@@ -95,28 +95,33 @@ function attemptMansion(roomsX, roomsY, roomsZ, possibilities, mustSucceed=true)
     for (let y = 0; y < roomsY; y ++) {
       for (let z = 0; z < roomsZ; z ++) {
         const position = [x, y, z]
+        // console.log("Edge-checking at " + position)
+        let shouldPropagate = false
         if (x === 0) {
           matchOnSide(grid.cells[position].possibilities, 0, edgePattern[3])
-          propagateChanges(grid, position)
+          shouldPropagate = true
         }
         if (y === 0) {
           matchOnSide(grid.cells[position].possibilities, 1, edgePattern[4])
-          propagateChanges(grid, position)
+          shouldPropagate = true
         }
         if (z === 0) {
           matchOnSide(grid.cells[position].possibilities, 2, edgePattern[5])
-          propagateChanges(grid, position)
+          shouldPropagate = true
         }
         if (x === roomsX-1) {
           matchOnSide(grid.cells[position].possibilities, 3, edgePattern[0])
-          propagateChanges(grid, position)
+          shouldPropagate = true
         }
         if (y === roomsY-1) {
           matchOnSide(grid.cells[position].possibilities, 4, edgePattern[1])
-          propagateChanges(grid, position)
+          shouldPropagate = true
         }
         if (z === roomsZ-1) {
           matchOnSide(grid.cells[position].possibilities, 5, edgePattern[2])
+          shouldPropagate = true
+        }
+        if (shouldPropagate) {
           propagateChanges(grid, position)
         }
       }
@@ -204,6 +209,7 @@ function removeFromNeighbor(grid, position, direction) {
     // But don't remove it if it's the only possibility left
     if (!found && grid.cells[neighborPos].possibilities.length > 1) {
       // console.log("Removed possibility " + grid.cells[neighborPos].possibilities[i].assetName + " at position " + neighborPos)
+
       grid.cells[neighborPos].possibilities.splice(i, 1)
       changesMade ++
     }
@@ -295,21 +301,21 @@ function expandPossibilities(possibilities) {
     ret.push(vox.transformStructure(possibility, [
       {
         mode: 'rotate',
-        origin: [7, 7, 0],
+        origin: [2, 2, 0],
         amount: 1,
       }
     ]))
     ret.push(vox.transformStructure(possibility, [
       {
         mode: 'rotate',
-        origin: [7, 7, 0],
+        origin: [2, 2, 0],
         amount: 2,
       }
     ]))
     ret.push(vox.transformStructure(possibility, [
       {
         mode: 'rotate',
-        origin: [7, 7, 0],
+        origin: [2, 2, 0],
         amount: 3,
       }
     ]))

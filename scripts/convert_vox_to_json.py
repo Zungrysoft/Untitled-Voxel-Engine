@@ -204,7 +204,7 @@ def convert_vox_to_json(input_filename, output_filename):
         }
 
     with open(output_filename, 'w') as output_file:
-        json.dump(data, output_file, indent=2)
+        json.dump(data, output_file, indent=4)
 
 if __name__ == '__main__':
     import sys
