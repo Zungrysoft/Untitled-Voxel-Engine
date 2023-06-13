@@ -1,5 +1,5 @@
 {
-    "weight": 0,
+    "weight": 100,
     "things": [],
     "doorways": [],
     "symmetryMode": 2,
@@ -8,7 +8,7 @@
             "type": "air"
         },
         {
-            "type": "archTopEdgePillar"
+            "type": "archTopEdge"
         },
         {
             "type": "archMiddleEdge",
@@ -48,7 +48,7 @@
             "material": "stone",
             "solid": true
         },
-        "2,3,4": {
+        "2,4,0": {
             "material": "stone",
             "solid": true
         },
@@ -60,7 +60,27 @@
             "material": "stone",
             "solid": true
         },
-        "2,0,3": {
+        "2,3,4": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,4,2": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,4,1": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,3,3": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,3,2": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,2,3": {
             "material": "stone",
             "solid": true
         }

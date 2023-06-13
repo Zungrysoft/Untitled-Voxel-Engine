@@ -193,20 +193,33 @@ export default class Terrain extends Thing {
     // Mansion
     const tileScale = 5
     const mansion = procMansion.generateMansion({
-      width: 50,
-      length: 50,
-      height: 10,
+      width: 125,
+      length: 125,
+      height: 15,
       roomWidth: tileScale,
       roomLength: tileScale,
       roomHeight: tileScale,
       possibilities: [
         assets.json.structureArchesBottomCenter,
         assets.json.structureArchesBottomEdge,
+        assets.json.structureArchesBottomEdgePillar,
         assets.json.structureArchesBottomCornerPillar,
-        assets.json.structureArchesTopCornerPillar,
+        assets.json.structureArchesBottomJunctionPillar,
         assets.json.structureArchesTopEdge,
+        assets.json.structureArchesTopEdgePillar,
+        assets.json.structureArchesTopCornerPillar,
+        assets.json.structureArchesTopJunctionPillar,
+        assets.json.structureArchesRoofCorner,
+        assets.json.structureArchesRoofEdge,
+        assets.json.structureArchesRoofJunction,
+        assets.json.structureArchesRoofCenterEnd,
+        assets.json.structureArchesRoofCenterQuad,
+        assets.json.structureArchesRoofCenterStraight,
+        assets.json.structureArchesRoofCenterTee,
+        assets.json.structureArchesRoofCenterTurn,
         assets.json.structureAir,
         assets.json.structureFlat,
+        // assets.json.structureAny,
       ],
     })
     vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, -10])

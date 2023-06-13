@@ -1,0 +1,131 @@
+{
+    "weight": 100,
+    "things": [],
+    "doorways": [],
+    "symmetryMode": 2,
+    "connections": [
+        {
+            "type": "roofSide",
+            "mode": "socket"
+        },
+        {
+            "type": "roofSide",
+            "mode": "socket"
+        },
+        {
+            "type": "air"
+        },
+        {
+            "type": "roofSide",
+            "mode": "socket"
+        },
+        {
+            "type": "flat"
+        },
+        {
+            "type": "air"
+        }
+    ],
+    "voxels": {
+        "4,1,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "4,2,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "4,3,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "4,4,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "4,0,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "3,0,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "2,1,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "3,1,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "2,0,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "1,1,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "1,0,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "0,0,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "0,4,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "1,4,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "2,4,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "3,4,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "0,3,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "1,3,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "2,3,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "3,3,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "0,2,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "1,2,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "2,2,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "3,2,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        },
+        "0,1,3": {
+            "material": "stoneAccent2",
+            "solid": true
+        }
+    }
+}

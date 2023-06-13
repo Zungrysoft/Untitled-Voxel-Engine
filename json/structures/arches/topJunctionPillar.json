@@ -1,5 +1,5 @@
 {
-    "weight": 0,
+    "weight": 100,
     "things": [],
     "doorways": [],
     "symmetryMode": 2,
@@ -11,7 +11,7 @@
             "type": "air"
         },
         {
-            "type": "archMiddleCorner",
+            "type": "archMiddleJunction",
             "symmetry": [
                 0,
                 0,
@@ -26,7 +26,7 @@
             "type": "archTopEdgePillar"
         },
         {
-            "type": "archRoofCorner",
+            "type": "archRoofJunction",
             "symmetry": [
                 0,
                 0,

@@ -232,7 +232,7 @@ function connectionMatches(a, b) {
 
   // Confirm plug modes are different
   if (a.mode && b.mode) {
-    if (a.mode !== b.mode) {
+    if (a.mode === b.mode) {
       return false
     }
   }
