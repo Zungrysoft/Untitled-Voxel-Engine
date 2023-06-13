@@ -195,14 +195,16 @@ export default class Terrain extends Thing {
     const mansion = procMansion.generateMansion({
       width: 50,
       length: 50,
-      height: 5,
+      height: 10,
       roomWidth: tileScale,
       roomLength: tileScale,
       roomHeight: tileScale,
       possibilities: [
         assets.json.structureArchesBottomCenter,
         assets.json.structureArchesBottomEdge,
-        assets.json.structureArchesBottomCorner,
+        assets.json.structureArchesBottomCornerPillar,
+        assets.json.structureArchesTopCornerPillar,
+        assets.json.structureArchesTopEdge,
         assets.json.structureAir,
         assets.json.structureFlat,
       ],

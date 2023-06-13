@@ -117,10 +117,10 @@ function attemptMansion(roomsX, roomsY, roomsZ, possibilities, mustSucceed=true)
           matchOnSide(grid.cells[position].possibilities, 4, edgePattern[1])
           shouldPropagate = true
         }
-        if (z === roomsZ-1) {
-          matchOnSide(grid.cells[position].possibilities, 5, edgePattern[2])
-          shouldPropagate = true
-        }
+        // if (z === roomsZ-1) {
+        //   matchOnSide(grid.cells[position].possibilities, 5, edgePattern[2])
+        //   shouldPropagate = true
+        // }
         if (shouldPropagate) {
           propagateChanges(grid, position)
         }
@@ -239,7 +239,8 @@ function connectionMatches(a, b) {
 
   // Confirm symmetry
   if (a.symmetry && b.symmetry) {
-    for (let i = 0; i < 4; i ++) {
+    const symmLength = Math.min(a.symmetry.length, b.symmetry.length)
+    for (let i = 0; i < symmLength; i ++) {
       if (a.symmetry[i] !== b.symmetry[i]) {
         return false
       }
@@ -295,30 +296,92 @@ function pickNextCell(grid) {
 function expandPossibilities(possibilities) {
   let ret = []
 
-  // Include all four rotations of each structure
+  // Iterate over each possibility and make symmetries
   for (const possibility of possibilities) {
+    const s = possibility.symmetryMode
+
+    // Always use the original
     ret.push(possibility)
-    ret.push(vox.transformStructure(possibility, [
-      {
-        mode: 'rotate',
-        origin: [2, 2, 0],
-        amount: 1,
+
+    // Mode 1: Rotate 180 degrees
+    if (s) {
+      ret.push(vox.transformStructure(possibility, [
+        {
+          mode: 'rotate',
+          origin: [2, 2, 0],
+          amount: 1,
+        }
+      ]))
+
+      // Mode 2: All four rotations
+      if (s >= 2) {
+        ret.push(vox.transformStructure(possibility, [
+          {
+            mode: 'rotate',
+            origin: [2, 2, 0],
+            amount: 2,
+          }
+        ]))
+
+        ret.push(vox.transformStructure(possibility, [
+          {
+            mode: 'rotate',
+            origin: [2, 2, 0],
+            amount: 3,
+          }
+        ]))
+
+        // Mode 3: All four rotations and their mirrors
+        if (s >= 3) {
+          ret.push(vox.transformStructure(possibility, [
+            {
+              mode: 'mirror',
+              origin: [2, 2, 0],
+              axis: 'x',
+            }
+          ]))
+          ret.push(vox.transformStructure(possibility, [
+            {
+              mode: 'mirror',
+              origin: [2, 2, 0],
+              axis: 'x',
+            },
+            {
+              mode: 'rotate',
+              origin: [2, 2, 0],
+              amount: 1,
+            }
+          ]))
+          ret.push(vox.transformStructure(possibility, [
+            {
+              mode: 'mirror',
+              origin: [2, 2, 0],
+              axis: 'x',
+            },
+            {
+              mode: 'rotate',
+              origin: [2, 2, 0],
+              amount: 2,
+            }
+          ]))
+          ret.push(vox.transformStructure(possibility, [
+            {
+              mode: 'mirror',
+              origin: [2, 2, 0],
+              axis: 'x',
+            },
+            {
+              mode: 'rotate',
+              origin: [2, 2, 0],
+              amount: 3,
+            }
+          ]))
+        }
       }
-    ]))
-    ret.push(vox.transformStructure(possibility, [
-      {
-        mode: 'rotate',
-        origin: [2, 2, 0],
-        amount: 2,
-      }
-    ]))
-    ret.push(vox.transformStructure(possibility, [
-      {
-        mode: 'rotate',
-        origin: [2, 2, 0],
-        amount: 3,
-      }
-    ]))
+    }
+
+
+
   }
   return ret
 }

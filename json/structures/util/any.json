@@ -1,0 +1,26 @@
+{
+    "weight": 0,
+    "things": [],
+    "doorways": [],
+    "connections": [
+        {
+            "type": ""
+        },
+        {
+            "type": ""
+        },
+        {
+            "type": ""
+        },
+        {
+            "type": ""
+        },
+        {
+            "type": ""
+        },
+        {
+            "type": ""
+        }
+    ],
+    "voxels": {}
+}

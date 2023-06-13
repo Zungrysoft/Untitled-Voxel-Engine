@@ -2,6 +2,7 @@
     "weight": 100,
     "things": [],
     "doorways": [],
+    "symmetryMode": 3,
     "connections": [
         {
             "type": "air"
@@ -10,34 +11,30 @@
             "type": "archBottomEdge",
             "symmetry": [
                 0,
-                1,
-                2,
-                3
+                1
             ]
         },
         {
             "type": "flat"
         },
         {
-            "type": "archBottom",
+            "type": "archBottom"
+        },
+        {
+            "type": "archBottomEdgePillar",
+            "symmetry": [
+                0,
+                1
+            ]
+        },
+        {
+            "type": "archMiddleEdge",
             "symmetry": [
                 0,
                 1,
                 0,
-                0
+                2
             ]
-        },
-        {
-            "type": "archBottomEdge",
-            "symmetry": [
-                0,
-                1,
-                2,
-                3
-            ]
-        },
-        {
-            "type": "air"
         }
     ],
     "voxels": {
@@ -150,7 +147,7 @@
             "solid": true
         },
         "2,4,1": {
-            "material": "stoneAccent2",
+            "material": "stone",
             "solid": true
         },
         "3,4,1": {
@@ -199,6 +196,18 @@
         },
         "4,2,1": {
             "material": "stoneAccent",
+            "solid": true
+        },
+        "2,4,2": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,4,3": {
+            "material": "stone",
+            "solid": true
+        },
+        "2,4,4": {
+            "material": "stone",
             "solid": true
         }
     }

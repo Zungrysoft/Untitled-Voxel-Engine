@@ -317,13 +317,13 @@ export function transformPosition(position, transformations) {
     }
     else if (t.mode === 'mirror' && t.axis) {
       const origin = t.origin || [0, 0, 0]
-      if (axis === 'x') {
+      if (t.axis === 'x') {
         ret[0] = ((ret[0] - origin[0]) * -1) + origin[0]
       }
-      else if (axis === 'y') {
+      else if (t.axis === 'y') {
         ret[1] = ((ret[1] - origin[1]) * -1) + origin[1]
       }
-      else if (axis === 'z') {
+      else if (t.axis === 'z') {
         ret[2] = ((ret[2] - origin[2]) * -1) + origin[2]
       }
     }
@@ -387,164 +387,197 @@ export function transformConnections(connections, transformations) {
   for (const t of transformations) {
     if (t.mode === 'mirror' && t.axis) {
       if (t.axis === 'x') {
+        // Move X faces
         const swapper = ret[0]
         ret[0] = ret[3]
         ret[3] = swapper
+
+        // Flip Y side faces
+        if (ret[1].symmetry) {
+          const swapper = ret[1].symmetry[0]
+          ret[1].symmetry[0] = ret[1].symmetry[1]
+          ret[1].symmetry[1] = swapper
+        }
+        if (ret[4].symmetry) {
+          const swapper = ret[4].symmetry[0]
+          ret[4].symmetry[0] = ret[4].symmetry[1]
+          ret[4].symmetry[1] = swapper
+        }
+
+        // Flip Z side faces
+        if (ret[2].symmetry) {
+          const swapper = ret[2].symmetry[0]
+          ret[2].symmetry[0] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = swapper
+        }
+        if (ret[5].symmetry) {
+          const swapper = ret[5].symmetry[0]
+          ret[5].symmetry[0] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = swapper
+        }
       }
       else if (t.axis === 'y') {
+        // Move Y faces
         const swapper = ret[1]
         ret[1] = ret[4]
         ret[4] = swapper
+
+        // Flip X side faces
+        if (ret[0].symmetry) {
+          const swapper = ret[0].symmetry[0]
+          ret[0].symmetry[0] = ret[0].symmetry[1]
+          ret[0].symmetry[1] = swapper
+        }
+        if (ret[3].symmetry) {
+          const swapper = ret[3].symmetry[0]
+          ret[3].symmetry[0] = ret[3].symmetry[1]
+          ret[3].symmetry[1] = swapper
+        }
+
+        // Flip Z side faces
+        if (ret[2].symmetry) {
+          const swapper = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[3].symmetry[3]
+          ret[2].symmetry[3] = swapper
+        }
+        if (ret[5].symmetry) {
+          const swapper = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[3]
+          ret[5].symmetry[3] = swapper
+        }
       }
       else if (axis === 'z') {
+        // Move Z faces
         const swapper = ret[2]
         ret[2] = ret[5]
         ret[5] = swapper
       }
     }
-    else if (t.mode === 'rotate' && t.amount) {
+    else if (t.mode === 'rotate' && t.amount && t.axis !== 'x' && t.axis !== 'y') {
       const amount = t.amount % 4
-      // Moved faces
-      let a = 0
-      let b = 1
-      let c = 3
-      let d = 4
-      let spinTopsTemp = true
-      if (t.axis === 'x') {
-        a = 1
-        b = 2
-        c = 4
-        d = 5
-        spinTopsTemp = false
-      }
-      else if (t.axis === 'y') {
-        a = 0
-        b = 2
-        c = 3
-        d = 5
-        spinTopsTemp = false
-      }
-      if (amount === 1) {
-        const swapper = ret[a]
-        ret[a] = ret[b]
-        ret[b] = ret[c]
-        ret[c] = ret[d]
-        ret[d] = swapper
 
-        if (spinTopsTemp) {
-          // Rotate top faces
-          if (ret[2].symmetry) {
-            const swapper = ret[2].symmetry[0]
-            ret[2].symmetry[0] = ret[2].symmetry[1]
-            ret[2].symmetry[1] = ret[2].symmetry[2]
-            ret[2].symmetry[2] = ret[2].symmetry[3]
-            ret[2].symmetry[3] = swapper
-          }
-          if (ret[5].symmetry) {
-            const swapper = ret[5].symmetry[0]
-            ret[5].symmetry[0] = ret[5].symmetry[1]
-            ret[5].symmetry[1] = ret[5].symmetry[2]
-            ret[5].symmetry[2] = ret[5].symmetry[3]
-            ret[5].symmetry[3] = swapper
-          }
-          // Flip sides that changed polarity
-          if (ret[1].symmetry) {
-            const swapper = ret[1].symmetry[0]
-            ret[1].symmetry[0] = ret[1].symmetry[2]
-            ret[1].symmetry[2] = swapper
-          }
-          if (ret[4].symmetry) {
-            const swapper = ret[4].symmetry[0]
-            ret[4].symmetry[0] = ret[4].symmetry[2]
-            ret[4].symmetry[2] = swapper
-          }
+      if (amount === 1) {
+        // Move side faces
+        const swapper = ret[0]
+        ret[0] = ret[1]
+        ret[1] = ret[3]
+        ret[3] = ret[4]
+        ret[4] = swapper
+
+        // Rotate top and bottom faces
+        if (ret[2].symmetry) {
+          const swapper = ret[2].symmetry[0]
+          ret[2].symmetry[0] = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = ret[2].symmetry[3]
+          ret[2].symmetry[3] = swapper
+        }
+        if (ret[5].symmetry) {
+          const swapper = ret[5].symmetry[0]
+          ret[5].symmetry[0] = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = ret[5].symmetry[3]
+          ret[5].symmetry[3] = swapper
+        }
+
+        // Flip sides that changed polarity
+        if (ret[1].symmetry) {
+          const swapper = ret[1].symmetry[0]
+          ret[1].symmetry[0] = ret[1].symmetry[1]
+          ret[1].symmetry[1] = swapper
+        }
+        if (ret[4].symmetry) {
+          const swapper = ret[4].symmetry[0]
+          ret[4].symmetry[0] = ret[4].symmetry[1]
+          ret[4].symmetry[1] = swapper
         }
       }
       else if (amount === 2) {
-        const swapper = ret[a]
-        ret[a] = ret[c]
-        ret[c] = swapper
+        // Move side faces
+        const swapper = ret[0]
+        ret[0] = ret[3]
+        ret[3] = swapper
 
-        const swapper2 = ret[b]
-        ret[b] = ret[d]
-        ret[d] = swapper2
+        const swapper2 = ret[1]
+        ret[1] = ret[4]
+        ret[4] = swapper2
 
-        if (spinTopsTemp) {
-          if (ret[2].symmetry) {
-            const swapper = ret[2].symmetry[0]
-            ret[2].symmetry[0] = ret[2].symmetry[2]
-            ret[2].symmetry[2] = swapper
+        // Rotate top and bottom faces
+        if (ret[2].symmetry) {
+          const swapper = ret[2].symmetry[0]
+          ret[2].symmetry[0] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = swapper
 
-            const swapper2 = ret[2].symmetry[1]
-            ret[2].symmetry[1] = ret[2].symmetry[3]
-            ret[2].symmetry[3] = swapper2
-          }
-          if (ret[5].symmetry) {
-            const swapper = ret[5].symmetry[0]
-            ret[5].symmetry[0] = ret[5].symmetry[2]
-            ret[5].symmetry[2] = swapper
+          const swapper2 = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[2].symmetry[3]
+          ret[2].symmetry[3] = swapper2
+        }
+        if (ret[5].symmetry) {
+          const swapper = ret[5].symmetry[0]
+          ret[5].symmetry[0] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = swapper
 
-            const swapper2 = ret[5].symmetry[1]
-            ret[5].symmetry[1] = ret[5].symmetry[3]
-            ret[5].symmetry[3] = swapper2
-          }
-          // Flip sides
-          if (ret[0].symmetry) {
-            const swapper = ret[0].symmetry[0]
-            ret[0].symmetry[0] = ret[0].symmetry[2]
-            ret[0].symmetry[2] = swapper
-          }
-          if (ret[1].symmetry) {
-            const swapper = ret[1].symmetry[0]
-            ret[1].symmetry[0] = ret[1].symmetry[2]
-            ret[1].symmetry[2] = swapper
-          }
-          if (ret[3].symmetry) {
-            const swapper = ret[3].symmetry[0]
-            ret[3].symmetry[0] = ret[3].symmetry[2]
-            ret[3].symmetry[2] = swapper
-          }
-          if (ret[4].symmetry) {
-            const swapper = ret[4].symmetry[0]
-            ret[4].symmetry[0] = ret[4].symmetry[2]
-            ret[4].symmetry[2] = swapper
-          }
+          const swapper2 = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[3]
+          ret[5].symmetry[3] = swapper2
+        }
+
+        // Flip sides
+        if (ret[0].symmetry) {
+          const swapper = ret[0].symmetry[0]
+          ret[0].symmetry[0] = ret[0].symmetry[1]
+          ret[0].symmetry[1] = swapper
+        }
+        if (ret[1].symmetry) {
+          const swapper = ret[1].symmetry[0]
+          ret[1].symmetry[0] = ret[1].symmetry[1]
+          ret[1].symmetry[1] = swapper
+        }
+        if (ret[3].symmetry) {
+          const swapper = ret[3].symmetry[0]
+          ret[3].symmetry[0] = ret[3].symmetry[1]
+          ret[3].symmetry[1] = swapper
+        }
+        if (ret[4].symmetry) {
+          const swapper = ret[4].symmetry[0]
+          ret[4].symmetry[0] = ret[4].symmetry[1]
+          ret[4].symmetry[1] = swapper
         }
       }
       else if (amount === 3) {
-        {
-          const swapper = ret[d]
-          ret[d] = ret[c]
-          ret[c] = ret[b]
-          ret[b] = ret[a]
-          ret[a] = swapper
+        // Move side faces
+        const swapper = ret[4]
+        ret[4] = ret[3]
+        ret[3] = ret[1]
+        ret[1] = ret[0]
+        ret[0] = swapper
+
+        // Rotate top and bottom faces
+        if (ret[2].symmetry) {
+          const swapper = ret[2].symmetry[3]
+          ret[2].symmetry[3] = ret[2].symmetry[2]
+          ret[2].symmetry[2] = ret[2].symmetry[1]
+          ret[2].symmetry[1] = ret[2].symmetry[0]
+          ret[2].symmetry[0] = swapper
         }
-        if (spinTopsTemp) {
-          if (ret[2].symmetry) {
-            const swapper = ret[2].symmetry[3]
-            ret[2].symmetry[3] = ret[2].symmetry[2]
-            ret[2].symmetry[2] = ret[2].symmetry[1]
-            ret[2].symmetry[1] = ret[2].symmetry[0]
-            ret[2].symmetry[0] = swapper
-          }
-          if (ret[5].symmetry) {
-            const swapper2 = ret[5].symmetry[3]
-            ret[5].symmetry[3] = ret[5].symmetry[2]
-            ret[5].symmetry[2] = ret[5].symmetry[1]
-            ret[5].symmetry[1] = ret[5].symmetry[0]
-            ret[5].symmetry[0] = swapper2
-          }
-          // Flip sides that changed polarity
-          if (ret[0].symmetry) {
-            const swapper = ret[0].symmetry[0]
-            ret[0].symmetry[0] = ret[0].symmetry[2]
-            ret[0].symmetry[2] = swapper
-          }
-          if (ret[3].symmetry) {
-            const swapper = ret[3].symmetry[0]
-            ret[3].symmetry[0] = ret[3].symmetry[2]
-            ret[3].symmetry[2] = swapper
-          }
+        if (ret[5].symmetry) {
+          const swapper2 = ret[5].symmetry[3]
+          ret[5].symmetry[3] = ret[5].symmetry[2]
+          ret[5].symmetry[2] = ret[5].symmetry[1]
+          ret[5].symmetry[1] = ret[5].symmetry[0]
+          ret[5].symmetry[0] = swapper2
+        }
+
+        // Flip sides that changed polarity
+        if (ret[0].symmetry) {
+          const swapper = ret[0].symmetry[0]
+          ret[0].symmetry[0] = ret[0].symmetry[1]
+          ret[0].symmetry[1] = swapper
+        }
+        if (ret[3].symmetry) {
+          const swapper = ret[3].symmetry[0]
+          ret[3].symmetry[0] = ret[3].symmetry[1]
+          ret[3].symmetry[1] = swapper
         }
       }
     }

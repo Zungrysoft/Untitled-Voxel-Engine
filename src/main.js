@@ -44,9 +44,12 @@ await game.loadAssets({
   json: {
     structureArchesBottomCenter: 'json/structures/arches/bottomCenter.json',
     structureArchesBottomEdge: 'json/structures/arches/bottomEdge.json',
-    structureArchesBottomCorner: 'json/structures/arches/bottomCorner.json',
+    structureArchesBottomCornerPillar: 'json/structures/arches/bottomCornerPillar.json',
+    structureArchesTopCornerPillar: 'json/structures/arches/topCornerPillar.json',
+    structureArchesTopEdge: 'json/structures/arches/topEdge.json',
     structureFlat: 'json/structures/util/flat.json',
     structureAir: 'json/structures/util/air.json',
+    structureAny: 'json/structures/util/any.json',
   },
 })
 
