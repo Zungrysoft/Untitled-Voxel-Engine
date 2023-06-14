@@ -75,7 +75,7 @@ export function checkRoom(chunks, dungeon, doorway, voxel) {
     })
 
     // Shift its position
-    room = vox.shiftStructure(room, totalOffset)
+    room = vox.transformStructure(room, [{mode: "translate", offset: totalOffset}])
 
     // Check the room against reserve space
     if (vox.checkReservedInStructure(dungeon.structure, [0, 0, 0], room)) {
@@ -87,7 +87,7 @@ export function checkRoom(chunks, dungeon, doorway, voxel) {
 
     // Merge
     let possibility = copyDungeon(dungeon)
-    possibility.structure = vox.mergeStructureIntoStructure(dungeon.structure, room)
+    vox.mergeStructureIntoStructure(possibility.structure, room)
     possibility.doorways = []
 
     // Add doorways

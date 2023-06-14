@@ -208,17 +208,13 @@ export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0],
 }
 
 export function mergeStructureIntoStructure(mainStructure, structure, position = [0, 0, 0]) {
-  // Offset
-  structure = shiftStructure(structure, position)
+  // Offset the structure
+  structure = transformStructure(structure, [{mode: "translate", offset: position}])
 
   // Merge
-  const ret = emptyStructure()
-  ret.voxels = {...mainStructure.voxels, ...structure.voxels}
-  ret.things = [...mainStructure.things, ...structure.things]
-  ret.doorways = [...mainStructure.doorways, ...structure.doorways]
-
-  // Return
-  return ret
+  Object.assign(mainStructure.voxels, structure.voxels)
+  mainStructure.things.push(...structure.things)
+  mainStructure.doorways.push(...structure.doorways)
 }
 
 export function equals(voxel1, voxel2) {
@@ -614,35 +610,6 @@ export function transformStructure(structure, transformations) {
 
   // Weight
   ret.weight = structure.weight
-
-  return ret
-}
-
-export function shiftStructure(structure, offset) {
-  // Early exit if there is nothing to offset
-  if (vec3.equals(offset, [0, 0, 0])) {
-    return copyStructure(structure)
-  }
-
-  let ret = emptyStructure()
-
-  // Voxels
-  for (const sPos in structure.voxels) {
-    const newPos = vec3.add(stringToArray(sPos), offset)
-    ret.voxels[newPos] = structure.voxels[sPos]
-  }
-
-  // Things
-  ret.things = [...structure.things]
-  for (const thing of ret.things) {
-    thing.position = vec3.add(thing.position, offset)
-  }
-
-  // Doorways
-  ret.doorways = [...structure.doorways]
-  for (const doorway of ret.doorways) {
-    doorway.position = vec3.add(doorway.position, offset)
-  }
 
   return ret
 }

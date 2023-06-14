@@ -46,7 +46,7 @@ export function generateMansion({
           y*roomLength,
           z*roomHeight,
         ]
-        ret = vox.mergeStructureIntoStructure(ret, structure, position)
+        vox.mergeStructureIntoStructure(ret, structure, position)
       }
     }
   }
@@ -158,11 +158,11 @@ function propagateChanges(grid, position) {
   // Iterate over directions to propagate to
   for (const direction of vec3.allDirections()) {
     // Propagate changes in the current position to the neighbor
-    const newPos = vec3.add(position, vec3.directionToVector(direction))
     const changed = removeFromNeighbor(grid, position, direction)
 
     // If this cell was changed, we need to propagate further
     if (changed) {
+      const newPos = vec3.add(position, vec3.directionToVector(direction))
       propagateChanges(grid, newPos)
     }
   }
@@ -174,9 +174,7 @@ function removeFromNeighbor(grid, position, direction) {
     return 0
   }
 
-  // Get position of neighbor
-  const delta = vec3.directionToVector(direction)
-  const neighborPos = vec3.add(position, delta)
+  const neighborPos = vec3.add(position, vec3.directionToVector(direction))
 
   // If neighbor position is out of grid bounds, exit
   if (!vec3.withinBounds(neighborPos, [0, 0, 0], [grid.width, grid.length, grid.height])) {
@@ -196,14 +194,16 @@ function removeFromNeighbor(grid, position, direction) {
   let changesMade = 0
 
   // Iterate over possibilites in the neighbor cell
+  const herePossibilities = grid.cells[neighborPosKey].possibilities
+  const neighborPossibilities = grid.cells[positionKey].possibilities
   for (let i = grid.cells[neighborPosKey].possibilities.length-1; i >= 0; i --) {
     // Loop over possibilites in this cell
     let found = false
     const jLen = grid.cells[positionKey].possibilities.length
-    for (let j = 0; j < jLen; j ++) { // High load
+    const connectionTo = herePossibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))]
+    for (let j = 0; j < jLen; j ++) {
       // Check if these two structures have a matching connection
-      const connectionTo = grid.cells[neighborPosKey].possibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))] // High load
-      const connectionFrom = grid.cells[positionKey].possibilities[j].connections[vec3.directionToIndex(direction)] // High load
+      const connectionFrom = neighborPossibilities[j].connections[vec3.directionToIndex(direction)]
       if (connectionMatches(connectionTo, connectionFrom)) {
         found = true
         break
@@ -264,10 +264,11 @@ function pickNextCell(grid) {
     for (let y = 0; y < grid.length; y ++) {
       for (let z = 0; z < grid.height; z ++) {
         const position = [x, y, z]
-        const count = grid.cells[position].possibilities.length
+        const positionKey = position.toString()
+        const count = grid.cells[positionKey].possibilities.length
 
         // If this cell has already been picked, don't consider it
-        if (grid.cells[position].picked) {
+        if (grid.cells[positionKey].picked) {
           continue
         }
 
