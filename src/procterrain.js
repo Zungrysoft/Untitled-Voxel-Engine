@@ -1,5 +1,6 @@
 import * as vox from './voxel.js'
 import { add, scale } from './core/vector2.js'
+import Noise from './noise.js'
 
 const ROUGHNESS_CONSTANT = 0.5
 const SMOOTHING_ITERATIONS = 3
@@ -147,4 +148,10 @@ function diamondSquareIterate (terrain, size, moveDistance, variance, mode) {
 
 function diamondSquareRandomize (variance) {
   return (Math.random() - 0.5) * variance * ROUGHNESS_CONSTANT
+}
+
+let noise = new Noise(0)
+
+export function getPerlin(x, y, z) {
+  return noise.perlin3(x, y, z)
 }

@@ -196,12 +196,11 @@ function removeFromNeighbor(grid, position, direction) {
   // Iterate over possibilites in the neighbor cell
   const herePossibilities = grid.cells[neighborPosKey].possibilities
   const neighborPossibilities = grid.cells[positionKey].possibilities
-  for (let i = grid.cells[neighborPosKey].possibilities.length-1; i >= 0; i --) {
+  for (let i = herePossibilities.length-1; i >= 0; i --) {
     // Loop over possibilites in this cell
     let found = false
-    const jLen = grid.cells[positionKey].possibilities.length
     const connectionTo = herePossibilities[i].connections[vec3.directionToIndex(vec3.oppositeDirection(direction))]
-    for (let j = 0; j < jLen; j ++) {
+    for (let j = 0; j < neighborPossibilities.length; j ++) {
       // Check if these two structures have a matching connection
       const connectionFrom = neighborPossibilities[j].connections[vec3.directionToIndex(direction)]
       if (connectionMatches(connectionTo, connectionFrom)) {
@@ -226,7 +225,7 @@ function removeFromNeighbor(grid, position, direction) {
 
 function connectionMatches(a, b) {
   // Empty string always matches
-  if (a.type === '' || b.type === '') {
+  if (!a.type || !b.type) {
     return true
   }
 

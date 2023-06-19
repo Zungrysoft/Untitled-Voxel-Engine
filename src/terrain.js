@@ -16,6 +16,7 @@ import SpatialHash from './core/spatialhash.js'
 
 export default class Terrain extends Thing {
   time = 0
+  seed = Math.floor(Math.random() * Math.pow(2, 64))
   chunks = {}
   chunkMeshes = {}
   chunkGeneratorData = {}
@@ -214,57 +215,77 @@ export default class Terrain extends Thing {
       // })
 
       // Mansion
-      const tileScale = 5
-      const mansion = procMansion.generateMansion({
-        width: 125,
-        length: 125,
-        height: 15,
-        roomWidth: tileScale,
-        roomLength: tileScale,
-        roomHeight: tileScale,
-        possibilities: [
-          assets.json.structureArchesBottomCenter,
-          assets.json.structureArchesBottomEdge,
-          assets.json.structureArchesBottomEdgePillar,
-          assets.json.structureArchesBottomCornerPillar,
-          assets.json.structureArchesBottomJunctionPillar,
-          assets.json.structureArchesTopEdge,
-          assets.json.structureArchesTopEdgePillar,
-          assets.json.structureArchesTopCornerPillar,
-          assets.json.structureArchesTopJunctionPillar,
-          assets.json.structureArchesRoofCorner,
-          assets.json.structureArchesRoofEdge,
-          assets.json.structureArchesRoofJunction,
-          assets.json.structureArchesRoofCenterEnd,
-          assets.json.structureArchesRoofCenterQuad,
-          assets.json.structureArchesRoofCenterStraight,
-          assets.json.structureArchesRoofCenterTee,
-          assets.json.structureArchesRoofCenterTurn,
-          assets.json.structureAir,
-          assets.json.structureFlat,
-          // assets.json.structureAny,
-        ],
-      })
-      vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, -10])
-      for (let x = 0; x < 35; x ++) {
-        for (let y = 0; y < 35; y ++) {
-          let mansionPlat = procBasics.generateRectangularPrism({
-            width: tileScale,
-            length: tileScale,
-            height: 1,
-            voxel: {material: x%2 === y%2 ? 'grass' : 'leaves', solid: true},
-          })
-          vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -10], vec3.scale([x, y, 0], tileScale)))
-        }
-      }
+      // const tileScale = 5
+      // const mansion = procMansion.generateMansion({
+      //   width: 125,
+      //   length: 125,
+      //   height: 15,
+      //   roomWidth: tileScale,
+      //   roomLength: tileScale,
+      //   roomHeight: tileScale,
+      //   possibilities: [
+      //     assets.json.structureArchesBottomCenter,
+      //     assets.json.structureArchesBottomEdge,
+      //     assets.json.structureArchesBottomEdgePillar,
+      //     assets.json.structureArchesBottomCornerPillar,
+      //     assets.json.structureArchesBottomJunctionPillar,
+      //     assets.json.structureArchesTopEdge,
+      //     assets.json.structureArchesTopEdgePillar,
+      //     assets.json.structureArchesTopCornerPillar,
+      //     assets.json.structureArchesTopJunctionPillar,
+      //     assets.json.structureArchesRoofCorner,
+      //     assets.json.structureArchesRoofEdge,
+      //     assets.json.structureArchesRoofJunction,
+      //     assets.json.structureArchesRoofCenterEnd,
+      //     assets.json.structureArchesRoofCenterQuad,
+      //     assets.json.structureArchesRoofCenterStraight,
+      //     assets.json.structureArchesRoofCenterTee,
+      //     assets.json.structureArchesRoofCenterTurn,
+      //     assets.json.structureAir,
+      //     assets.json.structureFlat,
+      //     // assets.json.structureAny,
+      //   ],
+      // })
+      // vox.mergeStructureIntoWorld(this.chunks, mansion, [92, 55, -10])
+      // for (let x = 0; x < 35; x ++) {
+      //   for (let y = 0; y < 35; y ++) {
+      //     let mansionPlat = procBasics.generateRectangularPrism({
+      //       width: tileScale,
+      //       length: tileScale,
+      //       height: 1,
+      //       voxel: {material: x%2 === y%2 ? 'grass' : 'leaves', solid: true},
+      //     })
+      //     vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -10], vec3.scale([x, y, 0], tileScale)))
+      //   }
+      // }
+
+      const x = Math.random() * 50
+      const y = Math.random() * 50
+      const z = Math.random() * 50
+      console.log(procTerrain.getPerlin(x, y, z))
     }
   }
 
-  traceLine(traceStart, traceEnd) {
+  traceLine(traceStart, traceEnd, ignoreFirstVoxel=false) {
     const xSign = traceEnd[0] > traceStart[0]
     const ySign = traceEnd[1] > traceStart[1]
     const zSign = traceEnd[2] > traceStart[2]
     const moveVector = vec3.normalize(vec3.subtract(traceEnd, traceStart))
+
+    // Check the first voxel
+    if (!ignoreFirstVoxel) {
+      const hitVoxel = traceStart.map(x => Math.round(x))
+      if (vox.getVoxel(this.chunks, hitVoxel).solid) {
+        return {
+          voxel: hitVoxel,
+          position: [...traceStart],
+          normal: [0, 0, 0],
+          axis: -1,
+          distance: 0,
+          hit: true,
+        }
+      }
+    }
 
     const totalDistance = vec3.distance(traceStart, traceEnd)
     let distanceLeft = totalDistance // Distance left to travel
@@ -289,24 +310,29 @@ export default class Terrain extends Thing {
       // Set move distance based on which voxel face was next
       let moveDistance = 0
       let normal = [0, 0, 0]
+      let axis = -1
       if (xDist < yDist) {
         if (xDist < zDist) {
           moveDistance = xDist
           normal = [xSign ? -1 : 1, 0, 0]
+          axis = 0
         }
         else {
           moveDistance = zDist
           normal = [0, 0, zSign ? -1 : 1]
+          axis = 2
         }
       }
       else {
         if (yDist < zDist) {
           moveDistance = yDist
           normal = [0, ySign ? -1 : 1, 0]
+          axis = 1
         }
         else {
           moveDistance = zDist
           normal = [0, 0, zSign ? -1 : 1]
+          axis = 2
         }
       }
 
@@ -327,6 +353,7 @@ export default class Terrain extends Thing {
           voxel: hitVoxel,
           position: hitPos,
           normal: normal,
+          axis: axis,
           distance: totalDistance - distanceLeft,
           hit: true
         }
@@ -336,8 +363,9 @@ export default class Terrain extends Thing {
     // Base case if it hit nothing
     return {
       voxel: traceEnd.map(x => Math.round(x)),
-      position: traceEnd,
+      position: [...traceEnd],
       normal: [0, 0, 0],
+      axis: -1,
       distance: totalDistance,
       hit: false,
     }

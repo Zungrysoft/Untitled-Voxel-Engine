@@ -8,6 +8,10 @@ export function stringToArray(s) {
   return s.split(',').map(x => Number(x))
 }
 
+export function snapToVoxel(position) {
+  return position.map(n => Math.round(n))
+}
+
 export function positionToChunkKey(position) {
   return [
     Math.floor(position[0] / CHUNK_SIZE),

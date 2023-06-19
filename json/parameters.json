@@ -1,0 +1,8 @@
+{
+    "treeHeight": {
+        "scope": "biome",
+        "mode": "bellCurve",
+        "mean": 15,
+        "standardDeviation": 3.0
+    }
+}

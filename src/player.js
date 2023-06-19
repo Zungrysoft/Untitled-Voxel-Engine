@@ -14,7 +14,8 @@ import * as vec2 from './core/vector2.js'
 import * as vox from './voxel.js'
 
 export default class Player extends Thing {
-  height = 3.6
+  height = 3.8
+  cameraHeight = 3.5
   onGround = false
   wasOnGround = false
   aabb = [-16, -16, 16, 16]
@@ -358,14 +359,68 @@ export default class Player extends Thing {
   }
 
   moveAndCollide () {
-    this.position[0] += this.velocity[0]
-    this.position[1] += this.velocity[1]
-    this.position[2] += this.velocity[2]
+    // onGround state update
     this.wasOnGround = this.onGround
     this.onGround = false
 
+    // let pointList = []
+    // const [xs, ys, zs] = this.velocity.map(n => n > 0 ? 1 : -1)
+    // const stepHeight = 1.1
+    // pointList.push([])
+
+    // World collision
+    // const terrain = game.getThing('terrain')
+    // for (let i = 0; i < 3; i ++) {
+    //   // const startPos = vec3.add(this.position, vec3.add(vec3.scale(vec3.normalize(this.velocity), -0.3), [0, 0, 1.1]))
+    //   const startPos = vec3.add(this.position, [0, 0, 1.1])
+    //   const endPos = vec3.add(this.position, this.velocity)
+    //   const traceData = terrain.traceLine(startPos, endPos, true)
+    //   if (traceData.hit) {
+    //     console.log("Hit on axis " + traceData.axis)
+    //     // Floors
+    //     if (traceData.normal[2] >= 1.0) {
+    //       this.onGround = true
+    //       // this.velocity[2] -= vec3.dotProduct(this.velocity, [0, 0, 1])
+    //       this.velocity[2] = 0
+    //       const heightOld = this.position[2]
+    //       this.position[2] = 0.5 + traceData.voxel[2]
+
+    //       // Staircase offset, used to create a smooth camera movement when walking up stairs
+    //       this.staircaseOffset = Math.min(this.staircaseOffset + (this.position[2] - heightOld), 1.5)
+
+    //       // Do another raytrace with the updated velocity information
+    //       // continue
+    //     }
+    //     // Walls and ceilings
+    //     else {
+    //       // const axis = traceData.axis
+    //       // console.log("WALL" + axis)
+    //       // const dot = vec3.dotProduct(this.velocity, traceData.normal)
+    //       // this.velocity = vec3.subtract(this.velocity, vec3.scale(traceData.normal, dot))
+    //       // // if (dot < 0) {
+    //       // //   this.velocity[0] -= dot * normal[0]
+    //       // //   this.velocity[1] -= dot * normal[1]
+    //       // //   this.velocity[2] -= dot * normal[2]
+    //       // // }
+    //       // this.position[axis] = (traceData.normal[axis] * 0.5001) + traceData.voxel[axis]
+    //       // // const push = (this.width - distance) / 10
+    //       // // this.position[0] += normal[0] * push
+    //       // // this.position[1] += normal[1] * push
+    //       // // this.position[2] += normal[2] * push
+
+    //       // // Do another raytrace with the updated velocity information
+    //       // console.log(this.velocity)
+    //       // continue
+    //     }
+    //   }
+
+    //   break
+    // }
+    this.position = vec3.add(this.position, this.velocity)
+
     // Get all colliders near the player
-    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, this.position[2] - this.height, 4, 4, this.height + 4)
+    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, this.position[2] - 2, 4, 4, this.height + 4)
+    // const colliderList = []
 
     // Floor collisions
     for (const collider of colliderList) {
@@ -377,7 +432,7 @@ export default class Player extends Thing {
       }
 
       const position = [...this.position]
-      position[2] -= this.height
+      // position[2] -= this.height
 
       if (!vec3.isInsideTriangle(...points, [0, 0, 1], position)) {
         continue
@@ -420,7 +475,8 @@ export default class Player extends Thing {
       const stepHeight = this.onGround ? 1.5 : 0.5
       for (let h = stepHeight; h <= 3; h += 0.5) {
         const position = [...this.position]
-        position[2] += h - this.height
+        // position[2] += h - this.height
+        position[2] += h
 
         if (!vec3.isInsideTriangle(...points, fakeNormal, position)) {
           continue
@@ -493,7 +549,7 @@ export default class Player extends Thing {
     game.getCamera3D().position = [
       this.position[0],
       this.position[1],
-      this.position[2] - this.staircaseOffset,
+      this.position[2] - this.staircaseOffset + this.cameraHeight,
     ]
   }
 
@@ -571,7 +627,7 @@ export default class Player extends Thing {
     // Coordinates
     if (game.globals.debugMode) {
       const margin = 16
-      const pos = vec3.add(this.position, [0, 0, -this.height])
+      const pos = this.position
       const vPos = pos.map(x => Math.round(x))
       ctx.save()
       ctx.font = 'italic 16px Times New Roman'
@@ -611,7 +667,6 @@ export default class Player extends Thing {
           "0,0,1": "Up (+Z)",
           "0,0,-1": "Down (-Z)",
         }
-        const ang = game.getCamera3D().lookVector
         const str = "Facing " + mapping[vec3.findMostSimilarVector(vec3.scale(game.getCamera3D().lookVector, -1), possibilities)]
         ctx.fillStyle = 'darkBlue'
         ctx.fillText(str, 0, 0)
