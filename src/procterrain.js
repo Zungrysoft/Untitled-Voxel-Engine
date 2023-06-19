@@ -5,7 +5,7 @@ import Noise from './noise.js'
 const ROUGHNESS_CONSTANT = 0.5
 const SMOOTHING_ITERATIONS = 3
 
-export function generateTerrain ({width=10, length=10, height=1, variance=14, roughness=0.4, voxel={}}) {
+export function generateDiamondSquareTerrain ({width=10, length=10, height=1, variance=14, roughness=0.4, voxel={}}) {
   // Determine how big of a grid we'll need for the requested size
   const greater = Math.max(width, length)
   let size = 2
@@ -150,8 +150,36 @@ function diamondSquareRandomize (variance) {
   return (Math.random() - 0.5) * variance * ROUGHNESS_CONSTANT
 }
 
-let noise = new Noise(0)
+export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 16, 16], scale=16}) {
+  // Initialize structure
+  let ret = vox.emptyStructure()
 
-export function getPerlin(x, y, z) {
-  return noise.perlin3(x, y, z)
+  // Create noise object
+  let noise = new Noise(seed)
+
+  // Fix min and max coords
+  let xMin = Math.min(minPosition[0], maxPosition[0])
+  let yMin = Math.min(minPosition[1], maxPosition[1])
+  let zMin = Math.min(minPosition[2], maxPosition[2])
+  let xMax = Math.max(minPosition[0], maxPosition[0])
+  let yMax = Math.max(minPosition[1], maxPosition[1])
+  let zMax = Math.max(minPosition[2], maxPosition[2])
+
+  // Iterate over coords in volume
+  for (let x = xMin; x <= xMax; x++) {
+    for (let y = yMin; y <= yMax; y++) {
+      for (let z = zMin; z <= zMax; z++) {
+        const density = noise.perlin3(x/scale, y/scale, z/scale)
+        if (density > 0) {
+          ret.voxels[[x, y, z]] = {solid: true, material: 'dirt'}
+        }
+        else if (density > -0.1) {
+          ret.voxels[[x, y, z]] = {solid: true, material: 'grass'}
+        }
+      }
+    }
+  }
+
+  // Return
+  return ret
 }

@@ -163,7 +163,7 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, plat3, [0, 0, -1])
 
     // Terrain
-    let terrainTest = procTerrain.generateTerrain({
+    let terrainTest = procTerrain.generateDiamondSquareTerrain({
       width: 65,
       length: 65,
       height: 5,
@@ -191,7 +191,13 @@ export default class Terrain extends Thing {
     vox.mergeStructureIntoWorld(this.chunks, litRoom, [34, 5, 5])
     vox.mergeStructureIntoWorld(this.chunks, doorway, [34, 10, 6])
 
-
+    // Perlin 3D terrain
+    let perlinTerrain = procTerrain.generateTerrain(this.seed, {
+      minPosition: [63, 29, -10],
+      maxPosition: [95, 0, 20],
+      scale: 20
+    })
+    vox.mergeStructureIntoWorld(this.chunks, perlinTerrain)
   }
 
   update () {

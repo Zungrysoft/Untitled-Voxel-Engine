@@ -203,6 +203,11 @@ export function setVoxel(chunks, position, voxel) {
 export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], globalVoxel = {}) {
   // Global voxel is used to override certain properties of the structure's voxels
 
+  // Throw error if structure doesn't exist
+  if (!structure) {
+    throw new Error('Cannot merge empty structure!');
+  }
+
   // Iterate over voxels in structure
   for (const sPos in structure.voxels) {
     const voxel = structure.voxels[sPos]
