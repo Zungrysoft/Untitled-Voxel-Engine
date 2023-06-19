@@ -62,14 +62,7 @@ export default class Noise {
   // This isn't a very good seeding function, but it works ok. It supports 2^16
   // different seed values. Write something better if you need more seeds.
   seed(seed) {
-    // Scale the seed out
-    if(seed > 0 && seed < 1) {
-      seed *= 65536;
-    }
-    seed = Math.floor(seed);
-    if(seed < 256) {
-      seed |= seed << 8;
-    }
+    seed = Math.abs(seed)
 
     for (let i = 0; i < 256; i++) {
       let v;
