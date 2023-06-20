@@ -150,7 +150,7 @@ function diamondSquareRandomize (variance) {
   return (Math.random() - 0.5) * variance * ROUGHNESS_CONSTANT
 }
 
-export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 16, 16], scale=16}) {
+export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 16, 16], scale=16, zScale=0.5, heightScale=14}) {
   // Initialize structure
   let ret = vox.emptyStructure()
 
@@ -168,15 +168,17 @@ export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 1
   // Iterate over coords in volume
   for (let x = xMin; x <= xMax; x++) {
     for (let y = yMin; y <= yMax; y++) {
-      for (let z = zMin; z <= zMax; z++) {
-        let density = noise.perlin3(x/scale, y/scale, z/scale)
-        density += noise.perlin3(x/(scale/4), y/(scale/4), z/(scale/4)) / 16
-        density += (25-z)/33
+      let prevAir = true
+      for (let z = zMax; z >= zMin; z--) {
+        let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale))
+        density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16
+        density += (4-z)/heightScale
         if (density > 0.2) {
-          ret.voxels[[x, y, z]] = {solid: true, material: 'dirt'}
+          ret.voxels[[x, y, z]] = {solid: true, material: prevAir ? 'grass' : 'dirt'}
+          prevAir = false
         }
-        else if (density > 0.1) {
-          ret.voxels[[x, y, z]] = {solid: true, material: 'grass'}
+        else {
+          prevAir = true
         }
       }
     }

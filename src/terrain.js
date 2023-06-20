@@ -193,7 +193,7 @@ export default class Terrain extends Thing {
 
     // Perlin 3D terrain
     let perlinTerrain = procTerrain.generateTerrain(this.seed, {
-      minPosition: [63, 29, -10],
+      minPosition: [63, 29, -30],
       maxPosition: [145, -100, 50],
       scale: 20
     })
