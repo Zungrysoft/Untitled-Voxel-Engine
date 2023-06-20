@@ -194,7 +194,7 @@ export default class Terrain extends Thing {
     // Perlin 3D terrain
     let perlinTerrain = procTerrain.generateTerrain(this.seed, {
       minPosition: [63, 29, -10],
-      maxPosition: [95, 0, 20],
+      maxPosition: [145, -100, 50],
       scale: 20
     })
     vox.mergeStructureIntoWorld(this.chunks, perlinTerrain)
@@ -215,10 +215,15 @@ export default class Terrain extends Thing {
       // console.log(dungeon)
       // vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
 
-      // lit.lightingPass({
-      //   position: [43, 15, 10],
-      //   brightness: 35,
-      // })
+      lit.lightingPass({
+        position: [68, -5, 11],
+        brightness: 55,
+      })
+
+      lit.lightingPass({
+        position: [43, 15, 10],
+        brightness: 55,
+      })
 
       // Mansion
       // const tileScale = 5
@@ -264,11 +269,6 @@ export default class Terrain extends Thing {
       //     vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -10], vec3.scale([x, y, 0], tileScale)))
       //   }
       // }
-
-      const x = Math.random() * 50
-      const y = Math.random() * 50
-      const z = Math.random() * 50
-      console.log(procTerrain.getPerlin(x, y, z))
     }
   }
 

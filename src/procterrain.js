@@ -169,11 +169,13 @@ export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 1
   for (let x = xMin; x <= xMax; x++) {
     for (let y = yMin; y <= yMax; y++) {
       for (let z = zMin; z <= zMax; z++) {
-        const density = noise.perlin3(x/scale, y/scale, z/scale)
-        if (density > 0) {
+        let density = noise.perlin3(x/scale, y/scale, z/scale)
+        density += noise.perlin3(x/(scale/4), y/(scale/4), z/(scale/4)) / 16
+        density += (25-z)/33
+        if (density > 0.2) {
           ret.voxels[[x, y, z]] = {solid: true, material: 'dirt'}
         }
-        else if (density > -0.1) {
+        else if (density > 0.1) {
           ret.voxels[[x, y, z]] = {solid: true, material: 'grass'}
         }
       }
