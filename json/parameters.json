@@ -3,6 +3,40 @@
         "scope": "biome",
         "mode": "bellCurve",
         "mean": 15,
-        "standardDeviation": 3.0
+        "standardDeviation": 3
+    },
+
+
+    "terrainIslandRadius": {
+        "scope": "biome",
+        "mode": "bellCurve",
+        "mean": 150,
+        "standardDeviation": 50,
+        "min": 50
+    },
+    "terrainIslandRadiusVerticalScale": {
+        "scope": "biome",
+        "mode": "bellCurve",
+        "mean": 0.3,
+        "standardDeviation": 0.15,
+        "min": 0
+    },
+    "terrainMoundRadius": {
+        "scope": "biome",
+        "mode": "bellCurve",
+        "mean": 40,
+        "standardDeviation": 3
+    },
+    "terrainMoundRadiusVerticalScale": {
+        "scope": "biome",
+        "mode": "bellCurve",
+        "mean": 1.0,
+        "standardDeviation": 0.2,
+        "min": 0.1
+    },
+    "terrainMoundFlatness": {
+        "scope": "biome",
+        "mode": "constant",
+        "value": 5
     }
 }

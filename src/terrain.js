@@ -21,6 +21,7 @@ export default class Terrain extends Thing {
   chunkMeshes = {}
   chunkGeneratorData = {}
   chunkSpatialHashes = {}
+  selectedChunks = []
   fogColor = [1, 1, 1]
   palette = {
     structure: pal.generatePalette(0.027, 0.5, 0.8, 0.13),
@@ -50,160 +51,51 @@ export default class Terrain extends Thing {
     super()
     game.setThingName(this, 'terrain')
 
+    // Spawn platform
     let plat = procBasics.generateRectangularPrism({
-      length: 25,
-      width: 25,
-      height: 2,
+      length: 16,
+      width: 16,
+      height: 7,
       voxel: {material: 'structure', solid: true},
-    })
-    let plat2 = procBasics.applyPattern(plat, {
-      pattern: 'flat',
-      voxel1: {material: 'vines', solid: true},
     })
     plat = procBasics.applyPattern(plat, {
       pattern: 'checker',
-      voxel1: {material: 'wood', solid: true},
-      voxel2: {material: 'bark', solid: true},
-    })
-
-    let wall = procBasics.generateRectangularPrism({
-      width: 25,
-      length: 1,
-      height: 6,
-      voxel: {material: 'structure', solid: true},
-    })
-    wall = procBasics.applyPattern(wall, {
-      pattern: 'checker',
-      voxel1: {material: 'stone', solid: true},
-      voxel2: {material: 'stoneAccent', solid: true},
-    })
-
-    vox.mergeStructureIntoWorld(this.chunks, wall, [-10, -10, 3])
-    vox.mergeStructureIntoWorld(this.chunks, wall, [-7, -7, 3])
-
-    vox.mergeStructureIntoWorld(this.chunks, plat2, [-10, -10, 1])
-    vox.mergeStructureIntoWorld(this.chunks, plat, [0, 0, 2])
-    vox.mergeStructureIntoWorld(this.chunks, plat, [4, 0, 3])
-    vox.mergeStructureIntoWorld(this.chunks, plat, [9, 4, 4])
-
-    // Generate slope
-    for (let i = 0; i < 30; i ++) {
-      const x = i*5
-      const y = 30
-      const z = 4 - i
-      vox.mergeStructureIntoWorld(this.chunks, plat, [x, y, z])
-    }
-
-    const v1 = {material: 'bone', solid: true}
-    vox.setVoxel(this.chunks, [1, 0, 6], v1)
-    vox.setVoxel(this.chunks, [2, 0, 6], v1)
-    vox.setVoxel(this.chunks, [3, 0, 6], v1)
-    vox.setVoxel(this.chunks, [4, 0, 6], v1)
-    vox.setVoxel(this.chunks, [5, 0, 6], v1)
-    vox.setVoxel(this.chunks, [6, 0, 6], v1)
-    vox.setVoxel(this.chunks, [0, 0, 5], v1)
-    vox.setVoxel(this.chunks, [-1, 0, 4], v1)
-    vox.setVoxel(this.chunks, [-2, 0, 3], v1)
-    vox.setVoxel(this.chunks, [-3, 0, 2], v1)
-    vox.setVoxel(this.chunks, [-4, 0, 1], v1)
-
-    let room = procBasics.generateRoom({
-      width: 8,
-      length: 8,
-      height: 6,
-      wallThickness: 1,
-      floorThickness: 3,
-      ceilingThickness: 0,
-      voxel: {material: 'structure', solid: true},
-    })
-    room = procBasics.applyPattern(room, {
-      pattern: 'checker',
-      voxel1: {material: 'stone', solid: true},
-      voxel2: {material: 'stoneAccent', solid: true},
-    })
-    vox.mergeStructureIntoWorld(this.chunks, room, [17, -7, -5])
-
-    // Palette test
-    let keyZ = 0
-    for (const key in this.palette) {
-      for (let i = 0; i < 16; i ++) {
-        const s = u.map(i, 0, 16-1, 0, 1.0)
-        const v1 = {material: key, solid: true, shades: [s, s, s, s, s, s]}
-        vox.setVoxel(this.chunks, [27 + i, -keyZ-6, 3], v1)
-      }
-      keyZ ++
-    }
-
-    // Generate mountain
-    for (let i = 0; i < 700; i ++) {
-      let m = procBasics.generateRectangularPrism({
-        width: Math.floor(Math.random()*12),
-        length: Math.floor(Math.random()*12),
-        height: Math.floor(Math.random()*10 + 10),
-        voxel: {solid: true, material: 0.5 > Math.random() ? 'stone' : 'stoneRoof'},
-      })
-      const x = Math.floor(Math.random()*40 - 50)
-      const y = Math.floor(Math.random()*120 - 40)
-      const z = -10
-      vox.mergeStructureIntoWorld(this.chunks, m, [x, y, z])
-    }
-
-    // Chunk plat
-    let plat3 = procBasics.generateRectangularPrism({
-      length: 32,
-      width: 32,
-      height: 1,
-      voxel: {material: 'structure', solid: true},
-    })
-    plat3 = procBasics.applyPattern(plat3, {
-      pattern: 'checker',
-      voxel1: {material: 'vines', solid: true},
+      voxel1: {material: 'dirt', solid: true},
       voxel2: {material: 'grass', solid: true},
     })
-    vox.mergeStructureIntoWorld(this.chunks, plat3, [0, 0, -1])
+    vox.mergeStructureIntoWorld(this.chunks, plat, [0, 0, 0])
 
-    // Terrain
-    let terrainTest = procTerrain.generateDiamondSquareTerrain({
-      width: 65,
-      length: 65,
-      height: 5,
-      variance: 40,
-      voxel: {material: 'grass', solid: true},
-    })
-    vox.mergeStructureIntoWorld(this.chunks, terrainTest, [27, 55, 1])
+    for (let i = 1; i < 20; i ++) {
+      vox.mergeStructureIntoWorld(this.chunks, plat, [i*16, 0, 0])
+    }
 
-    // Lighting test room
-    let litRoom = procBasics.generateRoom({
-      width: 20,
-      length: 20,
-      height: 11,
-      wallThickness: 1,
-      floorThickness: 1,
-      ceilingThickness: 1,
-      voxel: {material: 'stone', solid: true},
-    })
-    let doorway = procBasics.generateRectangularPrism({
-      width: 1,
-      length: 2,
-      height: 4,
-      voxel: {solid: false},
-    })
-    vox.mergeStructureIntoWorld(this.chunks, litRoom, [34, 5, 5])
-    vox.mergeStructureIntoWorld(this.chunks, doorway, [34, 10, 6])
+    // Palette test
+    // let keyZ = 0
+    // for (const key in this.palette) {
+    //   for (let i = 0; i < 16; i ++) {
+    //     const s = u.map(i, 0, 16-1, 0, 1.0)
+    //     const v1 = {material: key, solid: true, shades: [s, s, s, s, s, s]}
+    //     vox.setVoxel(this.chunks, [27 + i, -keyZ-6, 3], v1)
+    //   }
+    //   keyZ ++
+    // }
 
-    // Perlin 3D terrain
-    let perlinTerrain = procTerrain.generateTerrain(this.seed, {
-      minPosition: [63, 29, -30],
-      maxPosition: [145, -100, 50],
-      scale: 20
-    })
-    vox.mergeStructureIntoWorld(this.chunks, perlinTerrain)
+    // Set up worker threads
+    this.chunkSelectorWorker = new Worker('src/workers/chunkselector.js');
+    this.chunkSelectorWorker.onmessage = (message) => {
+      this.loadChunks(message.data)
+    }
   }
 
   update () {
     super.update()
 
     this.time ++
+
+    // Chunk loading and unloading
+    if (this.time % 300 === 0) {
+      this.selectChunks(game.getThing('player').position)
+    }
 
     // Debug button
     if (game.keysPressed.KeyJ) {
@@ -215,14 +107,21 @@ export default class Terrain extends Thing {
       // console.log(dungeon)
       // vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
 
-      lit.lightingPass({
-        position: [68, -5, 11],
-        brightness: 55,
-      })
+      // lit.lightingPass({
+      //   position: [68, -5, 11],
+      //   brightness: 55,
+      // })
 
-      lit.lightingPass({
-        position: [43, 15, 10],
-        brightness: 55,
+      // lit.lightingPass({
+      //   position: [43, 15, 10],
+      //   brightness: 55,
+      // })
+
+      // Perlin 3D terrain
+      procTerrain.buildTerrain(this.chunks, this.seed, {
+        minPosition: [63, 29, -30],
+        maxPosition: [345, -300, 50],
+        scale: 20
       })
 
       // Mansion
@@ -269,6 +168,22 @@ export default class Terrain extends Thing {
       //     vox.mergeStructureIntoWorld(this.chunks, mansionPlat, vec3.add([92, 55, -10], vec3.scale([x, y, 0], tileScale)))
       //   }
       // }
+    }
+  }
+
+  selectChunks(position) {
+    this.chunkSelectorWorker.postMessage({position: position, renderDistance: 5})
+  }
+
+  loadChunks(data) {
+    for (const chunkKey of data) {
+      if (!(chunkKey in this.chunks)) {
+        procTerrain.buildTerrain(this.chunks, this.seed, {
+          minPosition: vox.getWorldPosition(chunkKey, [0, 0, 0]),
+          maxPosition: vox.getWorldPosition(chunkKey, [15, 15, 15]),
+          scale: 20,
+        })
+      }
     }
   }
 

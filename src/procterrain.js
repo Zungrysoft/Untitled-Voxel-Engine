@@ -150,10 +150,7 @@ function diamondSquareRandomize (variance) {
   return (Math.random() - 0.5) * variance * ROUGHNESS_CONSTANT
 }
 
-export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 16, 16], scale=16, zScale=0.5, heightScale=14}) {
-  // Initialize structure
-  let ret = vox.emptyStructure()
-
+export function buildTerrain(chunks, seed, {minPosition=[0, 0, 0], maxPosition=[16, 16, 16], scale=16, zScale=0.5, heightScale=14}) {
   // Create noise object
   let noise = new Noise(seed)
 
@@ -168,22 +165,27 @@ export function generateTerrain(seed, {minPosition=[0, 0, 0], maxPosition=[16, 1
   // Iterate over coords in volume
   for (let x = xMin; x <= xMax; x++) {
     for (let y = yMin; y <= yMax; y++) {
-      let prevAir = true
+      let lastAir = 0
       for (let z = zMax; z >= zMin; z--) {
         let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale))
         density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16
         density += (4-z)/heightScale
         if (density > 0.2) {
-          ret.voxels[[x, y, z]] = {solid: true, material: prevAir ? 'grass' : 'dirt'}
-          prevAir = false
+          let material = 'grass'
+          if (lastAir > 3) {
+            material = 'stone'
+          }
+          else if (lastAir > 0) {
+            material = 'dirt'
+          }
+
+          vox.setVoxel(chunks, [x, y, z], {solid: true, material: material})
+          lastAir ++
         }
         else {
-          prevAir = true
+          lastAir = 0
         }
       }
     }
   }
-
-  // Return
-  return ret
 }

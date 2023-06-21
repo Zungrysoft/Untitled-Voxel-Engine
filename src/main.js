@@ -95,5 +95,5 @@ assets.meshes = Object.fromEntries(
 
 game.setScene(() => {
   game.addThing(new Terrain())
-  game.addThing(new Player([4, 3, 15]))
+  game.addThing(new Player([7, 7, 7]))
 })
