@@ -154,6 +154,9 @@ export function buildTerrain(chunks, seed, {minPosition=[0, 0, 0], maxPosition=[
   // Create noise object
   let noise = new Noise(seed)
 
+  // Force initialize the chosen chunk
+  vox.forceInitChunk(chunks, vox.positionToChunkKey(minPosition))
+
   // Fix min and max coords
   let xMin = Math.min(minPosition[0], maxPosition[0])
   let yMin = Math.min(minPosition[1], maxPosition[1])
@@ -169,6 +172,7 @@ export function buildTerrain(chunks, seed, {minPosition=[0, 0, 0], maxPosition=[
       for (let z = zMax; z >= zMin; z--) {
         let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale))
         density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16
+        density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)/zScale)) * 12
         density += (4-z)/heightScale
         if (density > 0.2) {
           let material = 'grass'

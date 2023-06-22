@@ -7,7 +7,7 @@ onmessage = function(e) {
   }
 
   const { renderDistance, position } = e.data
-  const r2 = renderDistance * renderDistance
+  const r2 = (renderDistance + 0.5) * (renderDistance + 0.5)
   const chunkKey = vox.positionToChunkKey(position)
 
   const xMin = chunkKey[0]-renderDistance
@@ -24,10 +24,10 @@ onmessage = function(e) {
   let ret = []
   for (let x = xMin; x <= xMax; x ++) {
     for (let y = yMin; y <= yMax; y ++) {
-      for (let z = zMin; z <= zMax; z ++) {
-        // If this chunk is within the render sphere, push it to the stack
-        const dist = Math.pow(x-xAvg, 2) + Math.pow(y-yAvg, 2) + Math.pow(z-zAvg, 2)
-        if (dist <= r2) {
+      // If this horizontal position is within the render cylinder, iterate over z
+      const dist = Math.pow(x-xAvg, 2) + Math.pow(y-yAvg, 2)
+      if (dist <= r2) {
+        for (let z = zMin; z <= zMax; z ++) {
           ret.push([x, y, z])
         }
       }

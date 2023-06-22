@@ -69,12 +69,6 @@ export default class Player extends Thing {
       }
     }
 
-    // TEMP Put the player back on top of the level if they fall off
-    if (this.position[2] < this.spawnPosition[2] - 50) {
-      this.position = [...this.spawnPosition]
-      this.velocity = [0, 0, 0]
-    }
-
     // Walking
     let dx = !!game.keysDown.KeyD - !!game.keysDown.KeyA
     let dy = !!game.keysDown.KeyS - !!game.keysDown.KeyW

@@ -86,12 +86,9 @@ export default class Terrain extends Thing {
 
     // Chunk selector
     this.chunkSelectorWorker = new Worker('src/workers/chunkselector.js', { type: "module" })
-    this.chunkSelectorWorker.onmessage = (message) => {
-      this.loadChunks(message.data)
-    }
 
     // Chunk meshers
-    const CHUNK_MESHERS = 3
+    const CHUNK_MESHERS = 8
     this.chunkMeshers = []
     this.chunkMesherIndex = 0
     for (let i = 0; i < CHUNK_MESHERS; i ++) {
@@ -112,31 +109,6 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-      // const dungeon = procDungeon.generateDungeon(this.chunks, {
-      //   position: [25, 30, 4],
-      //   rooms: 30,
-      //   voxel: {solid: true, material:'stone', generatorData:{reserved: true}}
-      // })
-      // console.log(dungeon)
-      // vox.mergeStructureIntoWorld(this.chunks, dungeon, [0, 0, 0])
-
-      // lit.lightingPass({
-      //   position: [68, -5, 11],
-      //   brightness: 55,
-      // })
-
-      // lit.lightingPass({
-      //   position: [43, 15, 10],
-      //   brightness: 55,
-      // })
-
-      // Perlin 3D terrain
-      procTerrain.buildTerrain(this.chunks, this.seed, {
-        minPosition: [63, 29, -30],
-        maxPosition: [345, -300, 50],
-        scale: 20
-      })
-
       // Mansion
       // const tileScale = 5
       // const mansion = procMansion.generateMansion({
@@ -185,7 +157,16 @@ export default class Terrain extends Thing {
   }
 
   selectChunks(position) {
-    this.chunkSelectorWorker.postMessage({position: position, renderDistance: 5})
+    // Get worker
+    const worker = this.chunkSelectorWorker
+
+    // Set callback
+    worker.onmessage = (message) => {
+      this.loadChunks(message.data)
+    }
+
+    // Send message
+    worker.postMessage({position: position, renderDistance: 10})
   }
 
   loadChunks(data) {
@@ -198,6 +179,35 @@ export default class Terrain extends Thing {
         })
       }
     }
+  }
+
+  rebuildChunkMeshes() {
+    // Iterate over chunks and rebuild all marked "modified"
+    for (const chunkKey in this.chunks) {
+      if (this.chunks[chunkKey].modified) {
+        console.log("Rebuilding mesh for chunk " + chunkKey)
+        this.rebuildChunkMesh(chunkKey)
+        this.chunks[chunkKey].modified = false
+      }
+    }
+  }
+
+  rebuildChunkMesh(chunkKey) {
+    // Get worker
+    const worker = this.chunkMeshers[this.chunkMesherIndex]
+    this.chunkMesherIndex = (this.chunkMesherIndex + 1) % 8
+
+    // Set callback
+    worker.onmessage = (message) => {
+      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(message.data.verts)
+    }
+
+    // Send message
+    worker.postMessage({
+      chunk: this.chunks[chunkKey],
+      palette: this.palette,
+      chunkKey: chunkKey,
+    })
   }
 
   traceLine(traceStart, traceEnd, ignoreFirstVoxel=false) {
@@ -303,34 +313,6 @@ export default class Terrain extends Thing {
       distance: totalDistance,
       hit: false,
     }
-  }
-
-  rebuildChunkMeshes() {
-    // Iterate over chunks and rebuild all marked "modified"
-    for (const chunkKey in this.chunks) {
-      if (this.chunks[chunkKey].modified) {
-        console.log("Rebuilding mesh for chunk " + chunkKey)
-        this.rebuildChunkMesh(chunkKey)
-        this.chunks[chunkKey].modified = false
-      }
-    }
-  }
-
-  rebuildChunkMesh(chunkKey) {
-    // Get worker
-    const worker = this.chunkMeshers[this.chunkMesherIndex]
-
-    // Set callback
-    worker.onmessage = (message) => {
-      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(message.data.verts)
-    }
-
-    // Set message
-    worker.postMessage({
-      chunk: this.chunks[chunkKey],
-      palette: this.palette,
-      chunkKey: chunkKey,
-    })
   }
 
   draw () {

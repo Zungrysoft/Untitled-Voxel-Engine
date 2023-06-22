@@ -200,6 +200,16 @@ export function setVoxel(chunks, position, voxel) {
   }
 }
 
+export function forceInitChunk(chunks, chunkKey) {
+  // Do nothing if the chunk already exists
+  if (chunkKey in chunks) {
+    return
+  }
+
+  // Otherwise, set it to an empty chunk
+  chunks[chunkKey] = emptyChunk()
+}
+
 export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], globalVoxel = {}) {
   // Global voxel is used to override certain properties of the structure's voxels
 
