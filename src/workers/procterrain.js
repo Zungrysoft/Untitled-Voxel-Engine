@@ -2,6 +2,9 @@ import * as vox from '../voxel.js'
 import * as vec3 from '../core/vector3.js'
 import Noise from '../noise.js'
 
+const DIRT_DEPTH = 4
+const GRASS_DEPTH = 1
+
 onmessage = function(e) {
   // Handle STOP message
   if (e.data === 'STOP') {
@@ -37,7 +40,7 @@ onmessage = function(e) {
         if (density > 0) {
           // If we are building a block on the top layer, trace upwards to figure out how deep we are
           if (z === vox.CHUNK_SIZE-1) {
-            for (let za = 0; za < 4; za ++) {
+            for (let za = 0; za < DIRT_DEPTH; za ++) {
               // Get world position and perlin density at this position
               const position = vox.getWorldPosition(aboveChunk, [x, y, za])
               const density = getPerlinDensity(position, noise, params)
@@ -51,10 +54,10 @@ onmessage = function(e) {
           }
 
           let material = 'grass'
-          if (depth > 3) {
+          if (depth >= DIRT_DEPTH) {
             material = 'stone'
           }
-          else if (depth > 0) {
+          else if (depth >= GRASS_DEPTH) {
             material = 'dirt'
           }
 
@@ -85,7 +88,7 @@ function getPerlinDensity(position, noise, params) {
 
   let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale))
   density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16
-  density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)/zScale)) * 12
+  density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * 12
   density += (4-z)/heightScale
   density -= 0.2
   return density
