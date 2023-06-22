@@ -88,7 +88,7 @@ function getPerlinDensity(position, noise, params) {
 
   let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale))
   density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16
-  density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * 12
+  density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * 9
   density += (4-z)/heightScale
   density -= 0.2
   return density

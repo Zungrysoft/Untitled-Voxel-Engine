@@ -7,7 +7,7 @@ export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 export const VOXEL_PARAMETERS = 8
 // 0: Material
 // 1: Flags
-// 2-7: Shading (range [0, 65535])
+// 2-7: Shading (range [0, 255])
 // All values are integers
 export const FLAG_SOLID = 1
 export const FLAG_RESERVED = 2
@@ -70,16 +70,20 @@ export function chunkIndexToChunkPosition(index) {
 }
 
 export function emptyVoxel() {
-  return [1, 0, 39321, 32767, 26214, 45874, 52428, 65535]
+  return [1, 0, 153, 127, 102, 179, 204, 255]
 }
 
 export function emptyChunk() {
-  let voxels = []
+  let buffer = new ArrayBuffer(CHUNK_VOLUME * VOXEL_PARAMETERS);
+  let bufferView = new Uint8Array(buffer);
+  const emptyVoxe = emptyVoxel()
   for (let i = 0; i < CHUNK_VOLUME; i ++) {
-    voxels.push(...emptyVoxel())
+    for (let j = 0; j < VOXEL_PARAMETERS; j ++) {
+      bufferView[i*VOXEL_PARAMETERS + j] = emptyVoxe[j]
+    }
   }
   return {
-    voxels: voxels,
+    voxels: buffer,
     things: [],
     modified: false,
   }
@@ -256,11 +260,14 @@ export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS]) {
   // Convert world position to the index within the chunk
   let indexInChunk = chunkPositionToChunkIndex(positionToChunkPosition(position))
 
+  // Get a view of the voxel buffer
+  let bufferView = new Uint8Array(chunk.voxels);
+
   // Return the voxel's data
   if (Array.isArray(quality)) {
-    return chunk.voxels.slice(indexInChunk + quality[0], indexInChunk + quality[1])
+    return bufferView.slice(indexInChunk + quality[0], indexInChunk + quality[1])
   }
-  return chunk.voxels[indexInChunk + quality]
+  return bufferView[indexInChunk + quality]
 }
 
 export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }) {
@@ -280,16 +287,19 @@ export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0
   let chunkPosition = positionToChunkPosition(position)
   let indexInChunk = chunkPositionToChunkIndex(chunkPosition)
 
+  // Get a view of the voxel buffer
+  let bufferView = new Uint8Array(chunk.voxels);
+
   // Merge the data, skipping undefined elements
-  const beforeVoxel = chunk.voxels.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
+  const beforeVoxel = bufferView.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
   for (let i = 0; i < VOXEL_PARAMETERS; i ++) {
     if (voxel[i] !== undefined) {
-      chunk.voxels[indexInChunk + i] = voxel[i]
+      bufferView[indexInChunk + i] = voxel[i]
     }
   }
-  chunk.voxels[indexInChunk + 1] = chunk.voxels[indexInChunk + 1] | flagsAdd
-  chunk.voxels[indexInChunk + 1] = ~(~chunk.voxels[indexInChunk + 1] | flagsRemove)
-  const afterVoxel = chunk.voxels.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
+  bufferView[indexInChunk + 1] = bufferView[indexInChunk + 1] | flagsAdd
+  bufferView[indexInChunk + 1] = ~(~bufferView[indexInChunk + 1] | flagsRemove)
+  const afterVoxel = bufferView.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
 
   // Determine whether we should mark this chunk as modified (so it can be re-meshed)
   if (!chunk.modified) {
@@ -741,32 +751,6 @@ export function transformStructure(structure, transformations) {
 
   // Weight
   ret.weight = structure.weight
-
-  return ret
-}
-
-export function listVoxels(chunks) {
-  let ret = []
-
-  // Iterate over chunks
-  for (const chunkKey in chunks) {
-    const chunk = chunks[chunkKey]
-    // Iterate over voxels in chunk
-    for (let i = 0; i < CHUNK_VOLUME; i ++) {
-      // Get voxel color at this index
-      const voxel = chunk.voxels[i]
-
-      // If this voxel is not air, list it
-      if (voxel.solid) {
-        const chunkPosition = chunkIndexToChunkPosition(i)
-        const worldPosition = getWorldPosition(chunkKey, chunkPosition)
-        ret.push({
-          position: worldPosition,
-          voxel: voxel,
-        })
-      }
-    }
-  }
 
   return ret
 }
