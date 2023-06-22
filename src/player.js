@@ -186,7 +186,8 @@ export default class Player extends Thing {
     }
 
     if (this.wannaJump) {
-      const closestWall = this.getClosestWall()
+      // const closestWall = this.getClosestWall()
+      const closestWall = false
       if (closestWall) {
         const kickSpeed = 8
         this.velocity[0] += closestWall.normal[0] * kickSpeed

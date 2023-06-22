@@ -1,12 +1,4 @@
-const CHUNK_SIZE = 16
-
-function positionToChunkKey(position) {
-  return [
-    Math.floor(position[0] / CHUNK_SIZE),
-    Math.floor(position[1] / CHUNK_SIZE),
-    Math.floor(position[2] / CHUNK_SIZE),
-  ]
-}
+import * as vox from '../voxel.js'
 
 onmessage = function(e) {
   // Handle STOP message
@@ -16,7 +8,7 @@ onmessage = function(e) {
 
   const { renderDistance, position } = e.data
   const r2 = renderDistance * renderDistance
-  const chunkKey = positionToChunkKey(position)
+  const chunkKey = vox.positionToChunkKey(position)
 
   const xMin = chunkKey[0]-renderDistance
   const xMax = chunkKey[0]+renderDistance
