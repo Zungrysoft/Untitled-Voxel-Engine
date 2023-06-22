@@ -4,6 +4,14 @@ import * as vec3 from './core/vector3.js'
 export const CHUNK_SIZE = 16
 export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 
+export const VOXEL_PARAMETERS = 8
+// 0: Material
+// 1: Flags
+// 2-7: Shading (range [0, 65535])
+// All values are integers
+export const FLAG_SOLID = 1
+export const FLAG_RESERVED = 2
+
 export function stringToArray(s) {
   return s.split(',').map(x => Number(x))
 }
@@ -42,7 +50,7 @@ export function getWorldPosition(chunkKey, chunkPosition) {
 }
 
 export function chunkPositionToChunkIndex(position) {
-  return position[0] + position[1]*CHUNK_SIZE + position[2]*CHUNK_SIZE*CHUNK_SIZE
+  return (position[0] + position[1]*CHUNK_SIZE + position[2]*CHUNK_SIZE*CHUNK_SIZE) * VOXEL_PARAMETERS
 }
 
 export function chunkIndexToChunkPosition(index) {
@@ -62,19 +70,16 @@ export function chunkIndexToChunkPosition(index) {
 }
 
 export function emptyVoxel() {
-  return {
-    material: 'structure',
-    shades: [0.6, 0.5, 0.4, 0.7, 0.8, 1.0],
-    solid: false,
-    generatorData: {},
-  }
+  return [1, 0, 39321, 32767, 26214, 45874, 52428, 65535]
 }
 
 export function emptyChunk() {
-  let zeros
-  (zeros = []).length = CHUNK_VOLUME; zeros.fill(emptyVoxel());
+  let voxels = []
+  for (let i = 0; i < CHUNK_VOLUME; i ++) {
+    voxels.push(...emptyVoxel())
+  }
   return {
-    voxels: zeros,
+    voxels: voxels,
     things: [],
     modified: false,
   }
@@ -106,25 +111,159 @@ export function copyStructure(structure) {
   }
 }
 
-export function getVoxel(chunks, position) {
+export function materialToIndex(material) {
+  const mapping = {
+    "placeholder": 0,
+    "structure": 1,
+    "grass": 2,
+    "leaves": 3,
+    "vines": 4,
+    "fruit": 5,
+    "flower": 6,
+    "bark": 7,
+    "wood": 8,
+    "dirt": 9,
+    "sand": 10,
+    "stone": 11,
+    "stoneAccent": 12,
+    "stoneAccent2": 13,
+    "stoneRoof": 14,
+    "metal": 15,
+    "metalAccent": 16,
+    "sign": 17,
+    "signText": 18,
+    "bone": 19,
+    "rune": 20,
+    "crystal": 21,
+  }
+  return mapping[material] || 1
+}
+
+export function indexToMaterial(index) {
+  const mapping = [
+    "placeholder",
+    "structure",
+    "grass",
+    "leaves",
+    "vines",
+    "fruit",
+    "flower",
+    "bark",
+    "wood",
+    "dirt",
+    "sand",
+    "stone",
+    "stoneAccent",
+    "stoneAccent2",
+    "stoneRoof",
+    "metal",
+    "metalAccent",
+    "sign",
+    "signText",
+    "bone",
+    "rune",
+    "crystal",
+  ]
+  return mapping[index] || "structure"
+}
+
+export function voxelMaterial(voxel) {
+  return indexToMaterial(voxel[0])
+}
+
+export function getVoxelMaterial(chunks, position) {
+  return indexToMaterial(getVoxel(chunks, position, 0))
+}
+
+export function setVoxelMaterial(chunks, position, material) {
+  setVoxel(chunks, position, [materialToIndex(material)])
+}
+
+export function voxelSolid(voxel) {
+  return voxel[1] & FLAG_SOLID ? true : false
+}
+
+export function getVoxelSolid(chunks, position) {
+  return getVoxel(chunks, position, 1) & FLAG_SOLID ? true : false
+}
+
+export function setVoxelSolid(chunks, position, solid) {
+  if (solid) {
+    setVoxel(chunks, position, [], { flagsAdd: FLAG_SOLID })
+  }
+  else {
+    setVoxel(chunks, position, [], { flagsRemove: FLAG_SOLID })
+  }
+}
+
+export function voxelShades(voxel) {
+  return voxel.slice(2, 8)
+}
+
+export function getVoxelShades(chunks, position) {
+  return getVoxel(chunks, position, [2, 8])
+}
+
+export function setVoxelShades(chunks, position, shades) {
+  setVoxel(chunks, position, [undefined, undefined, ...shades])
+}
+
+export function editVoxel(chunks, position, changes) {
+  let flagsAdd = 0
+  let flagsRemove = 0
+  let overwrite = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined]
+
+  // Solidity
+  if ('solid' in changes) {
+    if (changes.solid) {
+      flagsAdd |= FLAG_SOLID
+    }
+    else {
+      flagsRemove |= FLAG_SOLID
+    }
+  }
+
+  // Material
+  if ('material' in changes) {
+    overwrite[0] = materialToIndex(changes.material)
+  }
+
+  // Shades
+  if ('shades' in changes) {
+    for (let i = 0; i < 6; i ++) {
+      overwrite[i+2] = changes.shades[i]
+    }
+  }
+
+  // Make changes
+  setVoxel(chunks, position, overwrite, { flagsAdd, flagsRemove })
+}
+
+export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS]) {
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkPosition = positionToChunkKey(position)
 
   // Get the chunk
   let chunk = chunks[chunkPosition]
-  // If the chunk doesn't exist, all voxels there are assumed to be zero
+  // If the chunk doesn't exist, all voxels there are assumed to be empty
   if (!chunk) {
-    return emptyVoxel()
+    if (Array.isArray(quality)) {
+      return emptyVoxel().slice(quality[0], quality[1])
+    }
+    return emptyVoxel()[quality]
   }
 
   // Convert world position to the index within the chunk
   let indexInChunk = chunkPositionToChunkIndex(positionToChunkPosition(position))
 
-  // Return the voxel
-  return chunk.voxels[indexInChunk]
+  // Return the voxel's data
+  if (Array.isArray(quality)) {
+    return chunk.voxels.slice(indexInChunk + quality[0], indexInChunk + quality[1])
+  }
+  return chunk.voxels[indexInChunk + quality]
 }
 
-export function setVoxel(chunks, position, voxel) {
+export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }) {
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkKey = positionToChunkKey(position)
 
@@ -141,60 +280,37 @@ export function setVoxel(chunks, position, voxel) {
   let chunkPosition = positionToChunkPosition(position)
   let indexInChunk = chunkPositionToChunkIndex(chunkPosition)
 
-  // Merge the new data into the voxel
-  const beforeVoxel = chunk.voxels[indexInChunk]
-  chunk.voxels[indexInChunk] = {...chunk.voxels[indexInChunk], ...voxel}
-  const afterVoxel = chunk.voxels[indexInChunk]
+  // Merge the data, skipping undefined elements
+  const beforeVoxel = chunk.voxels.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
+  for (let i = 0; i < VOXEL_PARAMETERS; i ++) {
+    if (voxel[i] !== undefined) {
+      chunk.voxels[indexInChunk + i] = voxel[i]
+    }
+  }
+  chunk.voxels[indexInChunk + 1] = chunk.voxels[indexInChunk + 1] | flagsAdd
+  chunk.voxels[indexInChunk + 1] = ~(~chunk.voxels[indexInChunk + 1] | flagsRemove)
+  const afterVoxel = chunk.voxels.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
 
   // Determine whether we should mark this chunk as modified (so it can be re-meshed)
-  // If the voxel has changed solidity...
-  if (beforeVoxel.solid !== afterVoxel.solid) {
-    chunk.modified = true
-  }
-  // If the voxel is solid and has changed color...
-  else if (afterVoxel.solid) {
-    if (beforeVoxel.material !== afterVoxel.material || beforeVoxel.shades !== afterVoxel.shades) {
+  if (!chunk.modified) {
+    // If the voxel has changed solidity...
+    if (voxelSolid(beforeVoxel) !== voxelSolid(afterVoxel)) {
       chunk.modified = true
     }
-  }
-
-  // If we removed an edge voxel, we may need to re-mesh adjacent voxels as well
-  if (beforeVoxel.solid && !afterVoxel.solid) {
-    if (chunkPosition[0] === 0) {
-      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [-1, 0, 0]))]
-      if (adjChunk) {
-        adjChunk.modified = true
+    // If the voxel is solid and has changed appearance...
+    else if (voxelSolid(afterVoxel)) {
+      // If the voxel has changed material...
+      if (beforeVoxel[0] !== afterVoxel[0]) {
+        chunk.modified = true
       }
-    }
-    if (chunkPosition[1] === 0) {
-      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, -1, 0]))]
-      if (adjChunk) {
-        adjChunk.modified = true
-      }
-    }
-    if (chunkPosition[2] === 0) {
-      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, 0, -1]))]
-      if (adjChunk) {
-        adjChunk.modified = true
-      }
-    }
-
-    if (chunkPosition[0] === CHUNK_SIZE-1) {
-      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [1, 0, 0]))]
-      if (adjChunk) {
-        adjChunk.modified = true
-      }
-    }
-    if (chunkPosition[1] === CHUNK_SIZE-1) {
-      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, 1, 0]))]
-      if (adjChunk) {
-        adjChunk.modified = true
-      }
-    }
-    if (chunkPosition[2] === CHUNK_SIZE-1) {
-      const adjChunk = chunks[positionToChunkKey(vec3.add(position, [0, 0, 1]))]
-      if (adjChunk) {
-        adjChunk.modified = true
+      // If the voxel is solid and has changed color...
+      else {
+        for (let i = 2; i < 8; i ++) {
+          if (beforeVoxel[i] !== afterVoxel[i]) {
+            chunk.modified = true
+            break
+          }
+        }
       }
     }
   }
@@ -222,7 +338,7 @@ export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0],
   for (const sPos in structure.voxels) {
     const voxel = structure.voxels[sPos]
     const deltaPos = vec3.add(position, stringToArray(sPos))
-    setVoxel(chunks, deltaPos, {...voxel, ...globalVoxel})
+    editVoxel(chunks, deltaPos, {...voxel, ...globalVoxel})
   }
 }
 
@@ -290,13 +406,9 @@ export function checkReservedInWorld(chunks, position, structure) {
   // Iterate over voxels in structure
   for (const sPos in structure.voxels) {
     const deltaPos = vec3.add(stringToArray(sPos), position)
-    const voxel = getVoxel(chunks, deltaPos)
-    const compare = {
-      reserved: true
-    }
 
     // Check if the voxel is reserved
-    if (compareGeneratorData(voxel.generatorData, compare)) {
+    if (getVoxelReserved(chunks, deltaPos)) {
       return true
     }
   }

@@ -35,40 +35,44 @@ onmessage = function(e) {
 
         // If the voxel is not air, add its faces
         const voxel = vox.getVoxel(chunks, position)
-        if (voxel.solid) {
+        if (vox.voxelSolid(voxel)) {
+          // Get material and shades
+          const material = vox.voxelMaterial(voxel)
+          const shades = vox.voxelShades(voxel)
+
           // Get voxel palette
-          const paletteRow = palette[voxel.material]
+          const paletteRow = palette[material]
 
           // Check for adjacent voxels so we don't render faces that are hidden by other voxels
           // East
-          if (!vox.getVoxel(chunks, vec3.add(position, [1, 0, 0])).solid) {
+          if (!vox.getVoxelSolid(chunks, vec3.add(position, [1, 0, 0]))) {
             faces.eastKeys.push(position)
-            faces.east[position] = [[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, voxel.shades[3])]
+            faces.east[position] = [[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, shades[3])]
           }
           // West
-          if (!vox.getVoxel(chunks, vec3.add(position, [-1, 0, 0])).solid) {
+          if (!vox.getVoxelSolid(chunks, vec3.add(position, [-1, 0, 0]))) {
             faces.westKeys.push(position)
-            faces.west[position] = [[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, voxel.shades[0])]
+            faces.west[position] = [[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, shades[0])]
           }
           // South
-          if (!vox.getVoxel(chunks, vec3.add(position, [0, 1, 0])).solid) {
+          if (!vox.getVoxelSolid(chunks, vec3.add(position, [0, 1, 0]))) {
             faces.southKeys.push(position)
-            faces.south[position] = [[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, voxel.shades[4])]
+            faces.south[position] = [[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, shades[4])]
           }
           // North
-          if (!vox.getVoxel(chunks, vec3.add(position, [0, -1, 0])).solid) {
+          if (!vox.getVoxelSolid(chunks, vec3.add(position, [0, -1, 0]))) {
             faces.northKeys.push(position)
-            faces.north[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], pal.getColor(paletteRow, voxel.shades[1])]
+            faces.north[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], pal.getColor(paletteRow, shades[1])]
           }
           // Up
-          if (!vox.getVoxel(chunks, vec3.add(position, [0, 0, 1])).solid) {
+          if (!vox.getVoxelSolid(chunks, vec3.add(position, [0, 0, 1]))) {
             faces.upKeys.push(position)
-            faces.up[position] = [[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, voxel.shades[5])]
+            faces.up[position] = [[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], pal.getColor(paletteRow, shades[5])]
           }
           // Down
-          if (!vox.getVoxel(chunks, vec3.add(position, [0, 0, -1])).solid) {
+          if (!vox.getVoxelSolid(chunks, vec3.add(position, [0, 0, -1]))) {
             faces.downKeys.push(position)
-            faces.down[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], pal.getColor(paletteRow, voxel.shades[2])]
+            faces.down[position] = [[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], pal.getColor(paletteRow, shades[2])]
           }
         }
       }

@@ -61,7 +61,7 @@ onmessage = function(e) {
             material = 'dirt'
           }
 
-          vox.setVoxel(chunks, [x, y, z], {solid: true, material: material})
+          vox.editVoxel(chunks, [x, y, z], {solid: true, material: material})
           depth ++
         }
         else {

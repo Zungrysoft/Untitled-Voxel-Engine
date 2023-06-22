@@ -75,7 +75,7 @@ export default class Terrain extends Thing {
     //   for (let i = 0; i < 16; i ++) {
     //     const s = u.map(i, 0, 16-1, 0, 1.0)
     //     const v1 = {material: key, solid: true, shades: [s, s, s, s, s, s]}
-    //     vox.setVoxel(this.chunks, [27 + i, -keyZ-6, 3], v1)
+    //     vox.editVoxel(this.chunks, [27 + i, -keyZ-6, 3], v1)
     //   }
     //   keyZ ++
     // }
@@ -239,7 +239,7 @@ export default class Terrain extends Thing {
     // Check the first voxel
     if (!ignoreFirstVoxel) {
       const hitVoxel = traceStart.map(x => Math.round(x))
-      if (vox.getVoxel(this.chunks, hitVoxel).solid) {
+      if (vox.getVoxelSolid(this.chunks, hitVoxel)) {
         return {
           voxel: hitVoxel,
           position: [...traceStart],
@@ -312,7 +312,7 @@ export default class Terrain extends Thing {
       const hitVoxel = curPos.map(x => Math.round(x))
 
       // Check if the hit voxel is solid
-      if (vox.getVoxel(this.chunks, hitVoxel).solid) {
+      if (vox.getVoxelSolid(this.chunks, hitVoxel)) {
         return {
           voxel: hitVoxel,
           position: hitPos,

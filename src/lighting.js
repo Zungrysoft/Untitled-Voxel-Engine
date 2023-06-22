@@ -1,6 +1,8 @@
 import * as vox from './voxel.js'
 import * as game from './core/game.js'
 import * as vec3 from './core/vector3.js'
+import * as pal from './palette.js'
+import * as u from './core/utils.js'
 
 export const LIGHTING_HARD_CUTOFF = 16
 export const BOUNCES = 1
@@ -17,8 +19,8 @@ export function lightingPass(light) {
         const pos = [x, y, z]
 
         // Check if this is a solid voxel
-        if (vox.getVoxel(terrain.chunks, pos).solid) {
-          let shades = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        if (vox.getVoxelSolid(terrain.chunks, pos)) {
+          let shades = [0, 0, 0, 0, 0, 0]
 
           // Iterate over faces
 
@@ -29,7 +31,7 @@ export function lightingPass(light) {
             if (!trace.hit) {
               const incidence = vec3.dotProduct([1, 0, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
-              shades[3] = shade
+              shades[3] = u.clamp(Math.floor(shade), 0, pal.MAX_SHADE)
             }
           }
           // -X
@@ -39,7 +41,7 @@ export function lightingPass(light) {
             if (!trace.hit) {
               const incidence = vec3.dotProduct([-1, 0, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
-              shades[0] = shade
+              shades[0] = u.clamp(Math.floor(shade), 0, pal.MAX_SHADE)
             }
           }
 
@@ -50,7 +52,7 @@ export function lightingPass(light) {
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, 1, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
-              shades[4] = shade
+              shades[4] = u.clamp(Math.floor(shade), 0, pal.MAX_SHADE)
             }
           }
           // -Y
@@ -60,7 +62,7 @@ export function lightingPass(light) {
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, -1, 0], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
-              shades[1] = shade
+              shades[1] = u.clamp(Math.floor(shade), 0, pal.MAX_SHADE)
             }
           }
 
@@ -71,7 +73,7 @@ export function lightingPass(light) {
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, 0, 1], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
-              shades[5] = shade
+              shades[5] = u.clamp(Math.floor(shade), 0, pal.MAX_SHADE)
             }
           }
           // -Z
@@ -81,12 +83,12 @@ export function lightingPass(light) {
             if (!trace.hit) {
               const incidence = vec3.dotProduct([0, 0, -1], vec3.normalize(vec3.subtract(light.position, fPos)))
               const shade = (light.brightness * incidence) / Math.pow(trace.distance, 2)
-              shades[2] = shade
+              shades[2] = u.clamp(Math.floor(shade), 0, pal.MAX_SHADE)
             }
           }
 
           // Apply the new shading data
-          vox.setVoxel(terrain.chunks, pos, {shades: shades})
+          vox.setVoxelShades(terrain.chunks, pos, shades)
         }
       }
     }

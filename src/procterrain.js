@@ -183,7 +183,7 @@ export function buildTerrain(chunks, seed, {minPosition=[0, 0, 0], maxPosition=[
             material = 'dirt'
           }
 
-          vox.setVoxel(chunks, [x, y, z], {solid: true, material: material})
+          vox.editVoxel(chunks, [x, y, z], {solid: true, material: material})
           lastAir ++
         }
         else {

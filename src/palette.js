@@ -4,6 +4,8 @@ export const COLOR_MAP_WIDTH = 32
 
 export const PALETTE_ROW_SIZE = 20
 
+export const MAX_SHADE = 65535
+
 export function hsvToRgb(hsv) {
     let [h, s, v] = hsv
     let r, g, b;
@@ -27,7 +29,7 @@ export function hsvToRgb(hsv) {
 }
 
 export function getColor(palette, shade) {
-    shade = u.clamp(shade, 0, 0.99999)
+    shade = u.map(shade, 0, 65535, 0, 0.99999, true)
     const shadeIndex = Math.floor(shade * palette.length)
     return palette[shadeIndex]
 }

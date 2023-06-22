@@ -211,7 +211,7 @@ export default class Player extends Thing {
       const ang = game.getCamera3D().lookVector
       const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 128)))
       // console.log (hitData)
-      vox.setVoxel(terrain.chunks, hitData.voxel, {solid: false})
+      vox.setVoxelSolid(terrain.chunks, hitData.voxel, false)
     }
     if (leftClicked) {
       const terrain = game.getThing("terrain")
@@ -219,7 +219,7 @@ export default class Player extends Thing {
       const ang = game.getCamera3D().lookVector
       const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 128)))
       // console.log (hitData)
-      vox.setVoxel(terrain.chunks, vec3.add(hitData.voxel, hitData.normal), {solid: true})
+      vox.setVoxelSolid(terrain.chunks, vec3.add(hitData.voxel, hitData.normal), true)
     }
 
     // shooting
@@ -425,7 +425,7 @@ export default class Player extends Thing {
     for (let x = xMin; x <= xMax; x ++) {
       for (let y = yMin; y <= yMax; y ++) {
         for (let z = zMin; z <= zMax; z ++) {
-          if (vox.getVoxel(game.getThing('terrain').chunks, [x, y, z]).solid) {
+          if (vox.getVoxelSolid(game.getThing('terrain').chunks, [x, y, z])) {
             faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], false])
             faces.push([[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], [-1, 0, 0], true])
             faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 1, 0], false])
