@@ -93,9 +93,9 @@ export default class Terrain extends Thing {
     this.time ++
 
     // Chunk loading and unloading
-    if (this.time % 300 === 0) {
-      this.selectChunks(game.getThing('player').position)
-    }
+    // if (this.time % 60 === 0) {
+    //   this.selectChunks(game.getThing('player').position)
+    // }
 
     // Debug button
     if (game.keysPressed.KeyJ) {

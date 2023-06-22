@@ -418,9 +418,74 @@ export default class Player extends Thing {
     // }
     this.position = vec3.add(this.position, this.velocity)
 
-    // Get all colliders near the player
-    const colliderList = game.getThing('terrain').query(this.position[0] - 2, this.position[1] - 2, this.position[2] - 2, 4, 4, this.height + 4)
-    // const colliderList = []
+    // Create faces
+    const vPos = vox.snapToVoxel(this.position)
+    const xMin = vPos[0]-1
+    const xMax = vPos[0]+1
+    const yMin = vPos[1]-1
+    const yMax = vPos[1]+1
+    const zMin = vPos[2]-0
+    const zMax = vPos[2]+4
+    let faces = []
+    for (let x = xMin; x <= xMax; x ++) {
+      for (let y = yMin; y <= yMax; y ++) {
+        for (let z = zMin; z <= zMax; z ++) {
+          if (vox.getVoxel(game.getThing('terrain').chunks, [x, y, z]).solid) {
+            faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], false])
+            faces.push([[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], [-1, 0, 0], true])
+            faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 1, 0], false])
+            faces.push([[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y - 0.5, z + 0.5], [0, -1, 0], true])
+            faces.push([[x - 0.5, y - 0.5, z + 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 0, 1], false])
+            faces.push([[x - 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z - 0.5], [0, 0, -1], true])
+          }
+        }
+      }
+    }
+
+    // Convert faces into colliders
+    let colliderList = []
+    for (const face of faces) {
+      // Get data from face
+      const [v1, v2, normal, flip] = face
+
+      // Calculate the other two vertices in the quad
+      let v3 = [...v1]
+      let v4 = [...v1]
+      // X axis
+      if (v1[0] === v2[0]) {
+        v3[1] = v2[1]
+        v4[2] = v2[2]
+      }
+      // Y axis
+      if (v1[1] === v2[1]) {
+        v3[2] = v2[2]
+        v4[0] = v2[0]
+      }
+      // Z axis
+      if (v1[2] === v2[2]) {
+        v3[0] = v2[0]
+        v4[1] = v2[1]
+      }
+
+      // Flip direction
+      if (flip) {
+        const swapper = v3
+        v3 = v4
+        v4 = swapper
+      }
+
+      // Push the colliders
+      colliderList.push({
+        material: 'voxel',
+        normal: normal,
+        points: [v1, v2, v3],
+      })
+      colliderList.push({
+        material: 'voxel',
+        normal: normal,
+        points: [v2, v1, v4],
+      })
+    }
 
     // Floor collisions
     for (const collider of colliderList) {
