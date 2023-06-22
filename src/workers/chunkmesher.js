@@ -241,12 +241,9 @@ onmessage = function(e) {
     }
   }
 
-  // Build the mesh
-  const ret = {
+  // Return
+  postMessage({
     verts: verts,
     chunkKey: chunkKey,
-  }
-
-  // Return
-  postMessage(ret);
+  });
 }

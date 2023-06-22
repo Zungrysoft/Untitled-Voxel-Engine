@@ -88,12 +88,19 @@ export default class Terrain extends Thing {
     this.chunkSelectorWorker = new Worker('src/workers/chunkselector.js', { type: "module" })
 
     // Chunk meshers
-    const CHUNK_MESHERS = 8
     this.chunkMeshers = []
     this.chunkMesherIndex = 0
-    for (let i = 0; i < CHUNK_MESHERS; i ++) {
+    for (let i = 0; i < game.config.threads; i ++) {
       const newWorker = new Worker('src/workers/chunkmesher.js', { type: "module" })
       this.chunkMeshers.push(newWorker)
+    }
+
+    // Terrain Generators
+    this.terrainGenerators = []
+    this.terrainGeneratorIndex = 0
+    for (let i = 0; i < game.config.threads; i ++) {
+      const newWorker = new Worker('src/workers/procterrain.js', { type: "module" })
+      this.terrainGenerators.push(newWorker)
     }
   }
 
@@ -166,19 +173,32 @@ export default class Terrain extends Thing {
     }
 
     // Send message
-    worker.postMessage({position: position, renderDistance: 10})
+    worker.postMessage({position: position, renderDistance: 4})
   }
 
   loadChunks(data) {
     for (const chunkKey of data) {
       if (!(chunkKey in this.chunks)) {
-        procTerrain.buildTerrain(this.chunks, this.seed, {
-          minPosition: vox.getWorldPosition(chunkKey, [0, 0, 0]),
-          maxPosition: vox.getWorldPosition(chunkKey, [15, 15, 15]),
-          scale: 20,
-        })
+        this.generateChunk(chunkKey)
       }
     }
+  }
+
+  generateChunk(chunkKey) {
+    // Get worker
+    const worker = this.terrainGenerators[this.terrainGeneratorIndex]
+    this.terrainGeneratorIndex = (this.terrainGeneratorIndex + 1) % game.config.threads
+
+    // Set callback
+    worker.onmessage = (message) => {
+      this.chunks[message.data.chunkKey] = message.data.chunk
+    }
+
+    // Send message
+    worker.postMessage({
+      chunkKey: chunkKey,
+      seed: this.seed,
+    })
   }
 
   rebuildChunkMeshes() {
@@ -195,7 +215,7 @@ export default class Terrain extends Thing {
   rebuildChunkMesh(chunkKey) {
     // Get worker
     const worker = this.chunkMeshers[this.chunkMesherIndex]
-    this.chunkMesherIndex = (this.chunkMesherIndex + 1) % 8
+    this.chunkMesherIndex = (this.chunkMesherIndex + 1) % game.config.threads
 
     // Set callback
     worker.onmessage = (message) => {

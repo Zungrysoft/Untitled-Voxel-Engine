@@ -5,6 +5,7 @@ import Player from './player.js'
 
 game.config.width = 640
 game.config.height = 360
+game.config.threads = 8
 //game.config.isWebglEnabled = false
 document.title = 'Untitled Voxel Shooter'
 
