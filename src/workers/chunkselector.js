@@ -12,8 +12,7 @@ onmessage = function(e) {
 
   const xAvg = chunkKey[0]
   const yAvg = chunkKey[1]
-  const zMin = chunkKey[2]-renderDistance
-  const zMax = chunkKey[2]+renderDistance
+  const zAvg = chunkKey[2]
 
   // Iterate over renderDistance sphere in a spiral pattern
   let ret = []
@@ -26,8 +25,10 @@ onmessage = function(e) {
       // If this horizontal position is within the render cylinder, iterate over z
       const dist = Math.pow(x-xAvg, 2) + Math.pow(y-yAvg, 2)
       if (dist <= r2) {
-        for (let z = zMin; z <= zMax; z ++) {
-          ret.push([x, y, z])
+        ret.push([x, y, zAvg])
+        for (let z = 1; z <= renderDistance; z ++) {
+          ret.push([x, y, zAvg-z])
+          ret.push([x, y, zAvg+z])
         }
       }
 

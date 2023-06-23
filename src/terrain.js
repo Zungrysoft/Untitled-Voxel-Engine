@@ -146,7 +146,7 @@ export default class Terrain extends Thing {
     }
 
     // Send message
-    worker.postMessage({position: position, renderDistance: 8})
+    worker.postMessage({position: position, renderDistance: 5})
   }
 
   loadChunks(data) {
