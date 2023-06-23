@@ -1,4 +1,5 @@
 import * as vox from '../voxel.js'
+import * as u from '../core/utils.js'
 import * as pal from '../palette.js'
 import * as vec3 from '../core/vector3.js'
 import { meshChunk } from './chunkmesher.js'
@@ -107,9 +108,13 @@ function getPerlinDensity(position, noise, params) {
 
   const {scale, heightScale, zScale} = params
 
-  let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale))
+  const steepness = noise.perlin2(x/(scale*50), y/(scale*50))
+  const mScale = u.map(steepness, 0, 0.9, 0, 15, true)
+  const mScale2 = u.map(steepness, 0, 0.9, 0.2, 1.5, true)
+
+  let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale)) * mScale2
   density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16
-  density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * 9
+  density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * mScale /* * 9 */
   density += (4-z)/heightScale
   density -= 0.2
   return density
