@@ -63,8 +63,15 @@ export default class Terrain extends Thing {
 
     // Chunk meshers
     this.mesherPool = new WorkerPool('src/workers/chunkmesher.js', game.config.threads, (message) => {
+      // Save the chunk mesh
       let vertsView = new Float32Array(message.data.verts);
-      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
+      if (vertsView.length > 0) {
+        this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
+      }
+      // If the mesh is empty, delete its entry in the dict instead
+      else {
+        delete this.chunkMeshes[message.data.chunkKey]
+      }
     })
 
     // Terrain Generators

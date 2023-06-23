@@ -420,7 +420,7 @@ export default class Player extends Thing {
     const yMin = vPos[1]-1
     const yMax = vPos[1]+1
     const zMin = vPos[2]-0
-    const zMax = vPos[2]+4
+    const zMax = vPos[2]+6
     let faces = []
     for (let x = xMin; x <= xMax; x ++) {
       for (let y = yMin; y <= yMax; y ++) {
