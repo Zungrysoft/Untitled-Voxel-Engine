@@ -79,8 +79,12 @@ onmessage = function(e) {
   // Now that we've generated the chunk, we should create an initial mesh for it as well
   // This saves a step since now the main thread won't have to pass the chunk data back to a mesher worker
   const chunk = chunks['0,0,0']
-  let initialMesh = meshChunk(chunk, pal.palette)
-  chunk.modified = false
+  let initialMesh
+  if (chunk.modified) {
+    initialMesh = meshChunk(chunk, pal.palette)
+    chunk.modified = false
+  }
+
 
   // Return
   postMessage({

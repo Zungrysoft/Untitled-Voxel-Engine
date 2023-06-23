@@ -172,8 +172,10 @@ export default class Terrain extends Thing {
       this.chunks[message.data.chunkKey] = message.data.chunk
 
       // Save this chunk's initial mesh as well
-      let vertsView = new Float32Array(message.data.verts);
-      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
+      if (message.data.verts) {
+        let vertsView = new Float32Array(message.data.verts);
+        this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
+      }
     }
 
     // Send message
