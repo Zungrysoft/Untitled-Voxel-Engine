@@ -187,8 +187,8 @@ export function voxelSolid(voxel) {
   return voxel[1] & FLAG_SOLID ? true : false
 }
 
-export function getVoxelSolid(chunks, position) {
-  return getVoxel(chunks, position, 1) & FLAG_SOLID ? true : false
+export function getVoxelSolid(chunks, position, emptyChunkSolid=false) {
+  return getVoxel(chunks, position, 1, emptyChunkSolid) & FLAG_SOLID ? true : false
 }
 
 export function setVoxelSolid(chunks, position, solid) {
@@ -243,7 +243,7 @@ export function editVoxel(chunks, position, changes) {
   setVoxel(chunks, position, overwrite, { flagsAdd, flagsRemove })
 }
 
-export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS]) {
+export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS], emptyChunkSolid=false) {
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkPosition = positionToChunkKey(position)
 
@@ -251,10 +251,14 @@ export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS]) {
   let chunk = chunks[chunkPosition]
   // If the chunk doesn't exist, all voxels there are assumed to be empty
   if (!chunk) {
-    if (Array.isArray(quality)) {
-      return emptyVoxel().slice(quality[0], quality[1])
+    const empty = emptyVoxel()
+    if (emptyChunkSolid) {
+      empty[1] |= FLAG_SOLID
     }
-    return emptyVoxel()[quality]
+    if (Array.isArray(quality)) {
+      return empty.slice(quality[0], quality[1])
+    }
+    return empty[quality]
   }
 
   // Convert world position to the index within the chunk

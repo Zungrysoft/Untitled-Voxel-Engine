@@ -425,7 +425,7 @@ export default class Player extends Thing {
     for (let x = xMin; x <= xMax; x ++) {
       for (let y = yMin; y <= yMax; y ++) {
         for (let z = zMin; z <= zMax; z ++) {
-          if (vox.getVoxelSolid(game.getThing('terrain').chunks, [x, y, z])) {
+          if (vox.getVoxelSolid(game.getThing('terrain').chunks, [x, y, z], true)) {
             faces.push([[x + 0.5, y - 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [1, 0, 0], false])
             faces.push([[x - 0.5, y - 0.5, z - 0.5], [x - 0.5, y + 0.5, z + 0.5], [-1, 0, 0], true])
             faces.push([[x - 0.5, y + 0.5, z - 0.5], [x + 0.5, y + 0.5, z + 0.5], [0, 1, 0], false])

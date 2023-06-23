@@ -75,10 +75,11 @@ onmessage = function(e) {
   vox.forceInitChunk(chunks, [0, 0, 0])
 
   // Return
+  const chunk = chunks['0,0,0']
   postMessage({
-    chunk: chunks['0,0,0'],
+    chunk: chunk,
     chunkKey: chunkKey,
-  });
+  }, [chunk.voxels]);
 }
 
 function getPerlinDensity(position, noise, params) {
