@@ -79,19 +79,25 @@ onmessage = function(e) {
   // Now that we've generated the chunk, we should create an initial mesh for it as well
   // This saves a step since now the main thread won't have to pass the chunk data back to a mesher worker
   const chunk = chunks['0,0,0']
-  let initialMesh
   if (chunk.modified) {
-    initialMesh = meshChunk(chunk, pal.palette)
+    // Meshing
+    let initialMesh = meshChunk(chunk, pal.palette)
     chunk.modified = false
+
+    // Return with intial mesh
+    postMessage({
+      chunk: chunk,
+      chunkKey: chunkKey,
+      verts: initialMesh,
+    }, [chunk.voxels, initialMesh]);
   }
-
-
-  // Return
-  postMessage({
-    chunk: chunk,
-    chunkKey: chunkKey,
-    verts: initialMesh,
-  }, [chunk.voxels, initialMesh]);
+  else {
+    // Return with no intial mesh
+    postMessage({
+      chunk: chunk,
+      chunkKey: chunkKey,
+    }, [chunk.voxels]);
+  }
 }
 
 function getPerlinDensity(position, noise, params) {

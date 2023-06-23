@@ -30,8 +30,8 @@ export default class Terrain extends Thing {
 
     // Spawn platform
     let plat = procBasics.generateRectangularPrism({
-      length: 16,
-      width: 16,
+      length: vox.CHUNK_SIZE,
+      width: vox.CHUNK_SIZE,
       height: 7,
       voxel: {material: 'structure', solid: true},
     })
@@ -41,10 +41,6 @@ export default class Terrain extends Thing {
       voxel2: {material: 'grass', solid: true},
     })
     vox.mergeStructureIntoWorld(this.chunks, plat, [0, 0, 0])
-
-    for (let i = 1; i < 20; i ++) {
-      vox.mergeStructureIntoWorld(this.chunks, plat, [i*16, 0, 0])
-    }
 
     // Palette test
     // let keyZ = 0
