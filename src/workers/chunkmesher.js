@@ -9,7 +9,20 @@ onmessage = function(e) {
   }
 
   // Retrieve data
-  const { chunkKey, chunk, palette } = e.data
+  const { chunkKey, chunk } = e.data
+
+  // Call the mesher function
+  let verts = meshChunk(chunk, pal.palette)
+
+  // Return
+  postMessage({
+    verts: verts,
+    chunkKey: chunkKey,
+  }, [verts]);
+}
+
+export function meshChunk(chunk, palette) {
+  // Set up chunks object
   const chunks = {'0,0,0': chunk}
 
   // Build list of faces this chunk needs to render
@@ -261,8 +274,5 @@ onmessage = function(e) {
   }
 
   // Return
-  postMessage({
-    verts: verts,
-    chunkKey: chunkKey,
-  }, [verts]);
+  return verts
 }

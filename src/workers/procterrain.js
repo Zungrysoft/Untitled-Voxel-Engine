@@ -1,5 +1,7 @@
 import * as vox from '../voxel.js'
+import * as pal from '../palette.js'
 import * as vec3 from '../core/vector3.js'
+import { meshChunk } from './chunkmesher.js'
 import Noise from '../noise.js'
 
 const DIRT_DEPTH = 4
@@ -12,7 +14,7 @@ onmessage = function(e) {
   }
 
   // Get parameters
-  const {chunkKey, seed} = e.data
+  const { chunkKey, seed } = e.data
   const params = {...{
     scale: 20,
     zScale:  0.5,
@@ -74,12 +76,18 @@ onmessage = function(e) {
   // If chunk was all air, initialize it anyway
   vox.forceInitChunk(chunks, [0, 0, 0])
 
-  // Return
+  // Now that we've generated the chunk, we should create an initial mesh for it as well
+  // This saves a step since now the main thread won't have to pass the chunk data back to a mesher worker
   const chunk = chunks['0,0,0']
+  let initialMesh = meshChunk(chunk, pal.palette)
+  chunk.modified = false
+
+  // Return
   postMessage({
     chunk: chunk,
     chunkKey: chunkKey,
-  }, [chunk.voxels]);
+    verts: initialMesh,
+  }, [chunk.voxels, initialMesh]);
 }
 
 function getPerlinDensity(position, noise, params) {

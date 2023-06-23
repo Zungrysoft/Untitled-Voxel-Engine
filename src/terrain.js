@@ -23,29 +23,6 @@ export default class Terrain extends Thing {
   chunkSpatialHashes = {}
   selectedChunks = []
   fogColor = [1, 1, 1]
-  palette = {
-    structure: pal.generatePalette(0.027, 0.5, 0.8, 0.13),
-    grass: pal.generatePalette(0.33, 0.48, 0.67, 0.05),
-    leaves: pal.generatePalette(0.31, 0.65, 0.84, 0.1),
-    vines: pal.generatePalette(0.35, 0.87, 0.89, 0.02),
-    fruit: pal.generatePalette(0.03, 0.74, 0.83, 0.03),
-    flower: pal.generatePalette(0.65, 0.60, 0.85, 0.03),
-    bark: pal.generatePalette(0.08, 0.45, 0.54, 0.05),
-    wood: pal.generatePalette(0.11, 0.40, 0.73, 0.05),
-    dirt: pal.generatePalette(0.12, 0.33, 0.51, 0.02),
-    sand: pal.generatePalette(0.16, 0.42, 0.86, 0.02),
-    stone: pal.generatePalette(0.66, 0.06, 0.54, 0.05),
-    stoneAccent: pal.generatePalette(0.67, 0.64, 0.38, 0.03),
-    stoneAccent2: pal.generatePalette(0.99, 0.76, 0.61, 0.03),
-    stoneRoof: pal.generatePalette(0.99, 0.76, 0.45, 0.03),
-    metal: pal.generatePalette(0.83, 0.02, 0.45, 0.03),
-    metalAccent: pal.generatePalette(0.83, 0.02, 0.31, 0.03),
-    sign: pal.generatePalette(0.13, 0.16, 0.87, 0.03),
-    signText: pal.generatePalette(0.03, 0.74, 0.83, 0.03),
-    rune: pal.generatePalette(0.96, 1.0, 0.94, 0.03),
-    bone: pal.generatePalette(0.18, 0.13, 0.91, 0.01),
-    crystal: pal.generatePalette(0.83, 1.0, 0.94, 0.03),
-  }
 
   constructor () {
     super()
@@ -191,7 +168,12 @@ export default class Terrain extends Thing {
 
     // Set callback
     worker.onmessage = (message) => {
+      // Save chunk
       this.chunks[message.data.chunkKey] = message.data.chunk
+
+      // Save this chunk's initial mesh as well
+      let vertsView = new Float32Array(message.data.verts);
+      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
     }
 
     // Send message
@@ -227,7 +209,6 @@ export default class Terrain extends Thing {
       chunk: {
         voxels: this.chunks[chunkKey].voxels
       },
-      palette: this.palette,
       chunkKey: chunkKey,
     })
   }
