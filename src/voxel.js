@@ -1,7 +1,7 @@
 import * as u from './core/utils.js'
 import * as vec3 from './core/vector3.js'
 
-export const CHUNK_SIZE = 16
+export const CHUNK_SIZE = 32
 export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 
 export const VOXEL_PARAMETERS = 8
@@ -14,6 +14,18 @@ export const FLAG_RESERVED = 2
 
 export function stringToArray(s) {
   return s.split(',').map(x => Number(x))
+}
+
+export function getChunkPosition(chunks, chunkKey) {
+  const pos = chunks[chunkKey].position
+  if (pos) {
+    return pos
+  }
+  else {
+    const newPos = stringToArray(chunkKey)
+    chunks[chunkKey].position = newPos
+    return newPos
+  }
 }
 
 export function snapToVoxel(position) {

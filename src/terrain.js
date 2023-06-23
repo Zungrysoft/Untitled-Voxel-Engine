@@ -335,7 +335,8 @@ export default class Terrain extends Thing {
     // Chunk meshes
     for (const chunkKey in this.chunkMeshes) {
       const chunkMesh = this.chunkMeshes[chunkKey]
-      const position = vox.getWorldPosition(chunkKey, [0, 0, 0])
+      const chunkPosition = vox.getChunkPosition(this.chunks, chunkKey)
+      const position = vox.getWorldPosition(chunkPosition, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       gfx.set('fogDensity', 0.0)
       gfx.set('emission', 0.0)
