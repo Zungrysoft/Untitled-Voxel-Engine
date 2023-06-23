@@ -173,7 +173,7 @@ export default class Terrain extends Thing {
     }
 
     // Send message
-    worker.postMessage({position: position, renderDistance: 4})
+    worker.postMessage({position: position, renderDistance: 8})
   }
 
   loadChunks(data) {
@@ -205,7 +205,6 @@ export default class Terrain extends Thing {
     // Iterate over chunks and rebuild all marked "modified"
     for (const chunkKey in this.chunks) {
       if (this.chunks[chunkKey].modified) {
-        console.log("Rebuilding mesh for chunk " + chunkKey)
         this.rebuildChunkMesh(chunkKey)
         this.chunks[chunkKey].modified = false
       }
@@ -224,7 +223,9 @@ export default class Terrain extends Thing {
 
     // Send message
     worker.postMessage({
-      chunk: this.chunks[chunkKey],
+      chunk: {
+        voxels: this.chunks[chunkKey].voxels
+      },
       palette: this.palette,
       chunkKey: chunkKey,
     })
