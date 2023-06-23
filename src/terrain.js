@@ -218,7 +218,8 @@ export default class Terrain extends Thing {
 
     // Set callback
     worker.onmessage = (message) => {
-      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(message.data.verts)
+      let vertsView = new Float32Array(message.data.verts);
+      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
     }
 
     // Send message

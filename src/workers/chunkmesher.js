@@ -228,7 +228,19 @@ onmessage = function(e) {
     return [...t1, ...t2]
   }
 
-  let verts = []
+  // Set up vertex buffer
+  let bufferSize = (Object.keys(faces.north).length +
+                    Object.keys(faces.south).length +
+                    Object.keys(faces.east).length +
+                    Object.keys(faces.west).length +
+                    Object.keys(faces.up).length +
+                    Object.keys(faces.down).length) * (2 * 3 * 8 * 4)
+                    // 2 triangles * 3 vertices per triangle * 8 values per vertex * 4 bytes in a Float32
+  let verts = new ArrayBuffer(bufferSize);
+  let vertsView = new Float32Array(verts);
+  let vertIndex = 0
+
+  // Fill buffer with triangle vertex data
   for (const direction of ['north', 'south', 'east', 'west', 'up', 'down']) {
     // Faces facing toward a negative axis need to be flipped for some reason
     const flip = ['north', 'west', 'down'].includes(direction)
@@ -240,8 +252,11 @@ onmessage = function(e) {
       // Create triangles
       const newVerts = addFace(...face, vec3.directionToVector(direction), flip)
 
-      // Add to vertices
-      verts.push(...newVerts)
+      // Add new vertices to buffer
+      for (const vert of newVerts) {
+        vertsView[vertIndex] = vert
+        vertIndex ++
+      }
     }
   }
 
@@ -249,5 +264,5 @@ onmessage = function(e) {
   postMessage({
     verts: verts,
     chunkKey: chunkKey,
-  });
+  }, [verts]);
 }
