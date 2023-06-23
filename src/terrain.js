@@ -62,12 +62,10 @@ export default class Terrain extends Thing {
     this.chunkSelectorWorker = new Worker('src/workers/chunkselector.js', { type: "module" })
 
     // Chunk meshers
-    this.chunkMeshers = []
-    this.chunkMesherIndex = 0
-    for (let i = 0; i < game.config.threads; i ++) {
-      const newWorker = new Worker('src/workers/chunkmesher.js', { type: "module" })
-      this.chunkMeshers.push(newWorker)
-    }
+    this.mesherPool = new WorkerPool('src/workers/chunkmesher.js', game.config.threads, (message) => {
+      let vertsView = new Float32Array(message.data.verts);
+      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
+    })
 
     // Terrain Generators
     this.generatorPool = new WorkerPool('src/workers/procterrain.js', game.config.threads, (message) => {
@@ -80,14 +78,6 @@ export default class Terrain extends Thing {
         this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
       }
     })
-
-
-    // this.terrainGenerators = []
-    // this.terrainGeneratorIndex = 0
-    // for (let i = 0; i < game.config.threads; i ++) {
-    //   const newWorker = new Worker('src/workers/procterrain.js', { type: "module" })
-    //   this.terrainGenerators.push(newWorker)
-    // }
   }
 
   update () {
@@ -178,30 +168,18 @@ export default class Terrain extends Thing {
     // Iterate over chunks and rebuild all marked "modified"
     for (const chunkKey in this.chunks) {
       if (this.chunks[chunkKey].modified) {
-        this.rebuildChunkMesh(chunkKey)
+        // Unmark this chunk as modified
         this.chunks[chunkKey].modified = false
+
+        // Push the meshing job to the mesher worker pool
+        this.mesherPool.push({
+          chunk: {
+            voxels: this.chunks[chunkKey].voxels
+          },
+          chunkKey: chunkKey,
+        })
       }
     }
-  }
-
-  rebuildChunkMesh(chunkKey) {
-    // Get worker
-    const worker = this.chunkMeshers[this.chunkMesherIndex]
-    this.chunkMesherIndex = (this.chunkMesherIndex + 1) % game.config.threads
-
-    // Set callback
-    worker.onmessage = (message) => {
-      let vertsView = new Float32Array(message.data.verts);
-      this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
-    }
-
-    // Send message
-    worker.postMessage({
-      chunk: {
-        voxels: this.chunks[chunkKey].voxels
-      },
-      chunkKey: chunkKey,
-    })
   }
 
   traceLine(traceStart, traceEnd, ignoreFirstVoxel=false) {
