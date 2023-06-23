@@ -9,7 +9,7 @@ onmessage = function(e) {
   }
 
   // Retrieve data
-  const { chunkKey, chunk } = e.data
+  const { chunkKey, chunk, workerIndex } = e.data
 
   // Call the mesher function
   let verts = meshChunk(chunk, pal.palette)
@@ -18,6 +18,7 @@ onmessage = function(e) {
   postMessage({
     verts: verts,
     chunkKey: chunkKey,
+    workerIndex: workerIndex,
   }, [verts]);
 }
 

@@ -10,6 +10,7 @@ import * as procBasics from './procbasics.js'
 import * as procDungeon from './procdungeon.js'
 import * as procMansion from './procmansion.js'
 import * as procTerrain from './procterrain.js'
+import WorkerPool from './workerpool.js'
 import Thing from './core/thing.js'
 import { assets } from './core/game.js'
 import SpatialHash from './core/spatialhash.js'
@@ -69,12 +70,24 @@ export default class Terrain extends Thing {
     }
 
     // Terrain Generators
-    this.terrainGenerators = []
-    this.terrainGeneratorIndex = 0
-    for (let i = 0; i < game.config.threads; i ++) {
-      const newWorker = new Worker('src/workers/procterrain.js', { type: "module" })
-      this.terrainGenerators.push(newWorker)
-    }
+    this.generatorPool = new WorkerPool('src/workers/procterrain.js', game.config.threads, (message) => {
+      // Save chunk
+      this.chunks[message.data.chunkKey] = message.data.chunk
+
+      // Save this chunk's initial mesh as well
+      if (message.data.verts) {
+        let vertsView = new Float32Array(message.data.verts);
+        this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
+      }
+    })
+
+
+    // this.terrainGenerators = []
+    // this.terrainGeneratorIndex = 0
+    // for (let i = 0; i < game.config.threads; i ++) {
+    //   const newWorker = new Worker('src/workers/procterrain.js', { type: "module" })
+    //   this.terrainGenerators.push(newWorker)
+    // }
   }
 
   update () {
@@ -150,35 +163,15 @@ export default class Terrain extends Thing {
   }
 
   loadChunks(data) {
+    this.generatorPool.clearQueue()
     for (const chunkKey of data) {
       if (!(chunkKey in this.chunks)) {
-        this.generateChunk(chunkKey)
+        this.generatorPool.push({
+          chunkKey: chunkKey,
+          seed: this.seed,
+        })
       }
     }
-  }
-
-  generateChunk(chunkKey) {
-    // Get worker
-    const worker = this.terrainGenerators[this.terrainGeneratorIndex]
-    this.terrainGeneratorIndex = (this.terrainGeneratorIndex + 1) % game.config.threads
-
-    // Set callback
-    worker.onmessage = (message) => {
-      // Save chunk
-      this.chunks[message.data.chunkKey] = message.data.chunk
-
-      // Save this chunk's initial mesh as well
-      if (message.data.verts) {
-        let vertsView = new Float32Array(message.data.verts);
-        this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
-      }
-    }
-
-    // Send message
-    worker.postMessage({
-      chunkKey: chunkKey,
-      seed: this.seed,
-    })
   }
 
   rebuildChunkMeshes() {

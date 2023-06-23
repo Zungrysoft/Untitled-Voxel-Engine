@@ -14,7 +14,7 @@ onmessage = function(e) {
   }
 
   // Get parameters
-  const { chunkKey, seed } = e.data
+  const { chunkKey, seed, workerIndex } = e.data
   const params = {...{
     scale: 20,
     zScale:  0.5,
@@ -89,6 +89,7 @@ onmessage = function(e) {
       chunk: chunk,
       chunkKey: chunkKey,
       verts: initialMesh,
+      workerIndex: workerIndex,
     }, [chunk.voxels, initialMesh]);
   }
   else {
@@ -96,6 +97,7 @@ onmessage = function(e) {
     postMessage({
       chunk: chunk,
       chunkKey: chunkKey,
+      workerIndex: workerIndex,
     }, [chunk.voxels]);
   }
 }
