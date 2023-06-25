@@ -139,10 +139,6 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
-      console.log(this.chunks[vox.positionToChunkKey(game.getThing('player').position)].mode)
-      console.log(this.chunks[vox.positionToChunkKey(game.getThing('player').position)].voxels.byteLength)
-      console.log(this.chunks[vox.positionToChunkKey(game.getThing('player').position)].voxels)
-
       // Mansion
       // const tileScale = 5
       // const mansion = procMansion.generateMansion({
