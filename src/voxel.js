@@ -286,17 +286,16 @@ export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS], emptyC
   return bufferView[indexInChunk + quality]
 }
 
-export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }) {
+export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }={}) {
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkKey = positionToChunkKey(position)
 
   // Get the chunk
   let chunk = chunks[chunkKey]
-  // If the chunk doesn't exist, create it and edit the voxel
+
+  // If the chunk doesn't exist, don't allow it to be edited
   if (!chunk) {
-    // Set the chunk to a new empty chunk
-    chunks[chunkKey] = emptyChunk()
-    chunk = chunks[chunkKey]
+    return
   }
 
   // Convert world position to the index within the chunk
@@ -352,7 +351,7 @@ export function forceInitChunk(chunks, chunkKey) {
   chunks[chunkKey] = emptyChunk()
 }
 
-export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], globalVoxel = {}) {
+export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], { globalVoxel={} }={}) {
   // Global voxel is used to override certain properties of the structure's voxels
 
   // Throw error if structure doesn't exist

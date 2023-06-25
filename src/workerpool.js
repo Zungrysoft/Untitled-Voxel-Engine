@@ -10,9 +10,10 @@ export default class WorkerPool {
   idempotency = {}
   workerIdempotencies = []
 
-  constructor (workerFile, workerCount, callbackFunction, idempotencyKeys=[]) {
+  constructor (workerFile, workerCount, { idempotencyKeys=[] }, callbackFunction, assignmentCallbackFunction) {
     this.workerCount = workerCount
     this.callbackFunction = callbackFunction
+    this.assignmentCallbackFunction = assignmentCallbackFunction
     this.idempotencyKeys = idempotencyKeys
 
     // Create workers
@@ -76,6 +77,11 @@ export default class WorkerPool {
 
         // Post the message to the worker
         this.workers[i].postMessage(taskMessage)
+
+        // Run the assignment callback function
+        if (this.assignmentCallbackFunction) {
+          this.assignmentCallbackFunction(taskMessage)
+        }
       }
     }
   }
@@ -121,7 +127,7 @@ export default class WorkerPool {
     this.#resetWorker(message.data.workerIndex)
 
     // Perform the callback action
-    this.callbackFunction(message)
+    this.callbackFunction(message.data)
 
     // Get this worker working again
     this.assign()

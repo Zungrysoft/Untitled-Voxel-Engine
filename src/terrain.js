@@ -20,6 +20,7 @@ export default class Terrain extends Thing {
   seed = Math.floor(Math.random() * Math.pow(2, 64))
   renderDistance = 5
   chunks = {}
+  chunkStates = {}
   chunkMeshes = {}
   chunkGeneratorData = {}
   chunkSpatialHashes = {}
@@ -31,6 +32,7 @@ export default class Terrain extends Thing {
     game.setThingName(this, 'terrain')
 
     // Spawn platform
+    this.chunks['0,0,0'] = vox.emptyChunk()
     let plat = procBasics.generateRectangularPrism({
       length: vox.CHUNK_SIZE,
       width: vox.CHUNK_SIZE,
@@ -63,29 +65,43 @@ export default class Terrain extends Thing {
     this.chunkSelectorWorker = new Worker('src/workers/chunkselector.js', { type: "module" })
 
     // Chunk meshers
-    this.mesherPool = new WorkerPool('src/workers/chunkmesher.js', game.config.threads, (message) => {
-      // Save the chunk mesh
-      let vertsView = new Float32Array(message.data.verts);
-      if (vertsView.length > 0) {
-        this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
-      }
-      // If the mesh is empty, delete its entry in the dict instead
-      else {
-        delete this.chunkMeshes[message.data.chunkKey]
-      }
-    })
+    this.mesherPool = new WorkerPool('src/workers/chunkmesher.js', game.config.threads, {},
+      (message) => {
+        // Save the chunk mesh
+        let vertsView = new Float32Array(message.verts);
+        if (vertsView.length > 0) {
+          this.chunkMeshes[message.chunkKey] = gfx.createMesh(vertsView)
+        }
+        // If the mesh is empty, delete its entry in the dict instead
+        else {
+          delete this.chunkMeshes[message.chunkKey]
+        }
+      },
+    )
 
     // Terrain Generators
-    this.generatorPool = new WorkerPool('src/workers/generator.js', game.config.threads, (message) => {
-      // Save chunk
-      this.chunks[message.data.chunkKey] = message.data.chunk
+    this.generatorPool = new WorkerPool('src/workers/generator.js', game.config.threads,
+      {
+        idempotencyKeys: ['chunkKey'],
+      },
+      (message) => {
+        // Save chunk
+        this.chunks[message.chunkKey] = message.chunk
 
-      // Save this chunk's initial mesh as well
-      if (message.data.verts) {
-        let vertsView = new Float32Array(message.data.verts);
-        this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
-      }
-    }, ['chunkKey'])
+        // Save this chunk's initial mesh as well
+        if (message.verts) {
+          let vertsView = new Float32Array(message.verts);
+          this.chunkMeshes[message.chunkKey] = gfx.createMesh(vertsView)
+        }
+
+        // Set chunk state
+        this.chunkStates[message.chunkKey] = 'loaded'
+      },
+      (message) => {
+        // Set chunk state
+        this.chunkStates[message.chunkKey] = 'loading'
+      },
+    )
   }
 
   update () {
