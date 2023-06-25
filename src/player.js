@@ -220,6 +220,7 @@ export default class Player extends Thing {
       const hitData = terrain.traceLine(pos, vec3.subtract(pos, vec3.scale(ang, 128)))
       // console.log (hitData)
       vox.setVoxelSolid(terrain.chunks, vec3.add(hitData.voxel, hitData.normal), true)
+      // vox.setVoxelShade(terrain.chunks, vec3.add(hitData.voxel, hitData.normal), 'up', 128)
     }
 
     // shooting

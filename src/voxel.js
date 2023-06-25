@@ -4,13 +4,17 @@ import * as vec3 from './core/vector3.js'
 export const CHUNK_SIZE = 32
 export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
 
-export const VOXEL_PARAMETERS = 8
+export const PARAMS_UNLIT = 2
+export const PARAMS_LIT = 8
 // 0: Material
 // 1: Flags
 // 2-7: Shading (range [0, 255])
 // All values are integers
 export const FLAG_SOLID = 1
 export const FLAG_RESERVED = 2
+
+export const DEFAULT_SHADING = [153, 127, 102, 179, 204, 255]
+export const EMPTY_VOXEL = [1, 0, ...DEFAULT_SHADING]
 
 export function stringToArray(s) {
   return s.split(',').map(x => Number(x))
@@ -70,7 +74,7 @@ export function getWorldPosition(chunkKey, chunkPosition) {
 }
 
 export function chunkPositionToChunkIndex(position) {
-  return (position[0] + position[1]*CHUNK_SIZE + position[2]*CHUNK_SIZE*CHUNK_SIZE) * VOXEL_PARAMETERS
+  return (position[0] + position[1]*CHUNK_SIZE + position[2]*CHUNK_SIZE*CHUNK_SIZE)
 }
 
 export function chunkIndexToChunkPosition(index) {
@@ -89,26 +93,6 @@ export function chunkIndexToChunkPosition(index) {
   return [x, y, z]
 }
 
-export function emptyVoxel() {
-  return [1, 0, 153, 127, 102, 179, 204, 255]
-}
-
-export function emptyChunk() {
-  let buffer = new ArrayBuffer(CHUNK_VOLUME * VOXEL_PARAMETERS);
-  let bufferView = new Uint8Array(buffer);
-  const emptyVoxe = emptyVoxel()
-  for (let i = 0; i < CHUNK_VOLUME; i ++) {
-    for (let j = 0; j < VOXEL_PARAMETERS; j ++) {
-      bufferView[i*VOXEL_PARAMETERS + j] = emptyVoxe[j]
-    }
-  }
-  return {
-    voxels: buffer,
-    things: [],
-    modified: false,
-  }
-}
-
 export function emptyStructure() {
   return {
     voxels: {},
@@ -125,6 +109,68 @@ export function emptyStructure() {
     weight: 0.0,
     assetName: "UNNAMED",
   }
+}
+
+export function emptyChunk() {
+  let buffer = new ArrayBuffer(0);
+  return {
+    voxels: buffer,
+    mode: 0,
+    things: [],
+    modified: false,
+  }
+}
+
+export function upgradeChunkToUnlit(chunk) {
+  // If this chunk is already upgraded, ignore
+  if (chunk.mode >= 1) {
+    return
+  }
+
+  // Fill out new buffer
+  let buffer = new ArrayBuffer(CHUNK_VOLUME * PARAMS_UNLIT);
+  let bufferView = new Uint8Array(buffer);
+  for (let i = 0; i < CHUNK_VOLUME; i ++) {
+    for (let j = 0; j < PARAMS_UNLIT; j ++) {
+      bufferView[i*PARAMS_UNLIT + j] = EMPTY_VOXEL[j]
+    }
+  }
+
+  // Save to chunk
+  chunk.mode = 1
+  chunk.voxels = buffer
+}
+
+export function upgradeChunkToLit(chunk) {
+  // If this chunk is already upgraded, ignore
+  if (chunk.mode >= 2) {
+    return
+  }
+
+  // Upgrade it to Unlit first
+  upgradeChunkToUnlit(chunk)
+
+  // Fill out new buffer
+  let buffer = new ArrayBuffer(CHUNK_VOLUME * PARAMS_LIT);
+  let bufferView = new Uint8Array(buffer);
+  let existingView = new Uint8Array(chunk.voxels);
+  const unlit = PARAMS_UNLIT
+  const lit = PARAMS_LIT
+  for (let i = 0; i < CHUNK_VOLUME; i ++) {
+    // Transfer the preexisting fields
+    for (let j = 0; j < unlit; j ++) {
+      bufferView[i*lit + j] = existingView[i*unlit + j]
+    }
+
+    // Create new shading fields
+    for (let j = unlit; j < lit; j ++) {
+      bufferView[i*lit + j] = EMPTY_VOXEL[j]
+    }
+  }
+
+  // Save to chunk
+  chunk.mode = 2
+  chunk.voxels = buffer
 }
 
 export function copyStructure(structure) {
@@ -196,7 +242,7 @@ export function voxelMaterial(voxel) {
 }
 
 export function getVoxelMaterial(chunks, position) {
-  return indexToMaterial(getVoxel(chunks, position, 0))
+  return indexToMaterial(getVoxel(chunks, position)[0])
 }
 
 export function setVoxelMaterial(chunks, position, material) {
@@ -208,7 +254,7 @@ export function voxelSolid(voxel) {
 }
 
 export function getVoxelSolid(chunks, position, emptyChunkSolid=false) {
-  return getVoxel(chunks, position, 1, emptyChunkSolid) & FLAG_SOLID ? true : false
+  return getVoxel(chunks, position, emptyChunkSolid)[1] & FLAG_SOLID ? true : false
 }
 
 export function setVoxelSolid(chunks, position, solid) {
@@ -221,11 +267,17 @@ export function setVoxelSolid(chunks, position, solid) {
 }
 
 export function voxelShades(voxel) {
-  return voxel.slice(2, 8)
+  return voxel.slice(PARAMS_UNLIT, PARAMS_LIT)
 }
 
 export function getVoxelShades(chunks, position) {
-  return getVoxel(chunks, position, [2, 8])
+  return getVoxel(chunks, position).slice(PARAMS_UNLIT, PARAMS_LIT)
+}
+
+export function setVoxelShade(chunks, position, face, shade) {
+  const shades = []
+  shades[vec3.directionToIndex(face) + PARAMS_UNLIT] = shade
+  setVoxel(chunks, position, shades)
 }
 
 export function setVoxelShades(chunks, position, shades) {
@@ -263,7 +315,7 @@ export function editVoxel(chunks, position, changes) {
   setVoxel(chunks, position, overwrite, { flagsAdd, flagsRemove })
 }
 
-export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS], emptyChunkSolid=false) {
+export function getVoxel(chunks, position, emptyChunkSolid=false) {
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkPosition = positionToChunkKey(position)
 
@@ -271,14 +323,19 @@ export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS], emptyC
   let chunk = chunks[chunkPosition]
   // If the chunk doesn't exist, all voxels there are assumed to be empty
   if (!chunk) {
-    const empty = emptyVoxel()
     if (emptyChunkSolid) {
+      const empty = [...EMPTY_VOXEL]
       empty[1] |= FLAG_SOLID
+      return empty
     }
-    if (Array.isArray(quality)) {
-      return empty.slice(quality[0], quality[1])
+    else {
+      return [...EMPTY_VOXEL]
     }
-    return empty[quality]
+  }
+
+  // If the chunk is an air chunk, return an air voxel
+  if (chunk.mode === 0) {
+    return [...EMPTY_VOXEL]
   }
 
   // Convert world position to the index within the chunk
@@ -287,11 +344,17 @@ export function getVoxel(chunks, position, quality=[0, VOXEL_PARAMETERS], emptyC
   // Get a view of the voxel buffer
   let bufferView = new Uint8Array(chunk.voxels);
 
-  // Return the voxel's data
-  if (Array.isArray(quality)) {
-    return bufferView.slice(indexInChunk + quality[0], indexInChunk + quality[1])
+  // Return the voxel data
+  if (chunk.mode === 2) {
+    // Lit chunk
+    indexInChunk *= PARAMS_LIT
+    return bufferView.slice(indexInChunk, indexInChunk + PARAMS_LIT)
   }
-  return bufferView[indexInChunk + quality]
+  else {
+    // Unlit chunk
+    indexInChunk *= PARAMS_UNLIT
+    return [...bufferView.slice(indexInChunk, indexInChunk + PARAMS_UNLIT), ...DEFAULT_SHADING]
+  }
 }
 
 export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }={}) {
@@ -306,23 +369,39 @@ export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0
     return
   }
 
+  // Determine whether we need to upgrade the chunk
+  if (
+    voxel[2] !== undefined ||
+    voxel[3] !== undefined ||
+    voxel[4] !== undefined ||
+    voxel[5] !== undefined ||
+    voxel[6] !== undefined ||
+    voxel[7] !== undefined
+  ) {
+    upgradeChunkToLit(chunk)
+  }
+  else {
+    upgradeChunkToUnlit(chunk)
+  }
+
   // Convert world position to the index within the chunk
   let chunkPosition = positionToChunkPosition(position)
-  let indexInChunk = chunkPositionToChunkIndex(chunkPosition)
+  let params = chunk.mode === 2 ? PARAMS_LIT : PARAMS_UNLIT
+  let indexInChunk = chunkPositionToChunkIndex(chunkPosition) * params
 
   // Get a view of the voxel buffer
   let bufferView = new Uint8Array(chunk.voxels);
 
   // Merge the data, skipping undefined elements
-  const beforeVoxel = bufferView.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
-  for (let i = 0; i < VOXEL_PARAMETERS; i ++) {
+  const beforeVoxel = bufferView.slice(indexInChunk, indexInChunk + params)
+  for (let i = 0; i < params; i ++) {
     if (voxel[i] !== undefined) {
       bufferView[indexInChunk + i] = voxel[i]
     }
   }
   bufferView[indexInChunk + 1] = bufferView[indexInChunk + 1] | flagsAdd
   bufferView[indexInChunk + 1] = ~(~bufferView[indexInChunk + 1] | flagsRemove)
-  const afterVoxel = bufferView.slice(indexInChunk, indexInChunk + VOXEL_PARAMETERS)
+  const afterVoxel = bufferView.slice(indexInChunk, indexInChunk + params)
 
   // Determine whether we should mark this chunk as modified (so it can be re-meshed)
   if (!chunk.modified) {
@@ -347,16 +426,6 @@ export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0
       }
     }
   }
-}
-
-export function forceInitChunk(chunks, chunkKey) {
-  // Do nothing if the chunk already exists
-  if (chunkKey in chunks) {
-    return
-  }
-
-  // Otherwise, set it to an empty chunk
-  chunks[chunkKey] = emptyChunk()
 }
 
 export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], { globalVoxel={} }={}) {

@@ -23,6 +23,11 @@ onmessage = function(e) {
 }
 
 export function meshChunk(chunk, palette) {
+  // If this is an air chunk, don't bother meshing
+  if (chunk.mode === 0) {
+    return new ArrayBuffer(0);
+  }
+
   // Set up chunks object
   const chunks = {'0,0,0': chunk}
 

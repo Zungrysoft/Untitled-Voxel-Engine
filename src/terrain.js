@@ -18,7 +18,7 @@ import SpatialHash from './core/spatialhash.js'
 export default class Terrain extends Thing {
   time = 0
   seed = Math.floor(Math.random() * Math.pow(2, 64))
-  loadDistance = 2
+  loadDistance = 5
   chunks = {}
   chunkStates = {}
   chunkMeshes = {}
@@ -139,6 +139,10 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
+      console.log(this.chunks[vox.positionToChunkKey(game.getThing('player').position)].mode)
+      console.log(this.chunks[vox.positionToChunkKey(game.getThing('player').position)].voxels.byteLength)
+      console.log(this.chunks[vox.positionToChunkKey(game.getThing('player').position)].voxels)
+
       // Mansion
       // const tileScale = 5
       // const mansion = procMansion.generateMansion({
@@ -241,7 +245,8 @@ export default class Terrain extends Thing {
         // Push the meshing job to the mesher worker pool
         this.mesherPool.push({
           chunk: {
-            voxels: this.chunks[chunkKey].voxels
+            voxels: this.chunks[chunkKey].voxels,
+            mode: this.chunks[chunkKey].mode,
           },
           chunkKey: chunkKey,
         })
