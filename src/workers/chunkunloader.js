@@ -7,13 +7,13 @@ onmessage = function(e) {
   }
 
   // Retrieve data
-  const { chunkKey, chunk, workerIndex } = e.data
+  const { chunkKeyStr, chunk, workerIndex } = e.data
 
   // Make database write
-  writeChunk(chunkKey, chunk, (success) => {
+  writeChunk(chunkKeyStr, chunk, (success) => {
     postMessage({
       success: success,
-      chunkKey: chunkKey,
+      chunkKeyStr: chunkKeyStr,
       workerIndex: workerIndex,
     });
   })

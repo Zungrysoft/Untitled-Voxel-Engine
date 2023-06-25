@@ -29,8 +29,8 @@ export default class Terrain extends Thing {
     game.setThingName(this, 'terrain')
 
     // Spawn platform
-    this.chunks['0,0,0'] = vox.emptyChunk()
-    this.chunkStates['0,0,0'] = 'loaded'
+    this.chunks[vox.ts([0,0,0])] = vox.emptyChunk()
+    this.chunkStates[vox.ts([0,0,0])] = 'loaded'
     let plat = procBasics.generateRectangularPrism({
       length: vox.CHUNK_SIZE,
       width: vox.CHUNK_SIZE,
@@ -68,11 +68,11 @@ export default class Terrain extends Thing {
         // Save the chunk mesh
         let vertsView = new Float32Array(message.verts);
         if (vertsView.length > 0) {
-          this.chunkMeshes[message.chunkKey] = gfx.createMesh(vertsView)
+          this.chunkMeshes[message.chunkKeyStr] = gfx.createMesh(vertsView)
         }
         // If the mesh is empty, delete its entry in the dict instead
         else {
-          delete this.chunkMeshes[message.chunkKey]
+          delete this.chunkMeshes[message.chunkKeyStr]
         }
       },
     )
@@ -80,52 +80,54 @@ export default class Terrain extends Thing {
     // Terrain Generators
     this.generatorPool = new WorkerPool('src/workers/chunkgenerator.js', game.config.threads,
       {
-        idempotencyKeys: ['chunkKey'],
+        idempotencyKeys: ['chunkKeyStr'],
       },
       (message) => {
         // Save chunk
-        this.chunks[message.chunkKey] = message.chunk
+        this.chunks[message.chunkKeyStr] = message.chunk
 
         // Save this chunk's initial mesh as well
         if (message.verts) {
           let vertsView = new Float32Array(message.verts);
           if (vertsView.length > 0) {
-            this.chunkMeshes[message.chunkKey] = gfx.createMesh(vertsView)
+            this.chunkMeshes[message.chunkKeyStr] = gfx.createMesh(vertsView)
           }
         }
 
         // Set chunk state
-        this.chunkStates[message.chunkKey] = 'loaded'
+        this.chunkStates[message.chunkKeyStr] = 'loaded'
       },
       (message) => {
         // Set chunk state
-        this.chunkStates[message.chunkKey] = 'loading'
+        this.chunkStates[message.chunkKeyStr] = 'loading'
       },
     )
 
     // Chunk Unloaders
     this.unloaderPool = new WorkerPool('src/workers/chunkunloader.js', game.config.threads,
       {
-        idempotencyKeys: ['chunkKey'],
+        idempotencyKeys: ['chunkKeyStr'],
       },
       (message) => {
         if (message.success) {
           // Set chunk state
-          delete this.chunkStates[message.chunkKey]
+          delete this.chunkStates[message.chunkKeyStr]
         }
       },
       (message) => {
         // Set chunk state
-        this.chunkStates[message.chunkKey] = 'unloading'
+        this.chunkStates[message.chunkKeyStr] = 'unloading'
 
         // Delete the chunk from this object since it's now safe in the worker thread that is saving it to db
-        delete this.chunks[message.chunkKey]
+        delete this.chunks[message.chunkKeyStr]
 
         // Delete mesh
-        delete this.chunkMeshes[message.chunkKey]
+        delete this.chunkMeshes[message.chunkKeyStr]
       },
     )
   }
+
+
 
   update () {
     super.update()
@@ -139,6 +141,24 @@ export default class Terrain extends Thing {
 
     // Debug button
     if (game.keysPressed.KeyJ) {
+      game.globals.debugPressed = true
+
+      let counter = 0
+      for (let i = 0; i < 1000000; i ++) {
+        const x = Math.floor(Math.random()*80)
+        const y = Math.floor(Math.random()*80)
+        const z = Math.floor(Math.random()*80)
+        const voxel = vox.getVoxel(this.chunks, [x,y,z])
+        if (voxel[1] > 0) {
+          counter ++
+        }
+      }
+      console.log(counter)
+
+      // const playerPos = game.getThing('player').position
+      // console.log(this.chunks[vox.ts(vox.positionToChunkKey(playerPos))])
+      // console.log(this.chunkMeshes[vox.ts(vox.positionToChunkKey(playerPos))])
+
       // Mansion
       // const tileScale = 5
       // const mansion = procMansion.generateMansion({
@@ -206,10 +226,10 @@ export default class Terrain extends Thing {
   loadChunks(data) {
     // Rebuild the queue of which chunks to load
     this.generatorPool.clearQueue()
-    for (const chunkKey of data.chunksToLoad) {
-      if (!(chunkKey in this.chunkStates)) {
+    for (const chunkKeyStr of data.chunksToLoad) {
+      if (!(chunkKeyStr in this.chunkStates)) {
         this.generatorPool.push({
-          chunkKey: chunkKey,
+          chunkKeyStr: chunkKeyStr,
           seed: this.seed,
         })
       }
@@ -217,12 +237,12 @@ export default class Terrain extends Thing {
 
     // Set chunks to unload if they're loaded and not on the keep or load list
     this.unloaderPool.clearQueue()
-    for (const chunkKey in this.chunks) {
-      if (!data.chunksToLoad.includes(chunkKey) && !data.chunksToKeep.includes(chunkKey)) {
-        if (this.chunkStates[chunkKey] === 'loaded') {
-          const chunk = this.chunks[chunkKey]
+    for (const chunkKeyStr in this.chunks) {
+      if (!data.chunksToLoad.includes(chunkKeyStr) && !data.chunksToKeep.includes(chunkKeyStr)) {
+        if (this.chunkStates[chunkKeyStr] === 'loaded') {
+          const chunk = this.chunks[chunkKeyStr]
           this.unloaderPool.push({
-            chunkKey: chunkKey,
+            chunkKeyStr: chunkKeyStr,
             chunk: chunk,
             transfer: [chunk.voxels],
           })
@@ -233,18 +253,18 @@ export default class Terrain extends Thing {
 
   rebuildChunkMeshes() {
     // Iterate over chunks and rebuild all marked "modified"
-    for (const chunkKey in this.chunks) {
-      if (this.chunks[chunkKey].modified) {
+    for (const chunkKeyStr in this.chunks) {
+      if (this.chunks[chunkKeyStr].modified) {
         // Unmark this chunk as modified
-        this.chunks[chunkKey].modified = false
+        this.chunks[chunkKeyStr].modified = false
 
         // Push the meshing job to the mesher worker pool
         this.mesherPool.push({
           chunk: {
-            voxels: this.chunks[chunkKey].voxels,
-            mode: this.chunks[chunkKey].mode,
+            voxels: this.chunks[chunkKeyStr].voxels,
+            mode: this.chunks[chunkKeyStr].mode,
           },
-          chunkKey: chunkKey,
+          chunkKeyStr: chunkKeyStr,
         })
       }
     }
@@ -370,9 +390,9 @@ export default class Terrain extends Thing {
     // TODO: Fog skybox
 
     // Chunk meshes
-    for (const chunkKey in this.chunkMeshes) {
-      const chunkMesh = this.chunkMeshes[chunkKey]
-      const chunkPosition = vox.getChunkPosition(this.chunks, chunkKey)
+    for (const chunkKeyStr in this.chunkMeshes) {
+      const chunkMesh = this.chunkMeshes[chunkKeyStr]
+      const chunkPosition = vox.getChunkPosition(this.chunks, chunkKeyStr)
       const position = vox.getWorldPosition(chunkPosition, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
       // gfx.set('fogDistance', (this.loadDistance-1) * vox.CHUNK_SIZE * 1.0)

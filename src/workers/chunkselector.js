@@ -38,27 +38,27 @@ onmessage = function(e) {
       const dist = Math.pow(x-xAvg, 2) + Math.pow(y-yAvg, 2)
       if (dist <= r2) {
         // Add all of the chunks in this column, center outward
-        chunksToLoad.push([x, y, zAvg].toString())
+        chunksToLoad.push(vox.ts([x, y, zAvg]))
         for (let z = 1; z <= keepDistanceVertical; z ++) {
           // Check whether the vertical position is within the load cylinder
           if (z <= loadDistanceVertical) {
-            chunksToLoad.push([x, y, zAvg-z].toString())
-            chunksToLoad.push([x, y, zAvg+z].toString())
+            chunksToLoad.push(vox.ts([x, y, zAvg-z]))
+            chunksToLoad.push(vox.ts([x, y, zAvg+z]))
           }
           // If it's too high or low, it's part of the keep cylinder
           else {
-            chunksToKeep.push([x, y, zAvg-z].toString())
-            chunksToKeep.push([x, y, zAvg+z].toString())
+            chunksToKeep.push(vox.ts([x, y, zAvg-z]))
+            chunksToKeep.push(vox.ts([x, y, zAvg+z]))
           }
         }
       }
       // Else if this horizontal position is within the keep cylinder...
       else if (dist <= k2) {
         // Add all of the chunks in this column, center outward
-        chunksToKeep.push([x, y, zAvg].toString())
+        chunksToKeep.push(vox.ts([x, y, zAvg]))
         for (let z = 1; z <= keepDistanceVertical; z ++) {
-          chunksToKeep.push([x, y, zAvg-z].toString())
-          chunksToKeep.push([x, y, zAvg+z].toString())
+          chunksToKeep.push(vox.ts([x, y, zAvg-z]))
+          chunksToKeep.push(vox.ts([x, y, zAvg+z]))
         }
       }
 

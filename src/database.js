@@ -9,7 +9,7 @@ export function openDatabase(callback) {
 
   request.onupgradeneeded = function(e) {
     let db = e.target.result
-    db.createObjectStore('chunks', {keyPath: 'chunkKey'})
+    db.createObjectStore('chunks', {keyPath: 'chunkKeyStr'})
   }
 
   request.onsuccess = function(e) {
@@ -32,13 +32,13 @@ export function flush(callback) {
   }
 }
 
-export function readChunk(chunkKey, callback) {
+export function readChunk(chunkKeyStr, callback) {
   openDatabase((db) => {
     if (db) {
       const transaction = db.transaction('chunks', 'readonly')
       const store = transaction.objectStore('chunks')
 
-      const idQuery = store.get(chunkKey)
+      const idQuery = store.get(chunkKeyStr)
       idQuery.onsuccess = function(e) {
         // Close database connection
         db.close()
@@ -46,7 +46,7 @@ export function readChunk(chunkKey, callback) {
         // Return result
         const chunk = e.target.result
         if (chunk) {
-          delete chunk.chunkKey
+          delete chunk.chunkKeyStr
           callback(chunk)
         }
         else {
@@ -60,13 +60,13 @@ export function readChunk(chunkKey, callback) {
   })
 }
 
-export function writeChunk(chunkKey, chunk, callback) {
+export function writeChunk(chunkKeyStr, chunk, callback) {
   openDatabase((db) => {
     if (db) {
       const transaction = db.transaction('chunks', 'readwrite')
       const store = transaction.objectStore('chunks')
 
-      store.put({ chunkKey: chunkKey, ...chunk })
+      store.put({ chunkKeyStr: chunkKeyStr, ...chunk })
 
       transaction.oncomplete = function(e) {
         db.close()

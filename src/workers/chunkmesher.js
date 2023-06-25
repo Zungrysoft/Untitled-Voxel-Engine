@@ -9,7 +9,7 @@ onmessage = function(e) {
   }
 
   // Retrieve data
-  const { chunkKey, chunk, workerIndex } = e.data
+  const { chunkKeyStr, chunk, workerIndex } = e.data
 
   // Call the mesher function
   let verts = meshChunk(chunk, pal.palette)
@@ -17,7 +17,7 @@ onmessage = function(e) {
   // Return
   postMessage({
     verts: verts,
-    chunkKey: chunkKey,
+    chunkKeyStr: chunkKeyStr,
     workerIndex: workerIndex,
   }, [verts]);
 }
@@ -29,7 +29,8 @@ export function meshChunk(chunk, palette) {
   }
 
   // Set up chunks object
-  const chunks = {'0,0,0': chunk}
+  const chunks = {}
+  chunks[vox.ts([0,0,0])] = chunk
 
   // Build list of faces this chunk needs to render
   let faces = {

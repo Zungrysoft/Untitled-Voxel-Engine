@@ -16,15 +16,55 @@ export const FLAG_RESERVED = 2
 export const DEFAULT_SHADING = [153, 127, 102, 179, 204, 255]
 export const EMPTY_VOXEL = [1, 0, ...DEFAULT_SHADING]
 
+export const CHUNK_KEY_DIGITS = 10
+export const CHUNK_KEY_OFFSET = 0.5 * Math.pow(10, CHUNK_KEY_DIGITS)
+
+// export function ts(arr) {
+//   if (typeof arr === 'string') {
+//     return arr
+//   }
+//   return ((arr[0] + CHUNK_KEY_OFFSET) + '' + (arr[1] + CHUNK_KEY_OFFSET) + '' + (arr[2] + CHUNK_KEY_OFFSET))
+// }
+
+// export function ta(str) {
+//   if (Array.isArray(str)) {
+//     return str
+//   }
+//   return [
+//     parseInt(str.slice(0, 10), 10)-CHUNK_KEY_OFFSET,
+//     parseInt(str.slice(10, 20), 10)-CHUNK_KEY_OFFSET,
+//     parseInt(str.slice(20, 30), 10)-CHUNK_KEY_OFFSET,
+//   ]
+// }
+
+export function ts(arr) {
+  if (typeof arr === 'string') {
+    return arr
+  }
+  return arr[0] + ',' + arr[1] + ',' + arr[2]
+}
+
+export function ta(str) {
+  if (Array.isArray(str)) {
+    return str
+  }
+  const split = str.split(',')
+  return [
+    Number(split[0]),
+    Number(split[1]),
+    Number(split[2]),
+  ]
+}
+
 export function stringToArray(s) {
   return s.split(',').map(x => Number(x))
 }
 
-export function getChunkPosition(chunks, chunkKey) {
-  // If the chunk doesn't exist, just convert the chunkKey directly and send it back
+export function getChunkPosition(chunks, chunkKeyStr) {
+  // If the chunk doesn't exist, just convert the chunkKeyStr directly and send it back
   const chunk = chunks.position
   if (!chunk) {
-    return stringToArray(chunkKey)
+    return ta(chunkKeyStr)
   }
 
   // If the position is already saved within the chunk in array form, send that back
@@ -34,7 +74,7 @@ export function getChunkPosition(chunks, chunkKey) {
   }
   // If it is not saved, convert it and save it in for future calls
   else {
-    const newPos = stringToArray(chunkKey)
+    const newPos = ta(chunkKeyStr)
     chunk.position = newPos
     return newPos
   }
@@ -63,7 +103,7 @@ export function positionToChunkPosition(position) {
 export function getWorldPosition(chunkKey, chunkPosition) {
   // Make sure the chunkKey is in array format
   if (typeof chunkKey === "string") {
-    chunkKey = stringToArray(chunkKey)
+    chunkKey = ta(chunkKey)
   }
 
   return [
@@ -317,10 +357,10 @@ export function editVoxel(chunks, position, changes) {
 
 export function getVoxel(chunks, position, emptyChunkSolid=false) {
   // Convert world position to chunk coordinate (key to access chunk)
-  let chunkPosition = positionToChunkKey(position)
+  let chunkKeyStr = ts(positionToChunkKey(position))
 
   // Get the chunk
-  let chunk = chunks[chunkPosition]
+  let chunk = chunks[chunkKeyStr]
   // If the chunk doesn't exist, all voxels there are assumed to be empty
   if (!chunk) {
     if (emptyChunkSolid) {
@@ -359,10 +399,10 @@ export function getVoxel(chunks, position, emptyChunkSolid=false) {
 
 export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }={}) {
   // Convert world position to chunk coordinate (key to access chunk)
-  let chunkKey = positionToChunkKey(position)
+  let chunkKeyStr = ts(positionToChunkKey(position))
 
   // Get the chunk
-  let chunk = chunks[chunkKey]
+  let chunk = chunks[chunkKeyStr]
 
   // If the chunk doesn't exist, don't allow it to be edited
   if (!chunk) {

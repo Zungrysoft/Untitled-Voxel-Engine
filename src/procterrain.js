@@ -155,10 +155,10 @@ function diamondSquareRandomize (variance) {
   return (Math.random() - 0.5) * variance * ROUGHNESS_CONSTANT
 }
 
-export function buildChunkTerrain(chunks, chunkKey, seed, params={}) {
+export function buildChunkTerrain(chunks, chunkKeyStr, seed, params={}) {
   // Convert chunkKey to array
-  const chunkKeyArray = typeof chunkKey === 'string' ? vox.stringToArray(chunkKey) : chunkKey
-  const aboveChunk = vec3.add(chunkKeyArray, [0, 0, 1])
+  const chunkKey = vox.ta(chunkKeyStr)
+  const aboveChunk = vec3.add(chunkKey, [0, 0, 1])
 
   // Create noise object
   let noise = new Noise(seed)
@@ -169,7 +169,7 @@ export function buildChunkTerrain(chunks, chunkKey, seed, params={}) {
       let depth = 0
       for (let z = vox.CHUNK_SIZE-1; z >= 0; z --) {
         // Get world position and perlin density at this position
-        const position = vox.getWorldPosition(chunkKeyArray, [x, y, z])
+        const position = vox.getWorldPosition(chunkKey, [x, y, z])
         const density = getPerlinDensity(position, noise, params)
 
         // Build the material
