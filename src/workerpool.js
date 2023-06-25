@@ -1,12 +1,14 @@
 import Queue from './queue.js'
 
 export default class WorkerPool {
+  tasks = new Queue()
   callbackFunction = () => {}
   workers = []
-  idempotencyKeys = []
   workerCount = 0
   workerActive = []
-  tasks = new Queue()
+  idempotencyKeys = []
+  idempotency = {}
+  workerIdempotencies = []
 
   constructor (workerFile, workerCount, callbackFunction, idempotencyKeys=[]) {
     this.workerCount = workerCount
@@ -19,17 +21,34 @@ export default class WorkerPool {
       newWorker.onmessage = (message) => {this.#callback(message)}
       this.workers.push(newWorker)
       this.workerActive.push(false)
+      this.workerIdempotencies.push({})
+    }
+
+    // Create idempotency sets
+    for (const key of idempotencyKeys) {
+      this.idempotency[key] = new Set()
     }
   }
 
   clearQueue() {
+    // Clear idempotency
+    this.idempotency = {}
+    for (const key of this.idempotencyKeys) {
+      this.idempotency[key] = new Set()
+    }
+
+    // Reset queue
     this.tasks = new Queue()
   }
 
-  push(...entries) {
-    // TODO: Idempotency check
-    for (const entry of entries) {
-      this.tasks.push(entry)
+  push(...messages) {
+    for (const message of messages) {
+      // Make sure this entry doesn't already exist in the queue
+      if (this.#checkIdempotency(message)) {
+        continue
+      }
+      this.#addIdempotency(message)
+      this.tasks.push(message)
     }
     this.assign()
   }
@@ -52,16 +71,54 @@ export default class WorkerPool {
         // Add the workerIndex to the task so we can identify it later
         taskMessage.workerIndex = i
 
+        // Transfer idempotency
+        this.#transferIdempotencyToWorker(taskMessage, i)
+
         // Post the message to the worker
         this.workers[i].postMessage(taskMessage)
       }
     }
   }
 
+  #checkIdempotency(message) {
+    for (const key of this.idempotencyKeys) {
+      if (this.idempotency[key].has(message[key].toString())) {
+        return true
+      }
+      for (const workerIdempotency of this.workerIdempotencies) {
+        if (workerIdempotency[key] === message[key].toString()) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  #addIdempotency(message) {
+    for (const key of this.idempotencyKeys) {
+      this.idempotency[key].add(message[key].toString())
+    }
+  }
+
+  #transferIdempotencyToWorker(message, workerIndex) {
+    // Remove idempotency from the queue
+    for (const key of this.idempotencyKeys) {
+      this.idempotency[key].delete(message[key].toString())
+    }
+    // Add it to the worker
+    for (const key of this.idempotencyKeys) {
+      this.workerIdempotencies[workerIndex][key] = message[key].toString()
+    }
+  }
+
+  #resetWorker(workerIndex) {
+    this.workerIdempotencies[workerIndex] = {}
+    this.workerActive[workerIndex] = false
+  }
+
   #callback(message) {
     // Set this worker as inactive
-    const i = message.data.workerIndex
-    this.workerActive[i] = false
+    this.#resetWorker(message.data.workerIndex)
 
     // Perform the callback action
     this.callbackFunction(message)

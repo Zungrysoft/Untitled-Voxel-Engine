@@ -109,8 +109,8 @@ function getPerlinDensity(position, noise, params) {
   const {scale, heightScale, zScale} = params
 
   const steepness = noise.perlin2(x/(scale*50), y/(scale*50))
-  const mScale = u.map(steepness, 0, 0.9, 0.1, 15, true)
-  const mScale2 = u.map(steepness, 0, 0.9, 0.3, 1.5, true)
+  const mScale = u.map(steepness, 0, 0.9, 0.7, 15, true)
+  const mScale2 = u.map(steepness, 0, 0.9, 0.1, 1.5, true)
 
   let density = noise.perlin3(x/scale, y/scale, z/(scale*zScale)) * mScale2
   density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) / 16

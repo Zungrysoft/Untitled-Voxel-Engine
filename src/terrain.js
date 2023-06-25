@@ -18,6 +18,7 @@ import SpatialHash from './core/spatialhash.js'
 export default class Terrain extends Thing {
   time = 0
   seed = Math.floor(Math.random() * Math.pow(2, 64))
+  renderDistance = 5
   chunks = {}
   chunkMeshes = {}
   chunkGeneratorData = {}
@@ -75,7 +76,7 @@ export default class Terrain extends Thing {
     })
 
     // Terrain Generators
-    this.generatorPool = new WorkerPool('src/workers/procterrain.js', game.config.threads, (message) => {
+    this.generatorPool = new WorkerPool('src/workers/generator.js', game.config.threads, (message) => {
       // Save chunk
       this.chunks[message.data.chunkKey] = message.data.chunk
 
@@ -84,7 +85,7 @@ export default class Terrain extends Thing {
         let vertsView = new Float32Array(message.data.verts);
         this.chunkMeshes[message.data.chunkKey] = gfx.createMesh(vertsView)
       }
-    })
+    }, ['chunkKey'])
   }
 
   update () {
@@ -156,12 +157,13 @@ export default class Terrain extends Thing {
     }
 
     // Send message
-    worker.postMessage({position: position, renderDistance: 5})
+    worker.postMessage({position: position, renderDistance: this.renderDistance})
   }
 
   loadChunks(data) {
+    // Clear the queue of chunks to load
     this.generatorPool.clearQueue()
-    for (const chunkKey of data) {
+    for (const chunkKey of data.chunksToLoad) {
       if (!(chunkKey in this.chunks)) {
         this.generatorPool.push({
           chunkKey: chunkKey,

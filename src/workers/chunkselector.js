@@ -6,7 +6,7 @@ onmessage = function(e) {
     close();
   }
 
-  const { renderDistance, position } = e.data
+  const { renderDistance, keepDistance, position } = e.data
   const r2 = (renderDistance + 0.5) * (renderDistance + 0.5)
   const chunkKey = vox.positionToChunkKey(position)
 
@@ -42,5 +42,8 @@ onmessage = function(e) {
 
   ret.push(chunkKey)
 
-  postMessage(ret);
+  postMessage({
+    chunksToLoad: ret,
+    chunksToKeep: [],
+  });
 }
