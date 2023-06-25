@@ -2,6 +2,7 @@ import * as game from './core/game.js'
 import * as gfx from './core/webgl.js'
 import Terrain from './terrain.js'
 import Player from './player.js'
+import { flush } from './database.js'
 
 game.config.width = 640
 game.config.height = 360
@@ -93,8 +94,9 @@ assets.meshes = Object.fromEntries(
 )
 
 // console.log(assets)
-
-game.setScene(() => {
-  game.addThing(new Terrain())
-  game.addThing(new Player([7.1, 7, 7]))
+flush(() => {
+  game.setScene(() => {
+    game.addThing(new Terrain())
+    game.addThing(new Player([7.1, 7, 7]))
+  })
 })

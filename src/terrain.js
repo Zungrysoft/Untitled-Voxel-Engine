@@ -18,14 +18,11 @@ import SpatialHash from './core/spatialhash.js'
 export default class Terrain extends Thing {
   time = 0
   seed = Math.floor(Math.random() * Math.pow(2, 64))
-  renderDistance = 5
+  loadDistance = 2
   chunks = {}
   chunkStates = {}
   chunkMeshes = {}
-  chunkGeneratorData = {}
-  chunkSpatialHashes = {}
-  selectedChunks = []
-  fogColor = [1, 1, 1]
+  fogColor = [0.267, 0.533, 1]
 
   constructor () {
     super()
@@ -33,6 +30,7 @@ export default class Terrain extends Thing {
 
     // Spawn platform
     this.chunks['0,0,0'] = vox.emptyChunk()
+    this.chunkStates['0,0,0'] = 'loaded'
     let plat = procBasics.generateRectangularPrism({
       length: vox.CHUNK_SIZE,
       width: vox.CHUNK_SIZE,
@@ -80,7 +78,7 @@ export default class Terrain extends Thing {
     )
 
     // Terrain Generators
-    this.generatorPool = new WorkerPool('src/workers/generator.js', game.config.threads,
+    this.generatorPool = new WorkerPool('src/workers/chunkgenerator.js', game.config.threads,
       {
         idempotencyKeys: ['chunkKey'],
       },
@@ -91,7 +89,9 @@ export default class Terrain extends Thing {
         // Save this chunk's initial mesh as well
         if (message.verts) {
           let vertsView = new Float32Array(message.verts);
-          this.chunkMeshes[message.chunkKey] = gfx.createMesh(vertsView)
+          if (vertsView.length > 0) {
+            this.chunkMeshes[message.chunkKey] = gfx.createMesh(vertsView)
+          }
         }
 
         // Set chunk state
@@ -100,6 +100,29 @@ export default class Terrain extends Thing {
       (message) => {
         // Set chunk state
         this.chunkStates[message.chunkKey] = 'loading'
+      },
+    )
+
+    // Chunk Unloaders
+    this.unloaderPool = new WorkerPool('src/workers/chunkunloader.js', game.config.threads,
+      {
+        idempotencyKeys: ['chunkKey'],
+      },
+      (message) => {
+        if (message.success) {
+          // Set chunk state
+          delete this.chunkStates[message.chunkKey]
+        }
+      },
+      (message) => {
+        // Set chunk state
+        this.chunkStates[message.chunkKey] = 'unloading'
+
+        // Delete the chunk from this object since it's now safe in the worker thread that is saving it to db
+        delete this.chunks[message.chunkKey]
+
+        // Delete mesh
+        delete this.chunkMeshes[message.chunkKey]
       },
     )
   }
@@ -173,18 +196,37 @@ export default class Terrain extends Thing {
     }
 
     // Send message
-    worker.postMessage({position: position, renderDistance: this.renderDistance})
+    worker.postMessage({
+      position: position,
+      loadDistance: this.loadDistance,
+      keepDistance: this.loadDistance + 2,
+    })
   }
 
   loadChunks(data) {
-    // Clear the queue of chunks to load
+    // Rebuild the queue of which chunks to load
     this.generatorPool.clearQueue()
     for (const chunkKey of data.chunksToLoad) {
-      if (!(chunkKey in this.chunks)) {
+      if (!(chunkKey in this.chunkStates)) {
         this.generatorPool.push({
           chunkKey: chunkKey,
           seed: this.seed,
         })
+      }
+    }
+
+    // Set chunks to unload if they're loaded and not on the keep or load list
+    this.unloaderPool.clearQueue()
+    for (const chunkKey in this.chunks) {
+      if (!data.chunksToLoad.includes(chunkKey) && !data.chunksToKeep.includes(chunkKey)) {
+        if (this.chunkStates[chunkKey] === 'loaded') {
+          const chunk = this.chunks[chunkKey]
+          this.unloaderPool.push({
+            chunkKey: chunkKey,
+            chunk: chunk,
+            transfer: [chunk.voxels],
+          })
+        }
       }
     }
   }
@@ -332,8 +374,8 @@ export default class Terrain extends Thing {
       const chunkPosition = vox.getChunkPosition(this.chunks, chunkKey)
       const position = vox.getWorldPosition(chunkPosition, [0, 0, 0])
       gfx.set('fogColor', this.fogColor)
-      gfx.set('fogDensity', 0.0)
-      gfx.set('emission', 0.0)
+      // gfx.set('fogDistance', (this.loadDistance-1) * vox.CHUNK_SIZE * 1.0)
+      gfx.set('fogDistance', 0.0)
       gfx.setTexture(assets.textures.colorMap)
       gfx.set('modelMatrix', mat.getTransformation({
         translation: position,

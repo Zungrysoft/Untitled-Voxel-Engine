@@ -17,13 +17,21 @@ export function stringToArray(s) {
 }
 
 export function getChunkPosition(chunks, chunkKey) {
-  const pos = chunks[chunkKey].position
+  // If the chunk doesn't exist, just convert the chunkKey directly and send it back
+  const chunk = chunks.position
+  if (!chunk) {
+    return stringToArray(chunkKey)
+  }
+
+  // If the position is already saved within the chunk in array form, send that back
+  const pos = chunk.position
   if (pos) {
     return pos
   }
+  // If it is not saved, convert it and save it in for future calls
   else {
     const newPos = stringToArray(chunkKey)
-    chunks[chunkKey].position = newPos
+    chunk.position = newPos
     return newPos
   }
 }

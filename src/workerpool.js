@@ -43,14 +43,19 @@ export default class WorkerPool {
   }
 
   push(...messages) {
+    // Iterate over messages
     for (const message of messages) {
       // Make sure this entry doesn't already exist in the queue
       if (this.#checkIdempotency(message)) {
         continue
       }
       this.#addIdempotency(message)
+
+      // Push it to the queue
       this.tasks.push(message)
     }
+
+    // Try to assign workers to these newly pushed messages
     this.assign()
   }
 
@@ -76,7 +81,8 @@ export default class WorkerPool {
         this.#transferIdempotencyToWorker(taskMessage, i)
 
         // Post the message to the worker
-        this.workers[i].postMessage(taskMessage)
+        const transfer = taskMessage.transfer || []
+        this.workers[i].postMessage(taskMessage, transfer)
 
         // Run the assignment callback function
         if (this.assignmentCallbackFunction) {

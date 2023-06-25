@@ -9,8 +9,7 @@ varying vec4 viewPosition;
 
 uniform sampler2D texture;
 uniform vec3 fogColor;
-uniform float fogDensity;
-uniform float emission;
+uniform float fogDistance;
 
 void main() {
     // Get diffuse color from texture
@@ -22,8 +21,8 @@ void main() {
 
     // Calculate the fog factor based on the distance and fog density
     float fogFactor = 0.0;
-    if (fogDensity > 0.0) {
-      fogFactor = log(distance * fogDensity) * 0.1;
+    if (fogDistance > 0.0) {
+      fogFactor = distance / fogDistance;
       fogFactor = min(fogFactor, 1.0);
       fogFactor = max(fogFactor, 0.0);
     }
@@ -31,9 +30,6 @@ void main() {
     // Apply the fog effect by blending the fragment color with the fog color
     vec4 fogColor = vec4(fogColor.rgb, 1.0);
     vec4 result = mix(diffuse, fogColor, fogFactor);
-
-    // Apply emission
-    result = mix(result, diffuse, emission);
 
     gl_FragColor = result;
 }
