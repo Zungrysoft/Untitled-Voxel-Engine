@@ -282,7 +282,7 @@ export function voxelMaterial(voxel) {
 }
 
 export function getVoxelMaterial(chunks, position) {
-  return indexToMaterial(getVoxel(chunks, position)[0])
+  return indexToMaterial(getVoxel(chunks, position, {index: 0}))
 }
 
 export function setVoxelMaterial(chunks, position, material) {
@@ -293,16 +293,16 @@ export function voxelSolid(voxel) {
   return voxel[1] & FLAG_SOLID ? true : false
 }
 
-export function getVoxelSolid(chunks, position, emptyChunkSolid=false) {
-  return getVoxel(chunks, position, emptyChunkSolid)[1] & FLAG_SOLID ? true : false
+export function getVoxelSolid(chunks, position, { emptyChunkSolid=false, }={}) {
+  return getVoxel(chunks, position, {index: 1, emptyChunkSolid: emptyChunkSolid}) & FLAG_SOLID ? true : false
 }
 
 export function setVoxelSolid(chunks, position, solid) {
   if (solid) {
-    setVoxel(chunks, position, [], { flagsAdd: FLAG_SOLID })
+    setVoxel(chunks, position, [], {flagsAdd: FLAG_SOLID})
   }
   else {
-    setVoxel(chunks, position, [], { flagsRemove: FLAG_SOLID })
+    setVoxel(chunks, position, [], {flagsRemove: FLAG_SOLID})
   }
 }
 
@@ -311,7 +311,7 @@ export function voxelShades(voxel) {
 }
 
 export function getVoxelShades(chunks, position) {
-  return getVoxel(chunks, position).slice(PARAMS_UNLIT, PARAMS_LIT)
+  return getVoxel(chunks, position, {index: [PARAMS_UNLIT, PARAMS_LIT]})
 }
 
 export function setVoxelShade(chunks, position, face, shade) {
@@ -355,7 +355,8 @@ export function editVoxel(chunks, position, changes) {
   setVoxel(chunks, position, overwrite, { flagsAdd, flagsRemove })
 }
 
-export function getVoxel(chunks, position, emptyChunkSolid=false) {
+export function getVoxel(chunks, position, { index=[0, PARAMS_LIT], emptyChunkSolid=false }={}) {
+
   // Convert world position to chunk coordinate (key to access chunk)
   let chunkKeyStr = ts(positionToChunkKey(position))
 
@@ -366,16 +367,16 @@ export function getVoxel(chunks, position, emptyChunkSolid=false) {
     if (emptyChunkSolid) {
       const empty = [...EMPTY_VOXEL]
       empty[1] |= FLAG_SOLID
-      return empty
+      return Array.isArray(index) ? empty.slice(...index) : empty[index]
     }
     else {
-      return [...EMPTY_VOXEL]
+      return Array.isArray(index) ? EMPTY_VOXEL.slice(...index) : EMPTY_VOXEL[index]
     }
   }
 
   // If the chunk is an air chunk, return an air voxel
   if (chunk.mode === 0) {
-    return [...EMPTY_VOXEL]
+    return Array.isArray(index) ? EMPTY_VOXEL.slice(...index) : EMPTY_VOXEL[index]
   }
 
   // Convert world position to the index within the chunk
@@ -388,12 +389,32 @@ export function getVoxel(chunks, position, emptyChunkSolid=false) {
   if (chunk.mode === 2) {
     // Lit chunk
     indexInChunk *= PARAMS_LIT
-    return bufferView.slice(indexInChunk, indexInChunk + PARAMS_LIT)
+    if (Array.isArray(index)) {
+      return bufferView.slice(indexInChunk + index[0], indexInChunk + index[1])
+    }
+    else {
+      return bufferView[indexInChunk + index]
+    }
   }
   else {
     // Unlit chunk
     indexInChunk *= PARAMS_UNLIT
-    return [...bufferView.slice(indexInChunk, indexInChunk + PARAMS_UNLIT), ...DEFAULT_SHADING]
+    if (Array.isArray(index)) {
+      if (index[1] > PARAMS_UNLIT) {
+        return [...bufferView.slice(indexInChunk, indexInChunk + PARAMS_UNLIT), ...DEFAULT_SHADING]
+      }
+      else {
+        return bufferView.slice(indexInChunk + index[0], indexInChunk + index[1])
+      }
+    }
+    else {
+      if (index >= PARAMS_UNLIT) {
+        return EMPTY_VOXEL[index]
+      }
+      else {
+        return bufferView[indexInChunk + index]
+      }
+    }
   }
 }
 

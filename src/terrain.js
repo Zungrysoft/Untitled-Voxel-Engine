@@ -13,7 +13,7 @@ import * as procTerrain from './procterrain.js'
 import WorkerPool from './workerpool.js'
 import Thing from './core/thing.js'
 import { assets } from './core/game.js'
-import SpatialHash from './core/spatialhash.js'
+import { meshChunk } from './workers/chunkmesher.js'
 
 export default class Terrain extends Thing {
   time = 0
@@ -144,14 +144,8 @@ export default class Terrain extends Thing {
       game.globals.debugPressed = true
 
       let counter = 0
-      for (let i = 0; i < 1000000; i ++) {
-        const x = Math.floor(Math.random()*80)
-        const y = Math.floor(Math.random()*80)
-        const z = Math.floor(Math.random()*80)
-        const voxel = vox.getVoxel(this.chunks, [x,y,z])
-        if (voxel[1] > 0) {
-          counter ++
-        }
+      for (let i = 0; i < 30; i ++) {
+        counter += meshChunk(this.chunks[vox.ts([0,0,0])], pal.palette).byteLength
       }
       console.log(counter)
 
