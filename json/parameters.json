@@ -7,12 +7,19 @@
     },
 
 
+
+
+    "terrainIslandSpacing": {
+        "scope": "world",
+        "mode": "constant",
+        "value": 80
+    },
     "terrainIslandRadius": {
         "scope": "biome",
         "mode": "bellCurve",
-        "mean": 150,
-        "standardDeviation": 50,
-        "min": 50
+        "mean": 400,
+        "standardDeviation": 150,
+        "min": 150
     },
     "terrainIslandRadiusVerticalScale": {
         "scope": "biome",

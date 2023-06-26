@@ -22,8 +22,12 @@ export function rollParameters(seed, scope) {
 }
 
 function rollParameter(random, parameter) {
+  // Linear distribution
+  if (parameter.mode === "linear") {
+    return u.map(random.random(parameter.min, parameter.max))
+  }
   // Normal distribution / Bell curve
-  if (parameter.mode === "bell") {
+  else if (parameter.mode === "bell") {
     // Generate the random number
     let val = gaussianRandom(random, parameter.mean, parameter.standardDeviation)
 
@@ -39,8 +43,8 @@ function rollParameter(random, parameter) {
     return val
   }
 
-  // Linear random
-  return u.map(random.random(parameter.min, parameter.max))
+  // Constant value
+  return parameter.value || 0
 }
 
 function gaussianRandom(random, mean = 0, standardDeviation = 1) {
