@@ -907,3 +907,117 @@ export function transformStructure(structure, transformations) {
 
   return ret
 }
+
+export function traceLineStructure(structure, traceStart, traceEnd, ignoreFirstVoxel=false) {
+  return traceLine(structure, traceStart, traceEnd, ignoreFirstVoxel, true)
+}
+
+export function traceLine(chunks, traceStart, traceEnd, ignoreFirstVoxel=false, isStructure=false) {
+  // Set voxel solidity testing function based on whether we're testing chunks or structure format
+  const isSolid = isStructure ?
+  (position) => (chunks.voxels[position]?.solid) :
+  (position) => getVoxelSolid(chunks, position)
+
+  const xSign = traceEnd[0] > traceStart[0]
+  const ySign = traceEnd[1] > traceStart[1]
+  const zSign = traceEnd[2] > traceStart[2]
+  const moveVector = vec3.normalize(vec3.subtract(traceEnd, traceStart))
+
+  // Check the first voxel
+  if (!ignoreFirstVoxel) {
+    const hitVoxel = traceStart.map(x => Math.round(x))
+    if (isSolid(hitVoxel)) {
+      return {
+        voxel: hitVoxel,
+        position: [...traceStart],
+        normal: [0, 0, 0],
+        axis: -1,
+        distance: 0,
+        hit: true,
+      }
+    }
+  }
+
+  const totalDistance = vec3.distance(traceStart, traceEnd)
+  let distanceLeft = totalDistance // Distance left to travel
+  let curPos = [...traceStart]
+  while (distanceLeft > 0) {
+    // Figure out how far away the next voxel face is for each axis
+    let xDist = Math.abs(((xSign ? 1 : 0) - u.mod(curPos[0]+0.5, 1.0)) / moveVector[0])
+    let yDist = Math.abs(((ySign ? 1 : 0) - u.mod(curPos[1]+0.5, 1.0)) / moveVector[1])
+    let zDist = Math.abs(((zSign ? 1 : 0) - u.mod(curPos[2]+0.5, 1.0)) / moveVector[2])
+
+    // Handles special cases such an axis's direction being zero
+    if (!xDist || xDist < 0.000001) {
+      xDist = Infinity
+    }
+    if (!yDist || yDist < 0.000001) {
+      yDist = Infinity
+    }
+    if (!zDist || zDist < 0.000001) {
+      zDist = Infinity
+    }
+
+    // Set move distance based on which voxel face was next
+    let moveDistance = 0
+    let normal = [0, 0, 0]
+    let axis = -1
+    if (xDist < yDist) {
+      if (xDist < zDist) {
+        moveDistance = xDist
+        normal = [xSign ? -1 : 1, 0, 0]
+        axis = 0
+      }
+      else {
+        moveDistance = zDist
+        normal = [0, 0, zSign ? -1 : 1]
+        axis = 2
+      }
+    }
+    else {
+      if (yDist < zDist) {
+        moveDistance = yDist
+        normal = [0, ySign ? -1 : 1, 0]
+        axis = 1
+      }
+      else {
+        moveDistance = zDist
+        normal = [0, 0, zSign ? -1 : 1]
+        axis = 2
+      }
+    }
+
+    // Limit movement distance so it doesn't go past traceEnd
+    moveDistance = Math.min(moveDistance, distanceLeft)
+    distanceLeft -= moveDistance
+
+    // Move
+    const hitPos = vec3.add(curPos, vec3.scale(moveVector, moveDistance))
+    curPos = vec3.add(hitPos, vec3.scale(normal, -0.0001)) // We move forward a tiny bit on the crossed axis to cross into the next voxel
+
+    // Get the voxel at this position
+    const hitVoxel = curPos.map(x => Math.round(x))
+
+    // Check if the hit voxel is solid
+    if (isSolid(hitVoxel)) {
+      return {
+        voxel: hitVoxel,
+        position: hitPos,
+        normal: normal,
+        axis: axis,
+        distance: totalDistance - distanceLeft,
+        hit: true
+      }
+    }
+  }
+
+  // Base case if it hit nothing
+  return {
+    voxel: traceEnd.map(x => Math.round(x)),
+    position: [...traceEnd],
+    normal: [0, 0, 0],
+    axis: -1,
+    distance: totalDistance,
+    hit: false,
+  }
+}
