@@ -68,6 +68,23 @@ export function mod(n, m) {
   return ((n % m) + m) % m;
 }
 
+export function bend(v, f) {
+  return Math.pow(v, (1/f) - 1)
+}
+
+export function sCurve(x, k) {
+  if (x < 0.5) {
+    return Math.min(((k*2*x - 2*x) / (2*k*2*x - k - 1)) * 0.5, 0.5)
+  }
+  else {
+    return Math.max(((-k*2*(x-0.5)-2*(x-0.5)) / (2*-k*2*(x-0.5)+k-1))*0.5 + 0.5, 0.5)
+  }
+}
+
+export function sigmoid(x, k) {
+  return 1/(1 + Math.pow(Math.E, -k * (x - 0.5)))
+}
+
 // based on args does either 2d or 3d distance
 export function distance (...args) {
   if (args.length === 2) {

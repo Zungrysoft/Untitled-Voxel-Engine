@@ -16,6 +16,7 @@ await game.loadAssets({
     square: 'images/square.png',
     colorMap: 'images/color_map.png',
     crosshair: 'images/crosshair.png',
+    wasp: 'images/square.png',
   },
 
   sounds: {
@@ -41,6 +42,7 @@ await game.loadAssets({
     cube: 'models/cube.obj',
     skybox: 'models/skybox.obj',
     chunkOutline: 'models/chunk_outline.obj',
+    wasp: 'models/wasp.obj',
   },
 
   json: {

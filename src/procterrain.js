@@ -3,7 +3,7 @@ import * as vec3 from './core/vector3.js'
 import * as u from './core/utils.js'
 import { add, scale } from './core/vector2.js'
 import Noise from './noise.js'
-import { islandDensity } from './procisland.js'
+import { sdfDiamondField, sdfIsland } from './procsdf.js'
 
 const ROUGHNESS_CONSTANT = 0.5
 const SMOOTHING_ITERATIONS = 3
@@ -222,9 +222,12 @@ function getPerlinDensity(position, noise, {scale=20, zScale=0.5, heightScale=14
   density += noise.perlin3(x/(scale/4), y/(scale/4), z/((scale/4)*zScale)) * 0.06 * mScale3
   density += noise.perlin3(x/scale, y/scale, z/(scale*zScale)) * mScale2
   density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * mScale /* * 9 */
-  density += (4-z)/heightScale
+  // density += (4-z)/heightScale
   density -= 0.2
-  // density += islandDensity(position, [-40, 0, 0], 40, 10, 20) * 20
-  // density += islandDensity(position, [-400, 0, 0], 400, 100, 20) * 20
+  density += sdfIsland(position, [-400, 0, 0], 400, 30, 300) * 0.2
+  // density = sdfIsland(position, [-40, 0, 0], 40, 10, 60) * 1
+
+  // density += sdfDiamondField(position, 10) - 20
+  density += 4
   return density
 }
