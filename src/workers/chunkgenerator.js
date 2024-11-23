@@ -3,6 +3,8 @@ import * as pal from '../palette.js'
 import { meshChunk } from './chunkmesher.js'
 import { buildChunkTerrain } from '../procterrain.js'
 import { readChunk } from "../database.js";
+import { buildChunkFoliage } from '../procfoliage.js';
+import { limitPrint } from '../debug.js';
 
 onmessage = function(e) {
   // Handle STOP message
@@ -42,24 +44,29 @@ function loadExistingChunk(chunk, chunkKeyStr, workerIndex) {
 
 function buildNewChunk(chunkKeyStr, seed, workerIndex, params) {
   // Create empty chunk
-  let chunks = {}
-  const chunk = vox.emptyChunk()
-  chunks[vox.ts([0,0,0])] = chunk
+  const chunk = vox.emptyChunk();
 
   // Build terrain
-  buildChunkTerrain(chunks, chunkKeyStr, seed, params)
+  buildChunkTerrain(chunk, chunkKeyStr, seed, params);
+
+  // TODO: Generate castles and dungeons, etc.
+
+  // Populate terrain with trees, foliage, and other scattered structures
+  const leftovers = {};
+  buildChunkFoliage(chunk, chunkKeyStr, leftovers, seed, params);
 
   // Now that we've generated the chunk, we should create an initial mesh for it as well
   // This saves a step since now the main thread won't have to pass the chunk data back to a mesher worker
   if (chunk.modified) {
     // Meshing
-    let initialMesh = meshChunk(chunk, pal.palette)
-    chunk.modified = false
+    let initialMesh = meshChunk(chunk, pal.palette);
+    chunk.modified = false;
 
     // Return with intial mesh
     postMessage({
       chunk: chunk,
       chunkKeyStr: chunkKeyStr,
+      leftovers: leftovers,
       verts: initialMesh,
       workerIndex: workerIndex,
     }, [chunk.voxels, initialMesh]);
@@ -69,6 +76,7 @@ function buildNewChunk(chunkKeyStr, seed, workerIndex, params) {
     postMessage({
       chunk: chunk,
       chunkKeyStr: chunkKeyStr,
+      leftovers: leftovers,
       workerIndex: workerIndex,
     }, [chunk.voxels]);
   }

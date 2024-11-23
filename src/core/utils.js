@@ -85,6 +85,18 @@ export function sigmoid(x, k) {
   return 1/(1 + Math.pow(Math.E, -k * (x - 0.5)))
 }
 
+export function hash(str) {
+  str = str.toString();
+  let hashVal = 0;
+  let len = str.length;
+  for (let i = 0; i < len; i++) {
+      let chr = str.charCodeAt(i);
+      hashVal = (hashVal << 5) - hashVal + chr;
+      hashVal |= 0;
+  }
+  return hashVal;
+}
+
 // based on args does either 2d or 3d distance
 export function distance (...args) {
   if (args.length === 2) {

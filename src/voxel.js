@@ -1,5 +1,6 @@
 import * as u from './core/utils.js'
 import * as vec3 from './core/vector3.js'
+import { limitPrint } from './debug.js'
 
 export const CHUNK_SIZE = 32
 export const CHUNK_VOLUME = CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE
@@ -282,28 +283,24 @@ export function voxelMaterial(voxel) {
 }
 
 export function getVoxelMaterial(chunks, position) {
-  return indexToMaterial(getVoxel(chunks, position, {index: 0}))
+  return indexToMaterial(getVoxel(chunks, position, {index: 0}));
 }
 
 export function setVoxelMaterial(chunks, position, material) {
-  setVoxel(chunks, position, [materialToIndex(material)])
+  setVoxel(chunks, position, [materialToIndex(material)]);
 }
 
 export function voxelSolid(voxel) {
   return voxel[1] & FLAG_SOLID ? true : false
 }
 
-export function getVoxelSolid(chunks, position, { emptyChunkSolid=false, }={}) {
-  return getVoxel(chunks, position, {index: 1, emptyChunkSolid: emptyChunkSolid}) & FLAG_SOLID ? true : false
+export function getVoxelSolid(chunks, position, { emptyChunkSolid=false, } = {}) {
+  return getVoxel(chunks, position, {index: 1, emptyChunkSolid: emptyChunkSolid}) & FLAG_SOLID ? true : false;
 }
 
 export function setVoxelSolid(chunks, position, solid) {
-  if (solid) {
-    setVoxel(chunks, position, [], {flagsAdd: FLAG_SOLID})
-  }
-  else {
-    setVoxel(chunks, position, [], {flagsRemove: FLAG_SOLID})
-  }
+  const flags = solid ? {flagsAdd: FLAG_SOLID}: {flagsRemove: FLAG_SOLID}
+  setVoxel(chunks, position, [], flags);
 }
 
 export function voxelShades(voxel) {
@@ -355,13 +352,23 @@ export function editVoxel(chunks, position, changes) {
   setVoxel(chunks, position, overwrite, { flagsAdd, flagsRemove })
 }
 
-export function getVoxel(chunks, position, { index=[0, PARAMS_LIT], emptyChunkSolid=false }={}) {
+export function getVoxel(chunks, position, params = {}) {
+  if ('voxels' in chunks) {
+    // Single chunk mode
+    return getVoxelInChunk(chunks, position, params);
+  }
+  else {
+    // Convert world position to chunk coordinate (key to access chunk)
+    let chunkKeyStr = ts(positionToChunkKey(position));
 
-  // Convert world position to chunk coordinate (key to access chunk)
-  let chunkKeyStr = ts(positionToChunkKey(position))
+    // Get the chunk
+    let chunk = chunks[chunkKeyStr];
 
-  // Get the chunk
-  let chunk = chunks[chunkKeyStr]
+    return getVoxelInChunk(chunk, position, params);
+  }
+}
+
+export function getVoxelInChunk(chunk, position, { index=[0, PARAMS_LIT], emptyChunkSolid=false } = {}) {
   // If the chunk doesn't exist, all voxels there are assumed to be empty
   if (!chunk) {
     if (emptyChunkSolid) {
@@ -418,16 +425,32 @@ export function getVoxel(chunks, position, { index=[0, PARAMS_LIT], emptyChunkSo
   }
 }
 
-export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0 }={}) {
-  // Convert world position to chunk coordinate (key to access chunk)
-  let chunkKeyStr = ts(positionToChunkKey(position))
+export function setVoxel(chunks, position, voxel=[], params = {}) {
+  if ('voxels' in chunks) {
+    // Single chunk mode
+    if (position[0] >= 0 && position[0] < CHUNK_SIZE) {
+      if (position[1] >= 0 && position[1] < CHUNK_SIZE) {
+        if (position[2] >= 0 && position[2] < CHUNK_SIZE) {
+          setVoxelInChunk(chunks, position, voxel, params);
+        }
+      }
+    }
+  }
+  else {
+    // Convert world position to chunk coordinate (key to access chunk)
+    let chunkKeyStr = ts(positionToChunkKey(position));
 
-  // Get the chunk
-  let chunk = chunks[chunkKeyStr]
+    // Get the chunk
+    let chunk = chunks[chunkKeyStr];
 
+    setVoxelInChunk(chunk, position, voxel, params);
+  }
+}
+
+export function setVoxelInChunk(chunk, position, voxel=[], { flagsAdd=0, flagsRemove=0 } = {}) {
   // If the chunk doesn't exist, don't allow it to be edited
   if (!chunk) {
-    return
+    return;
   }
 
   // Determine whether we need to upgrade the chunk
@@ -489,7 +512,7 @@ export function setVoxel(chunks, position, voxel=[], { flagsAdd=0, flagsRemove=0
   }
 }
 
-export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], { globalVoxel={} }={}) {
+export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0], { globalVoxel={} } = {}) {
   // Global voxel is used to override certain properties of the structure's voxels
 
   // Throw error if structure doesn't exist
@@ -498,10 +521,45 @@ export function mergeStructureIntoWorld(chunks, structure, position = [0, 0, 0],
   }
 
   // Iterate over voxels in structure
-  for (const sPos in structure.voxels) {
+  for (const sPosStr in structure.voxels) {
+    const voxel = structure.voxels[sPosStr];
+    const deltaPos = vec3.add(position, ta(sPosStr));
+    editVoxel(chunks, deltaPos, {...voxel, ...globalVoxel});
+  }
+}
+
+export function mergeStructureIntoLeftovers(
+  leftovers,
+  structure,
+  position = [0, 0, 0],
+  homeChunkKey,
+  { globalVoxel={} } = {},
+) {
+  // Global voxel is used to override certain properties of the structure's voxels
+
+  // Throw error if structure doesn't exist
+  if (!structure) {
+    throw new Error('Cannot merge empty structure!');
+  }
+
+  // Iterate over voxels in structure
+  for (const sPosStr in structure.voxels) {
+    const sPos = ta(sPosStr);
+    const deltaPos = vec3.add(position, sPos);
+    const chunkKey = positionToChunkKey(deltaPos);
+
+    // Home chunk doesn't need leftovers
+    if (homeChunkKey && vec3.equals(chunkKey, homeChunkKey)) {
+      continue;
+    }
+
+    const chunkKeyStr = ts(chunkKey);
+    if (!(chunkKeyStr in leftovers)) {
+      leftovers[chunkKeyStr] = emptyChunk();
+    }
+    
     const voxel = structure.voxels[sPos]
-    const deltaPos = vec3.add(position, stringToArray(sPos))
-    editVoxel(chunks, deltaPos, {...voxel, ...globalVoxel})
+    editVoxel(leftovers, deltaPos, {...voxel, ...globalVoxel})
   }
 }
 
@@ -1019,5 +1077,46 @@ export function traceLine(chunks, traceStart, traceEnd, ignoreFirstVoxel=false, 
     axis: -1,
     distance: totalDistance,
     hit: false,
+  }
+}
+
+export function mergeLeftoverChunks(mainChunk, chunk) {
+  for (let x = 0; x < CHUNK_SIZE; x ++) {
+    for (let y = 0; y < CHUNK_SIZE; y ++) {
+      for (let z = 0; z < CHUNK_SIZE; z ++) {
+        const solid = getVoxelSolid(chunk, [x, y, z]);
+
+        if (solid) {
+          const material = getVoxelMaterial(chunk, [x, y, z]);
+          setVoxelMaterial(mainChunk, [x, y, z], material);
+          setVoxelSolid(mainChunk, [x, y, z], true);
+        }
+      }
+    }
+  }
+}
+
+export function mergeLeftovers(mainLeftovers, leftovers, chunkKeyStr) {
+  const chunkKey = ta(chunkKeyStr);
+  for (const leftoversChunkKeyStr in leftovers) {
+    const leftoversChunkKey = ta(leftoversChunkKeyStr);
+    const adjustedChunkKey = vec3.add(leftoversChunkKey, chunkKey);
+    const adjustedChunkKeyStr = ts(adjustedChunkKey);
+
+    if (adjustedChunkKeyStr in mainLeftovers) {
+      mergeLeftoverChunks(mainLeftovers[adjustedChunkKeyStr], leftovers[leftoversChunkKey]);
+    }
+    else {
+      mainLeftovers[adjustedChunkKeyStr] = leftovers[leftoversChunkKey];
+    }
+  }
+}
+
+export function resolveLeftovers(chunks, chunkStates, leftovers) {
+  for (const chunkKeyStr in leftovers) {
+    if (chunkKeyStr in chunks && chunkStates[chunkKeyStr] === 'loaded') {
+      mergeLeftoverChunks(chunks[chunkKeyStr], leftovers[chunkKeyStr]);
+      delete leftovers[chunkKeyStr]; 
+    }
   }
 }

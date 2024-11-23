@@ -16,6 +16,7 @@
  */
 
 import * as utils from './core/utils.js'
+import { limitPrint } from './debug.js'
 
 class Grad {
   constructor (x, y, z) {
@@ -295,4 +296,37 @@ export default class Noise {
         utils.lerp(n011, n111, u), w),
       v);
   };
+
+  // Everything beyond here is by ZungryWare
+
+  particle(x=0, y=0, z=0) {
+    // A simple hash function (32-bit mixing function)
+    function hash32(a) {
+      a = (a ^ 61) ^ (a >>> 16);
+      a = a + (a << 3);
+      a = a ^ (a >>> 4);
+      a = a * 0x27d4eb2d;
+      a = a ^ (a >>> 15);
+      return a >>> 0; // Ensure unsigned integer
+    }
+
+    // Combine the inputs into a single integer hash
+    function combineHash(x, y, z, seed) {
+      let h = hash32(seed);
+      h = hash32(h ^ x);
+      h = hash32(h ^ y);
+      h = hash32(h ^ z);
+      return h;
+    }
+
+    // Map the hash to a float in the range [0, 1)
+    function hashToFloat(hash) {
+      return (hash & 0xffffff) / 0x1000000; // Extract lower 24 bits and normalize
+    }
+
+    // Compute the combined hash and convert to a noise value
+    const hash = combineHash(Math.floor(x), Math.floor(y), Math.floor(z), this.seed);
+    const ret = hashToFloat(hash);
+    return ret;
+  }
 }

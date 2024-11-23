@@ -18,10 +18,12 @@ import { meshChunk } from './workers/chunkmesher.js'
 export default class Terrain extends Thing {
   time = 0
   seed = Math.floor(Math.random() * Math.pow(2, 64))
+  // seed = 4
   loadDistance = 5
   chunks = {}
   chunkStates = {}
   chunkMeshes = {}
+  leftovers = {}
   fogColor = [0.267, 0.533, 1]
 
   constructor () {
@@ -85,6 +87,7 @@ export default class Terrain extends Thing {
       (message) => {
         // Save chunk
         this.chunks[message.chunkKeyStr] = message.chunk
+        // this.chunks[message.chunkKeyStr] = vox.emptyChunk();
 
         // Save this chunk's initial mesh as well
         if (message.verts) {
@@ -93,9 +96,14 @@ export default class Terrain extends Thing {
             this.chunkMeshes[message.chunkKeyStr] = gfx.createMesh(vertsView)
           }
         }
+        // this.chunkMeshes[message.chunkKeyStr] = gfx.createMesh([])
 
         // Set chunk state
         this.chunkStates[message.chunkKeyStr] = 'loaded'
+
+        // Save leftovers
+        vox.mergeLeftovers(this.leftovers, message.leftovers, message.chunkKeyStr)
+        vox.resolveLeftovers(this.chunks, this.chunkStates, this.leftovers)
       },
       (message) => {
         // Set chunk state
@@ -126,8 +134,6 @@ export default class Terrain extends Thing {
       },
     )
   }
-
-
 
   update () {
     super.update()

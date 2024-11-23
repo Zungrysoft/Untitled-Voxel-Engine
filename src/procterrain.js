@@ -4,6 +4,7 @@ import * as u from './core/utils.js'
 import { add, scale } from './core/vector2.js'
 import Noise from './noise.js'
 import { sdfDiamondField, sdfIsland } from './procsdf.js'
+import { generateTree } from './proctree.js'
 
 const ROUGHNESS_CONSTANT = 0.5
 const SMOOTHING_ITERATIONS = 3
@@ -156,10 +157,10 @@ function diamondSquareRandomize (variance) {
   return (Math.random() - 0.5) * variance * ROUGHNESS_CONSTANT
 }
 
-export function buildChunkTerrain(chunks, chunkKeyStr, seed, params={}) {
+export function buildChunkTerrain(chunk, chunkKeyStr, seed, params={}) {
   // Convert chunkKey to array
   const chunkKey = vox.ta(chunkKeyStr)
-  const aboveChunk = vec3.add(chunkKey, [0, 0, 1])
+  const aboveChunkKey = vec3.add(chunkKey, [0, 0, 1])
 
   // Create noise object
   let noise = new Noise(seed)
@@ -179,7 +180,7 @@ export function buildChunkTerrain(chunks, chunkKeyStr, seed, params={}) {
           if (z === vox.CHUNK_SIZE-1) {
             for (let za = 0; za < DIRT_DEPTH; za ++) {
               // Get world position and perlin density at this position
-              const position = vox.getWorldPosition(aboveChunk, [x, y, za])
+              const position = vox.getWorldPosition(aboveChunkKey, [x, y, za])
               const density = getPerlinDensity(position, noise, params)
               if (density > 0) {
                 depth = za + 1
@@ -198,7 +199,8 @@ export function buildChunkTerrain(chunks, chunkKeyStr, seed, params={}) {
             material = 'dirt'
           }
 
-          vox.editVoxel(chunks, [x, y, z], {solid: true, material: material})
+          vox.editVoxel(chunk, [x, y, z], {solid: true, material: material})
+
           depth ++
         }
         else {
@@ -224,10 +226,10 @@ function getPerlinDensity(position, noise, {scale=20, zScale=0.5, heightScale=14
   density += noise.perlin3(x/(scale*6), y/(scale*6), z/((scale*6)*1.2)) * mScale /* * 9 */
   // density += (4-z)/heightScale
   density -= 0.2
-  density += sdfIsland(position, [-400, 0, 0], 400, 30, 300) * 0.2
-  // density = sdfIsland(position, [-40, 0, 0], 40, 10, 60) * 1
+  density += sdfIsland(position, [-400, 0, -60], 400, 100, 300) * 0.2
+  // density += sdfIsland(position, [-40, 0, 0], 40, 10, 90) * 0.07
 
   // density += sdfDiamondField(position, 10) - 20
-  density += 4
+  // density += 4
   return density
 }
