@@ -8,12 +8,12 @@ export const MAX_SHADE = 255
 
 export const palette = {
 	structure: generatePalette(0.027, 0.5, 0.8, 0.13),
-	grass: generatePalette(0.33, 0.48, 0.67, 0.05),
-	leaves: generatePalette(0.4, 0.65, 0.74, 0.03),
+	grass: generatePalette(0.38, 0.48, 0.67, 0.05),
+	leaves: generatePalette(0.4, 0.65, 0.76, 0.03),
 	vines: generatePalette(0.35, 0.87, 0.89, 0.02),
 	fruit: generatePalette(0.03, 0.74, 0.83, 0.03),
 	flower: generatePalette(0.65, 0.60, 0.85, 0.03),
-	bark: generatePalette(0.08, 0.45, 0.54, 0.05),
+	bark: generatePalette(0.08, 0.45, 0.44, 0.05),
 	wood: generatePalette(0.11, 0.40, 0.73, 0.05),
 	dirt: generatePalette(0.12, 0.33, 0.51, 0.02),
 	sand: generatePalette(0.16, 0.42, 0.86, 0.02),

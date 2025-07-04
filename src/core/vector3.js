@@ -35,11 +35,15 @@ export function subtract (a, b) {
 export function normalize (vector) {
   const magnitude = Math.sqrt(vector[0] ** 2 + vector[1] ** 2 + vector[2] ** 2)
 
-  // prevent dividing by 0 and causing NaNs by ORing with 1
+  // Return +X vector if zero vector is passed in
+  if (magnitude === 0) {
+    return [1, 0, 0]
+  }
+
   return [
-    vector[0] / (magnitude || 1),
-    vector[1] / (magnitude || 1),
-    vector[2] / (magnitude || 1)
+    vector[0] / magnitude,
+    vector[1] / magnitude,
+    vector[2] / magnitude,
   ]
 }
 
@@ -249,4 +253,78 @@ export function raySphere (ray, sphere, radius) {
 export function parseCoords (s) {
   const spl = s.split(',')
   return [parseInt(spl[0]) || 0, parseInt(spl[1]) || 0, parseInt(spl[2]) || 0]
+}
+
+export function distanceFromLineSegment(segment, point) {
+  const [x1, y1, z1] = segment[0];
+  const [x2, y2, z2] = segment[1];
+  const [px, py, pz] = point;
+
+  // Vector from the first endpoint to the second endpoint
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dz = z2 - z1;
+
+  // Vector from the first endpoint to the point
+  const px1 = px - x1;
+  const py1 = py - y1;
+  const pz1 = pz - z1;
+
+  // Calculate the projection factor `t` onto the line
+  const dotProduct = px1 * dx + py1 * dy + pz1 * dz;
+  const segmentLengthSquared = dx * dx + dy * dy + dz * dz;
+  let t = dotProduct / segmentLengthSquared;
+
+  // Clamp t to the range [0, 1]
+  t = Math.max(0, Math.min(1, t));
+
+  // Closest point on the line segment
+  const closestPoint = [
+      x1 + t * dx,
+      y1 + t * dy,
+      z1 + t * dz
+  ];
+
+  // Distance from the point to the closest point
+  const dist = distance([px, py, pz], closestPoint);
+
+  return [dist, t];
+}
+
+export function rotateVector(a, b, r) {
+  // Normalize vector b to ensure it's a unit vector
+  const u = normalize(b);
+
+  const cosTheta = Math.cos(r);
+  const sinTheta = Math.sin(r);
+
+  // Dot product of a and u
+  const dotProduct = a[0] * u[0] + a[1] * u[1] + a[2] * u[2];
+
+  // Cross product of u and a
+  const crossProduct = [
+      u[1] * a[2] - u[2] * a[1],
+      u[2] * a[0] - u[0] * a[2],
+      u[0] * a[1] - u[1] * a[0]
+  ];
+
+  // Rodrigues' rotation formula
+  const rotatedVector = [
+      cosTheta * a[0] + sinTheta * crossProduct[0] + (1 - cosTheta) * dotProduct * u[0],
+      cosTheta * a[1] + sinTheta * crossProduct[1] + (1 - cosTheta) * dotProduct * u[1],
+      cosTheta * a[2] + sinTheta * crossProduct[2] + (1 - cosTheta) * dotProduct * u[2]
+  ];
+
+  return rotatedVector;
+}
+
+export function getPerpendicularVectorAtAngle(inputVector, angle) {
+  const vector = normalize(inputVector);
+
+  const lengthXY = vec2.magnitude(vector);
+  const normXY = vec2.normalize(vector);
+
+  const upVector = [...vec2.scale(normXY, -Math.abs(vector[2])), lengthXY];
+
+  return rotateVector(upVector, vector, angle);
 }

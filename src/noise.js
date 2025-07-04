@@ -16,6 +16,7 @@
  */
 
 import * as utils from './core/utils.js'
+import * as vec3 from './core/vector3.js'
 import { limitPrint } from './debug.js'
 
 class Grad {
@@ -299,7 +300,9 @@ export default class Noise {
 
   // Everything beyond here is by ZungryWare
 
-  particle(x=0, y=0, z=0) {
+  random(position) {
+    const [x = 0, y = 0, z = 0] = position ?? [];
+
     // A simple hash function (32-bit mixing function)
     function hash32(a) {
       a = (a ^ 61) ^ (a >>> 16);
@@ -328,5 +331,39 @@ export default class Noise {
     const hash = combineHash(Math.floor(x), Math.floor(y), Math.floor(z), this.seed);
     const ret = hashToFloat(hash);
     return ret;
+  }
+
+  randomVector(position) {
+    const xOut = this.random(vec3.add(position, [983, 1907, 1303]));
+    const yOut = this.random(vec3.add(position, [1381, 859, 1777]));
+    const zOut = this.random(vec3.add(position, [2503, 1087, 661]));
+
+    return [xOut, yOut, zOut];
+  }
+
+  randomUnitVector(position) {
+    // Generate random u and v
+    const u = this.random(vec3.add(position, [1871, 2467, 1801]));
+    const v = this.random(vec3.add(position, [2153, 1531, 1433]));
+
+    // Convert to spherical coordinates
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+
+    // Convert spherical coordinates to Cartesian coordinates
+    const x = Math.sin(phi) * Math.cos(theta);
+    const y = Math.sin(phi) * Math.sin(theta);
+    const z = Math.cos(phi);
+
+    return [x, y, z];
+  }
+
+  randomUnitVector2D(position) {
+    const u = this.random(vec3.add(position, [1289, 2203, 587]));
+    const theta = 2 * Math.PI * u;
+    const x = Math.sin(theta);
+    const y = Math.cos(theta);
+
+    return [x, y];
   }
 }

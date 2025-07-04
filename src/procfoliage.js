@@ -16,8 +16,8 @@ export function buildChunkFoliage(chunk, chunkKeyStr, leftovers, seed, params={}
         const position = vox.getWorldPosition(chunkKey, [x, y, z])
         const material = vox.getVoxelMaterial(chunk, [x, y, z])
 
-        if (material === 'grass' && noise.particle(...position) < 0.005) {
-          const tree = generateTree()
+        if (material === 'grass' && noise.random(position) < 0.0001) {
+          const tree = generateTree(noise, position, {})
           vox.mergeStructureIntoWorld(chunk, tree, [x, y, z])
           vox.mergeStructureIntoLeftovers(leftovers, tree, [x, y, z], [0, 0, 0])
         }

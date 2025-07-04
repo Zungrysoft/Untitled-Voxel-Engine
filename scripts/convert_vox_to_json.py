@@ -1,4 +1,4 @@
-# This code converts back and forth between .vox and .json
+# This code converts from .vox to structure .json format
 
 import struct
 import json
@@ -10,79 +10,9 @@ def read_int(file):
 def write_int(file, value):
     file.write(struct.pack('<i', value))
 
-def default_palette():
-    palette = [
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-        (0, 0, 0), (255, 255, 255), (128, 128, 128), (255, 0, 0),
-        (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255),
-        (255, 0, 255), (128, 0, 0), (0, 128, 0), (0, 0, 128),
-        (128, 128, 0), (0, 128, 128), (128, 0, 128), (128, 0, 128),
-    ]
-    return [(r, g, b, 255) for r, g, b in palette]
-
 def read_vox_file(filename):
     size_x, size_y, size_z = None, None, None
     voxels = []
-    palette = default_palette()
 
     with open(filename, 'rb') as file:
         if file.read(4) != b'VOX ':
@@ -98,7 +28,6 @@ def read_vox_file(filename):
 
         size_x, size_y, size_z = 0, 0, 0
         voxels = []
-        palette = default_palette()
 
         # Process child chunks
         while file.tell() < main_chunk_end:
@@ -108,53 +37,11 @@ def read_vox_file(filename):
             elif chunk_id == b'XYZI':
                 num_voxels, = struct.unpack('<I', file.read(4))
                 voxels = [struct.unpack('<4B', file.read(4)) for _ in range(num_voxels)]
-            elif chunk_id == b'RGBA':
-                palette_data = file.read(chunk_content_size)
-                palette = [struct.unpack_from('<4B', palette_data, i * 4) for i in range(256)]
             else:
                 # Ignore unsupported chunk and move to the next one
                 file.seek(chunk_content_size + chunk_children_size, os.SEEK_CUR)
 
-    return size_x, size_y, size_z, voxels, palette
-
-def write_vox_file(filename, size_x, size_y, size_z, voxels, palette):
-    with open(filename, 'wb') as file:
-        file.write(b'VOX ')
-        write_int(file, 150)
-
-        file.write(b'MAIN')
-        write_int(file, 0)
-        write_int(file, 12 + 12 + 12 + 4 + len(voxels) * 4 + 12 + 256 * 4)
-
-        file.write(b'SIZE')
-        write_int(file, 12)
-        write_int(file, 0)
-        write_int(file, size_x)
-        write_int(file, size_y)
-        write_int(file, size_z)
-
-
-        file.write(b'XYZI')
-        write_int(file, 4 + len(voxels) * 4)
-        write_int(file, 0)
-        write_int(file, len(voxels))
-        for x, y, z, color_index in voxels:
-            file.write(struct.pack('<BBBB', x, y, z, color_index))
-
-        # Prepare the palette (RGBA) chunk
-        palette = palette[:256]  # Truncate the palette if it has more than 256 colors
-        while len(palette) < 256:  # Fill the palette with default colors if it has less than 256 colors
-            palette.append((0, 0, 0, 0))
-
-        rgba_data = bytearray()
-        for color in palette:
-            rgba_data.extend(struct.pack('<4B', *color))
-
-        file.write(b'RGBA')
-        write_int(file, 256 * 4)
-        write_int(file, 0)
-        for r, g, b, a in palette:
-            file.write(struct.pack('<BBBB', r, g, b, a))
+    return size_x, size_y, size_z, voxels
 
 def index_to_material(index):
     mapping = [
@@ -188,7 +75,7 @@ def index_to_material(index):
 
 def convert_vox_to_json(input_filename, output_filename):
     # Read vox file data
-    size_x, size_y, size_z, voxels, palette = read_vox_file(input_filename)
+    size_x, size_y, size_z, voxels = read_vox_file(input_filename)
 
     # Read existing output file data
     data = {}
@@ -197,11 +84,27 @@ def convert_vox_to_json(input_filename, output_filename):
 
     # Put new voxel data into structure
     data["voxels"] = {}
+    voidVoxels = set()
     for x, y, z, color_index in voxels:
-        data["voxels"][f"{x},{(size_y-1)-y},{z}"] = {
-            "material": index_to_material(color_index),
-            "solid": True,
-        }
+        voxelKey = f"{x},{(size_y-1)-y},{z}"
+        if color_index == 255:
+            voidVoxels.add(voxelKey)
+        else:
+            data["voxels"][voxelKey] = {
+                "material": index_to_material(color_index),
+                "solid": True,
+            }
+
+    # If we're in useVoid mode, fill all available voxels with air unless they have index 255
+    if "useVoid" in data and data["useVoid"]:
+        for x in range(size_x):
+            for y in range(size_y):
+                for z in range(size_z):
+                    voxelKey = f"{x},{(size_y-1)-y},{z}"
+                    if not (voxelKey in data["voxels"]) and not (voxelKey) in voidVoxels:
+                        data["voxels"][voxelKey] = {
+                            "solid": False,
+                        }
 
     with open(output_filename, 'w') as output_file:
         json.dump(data, output_file, indent=4)

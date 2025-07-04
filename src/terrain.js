@@ -17,8 +17,8 @@ import { meshChunk } from './workers/chunkmesher.js'
 
 export default class Terrain extends Thing {
   time = 0
-  seed = Math.floor(Math.random() * Math.pow(2, 64))
-  // seed = 4
+  // seed = Math.floor(Math.random() * Math.pow(2, 64))
+  seed = 5
   loadDistance = 5
   chunks = {}
   chunkStates = {}
@@ -149,11 +149,40 @@ export default class Terrain extends Thing {
     if (game.keysPressed.KeyJ) {
       game.globals.debugPressed = true
 
-      let counter = 0
-      for (let i = 0; i < 30; i ++) {
-        counter += meshChunk(this.chunks[vox.ts([0,0,0])], pal.palette).byteLength
+      let map = {}
+      const c = 100000
+      for (let i = 0; i < c; i ++) {
+        const r = vec3.normalize([
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+          Math.random() - 0.5,
+        ])
+
+        const quadrant = r.map(x => x > 0 ? 1 : -1);
+
+        const result = vec3.getPerpendicularVectorAtAngle(r, 0);
+
+        map[quadrant] = (map[quadrant] ?? 0) + result[2];
+
+        if (r[0] + r[1] > 0) {
+          if (result[2] > 0) {
+            map["pospos"] = (map["pospos"] ?? 0) + 1;
+          }
+          else {
+            map["posneg"] = (map["posneg"] ?? 0) + 1;
+          }
+          
+        }
+        else {
+          if (result[2] > 0) {
+            map["negpos"] = (map["negpos"] ?? 0) + 1;
+          }
+          else {
+            map["negneg"] = (map["negneg"] ?? 0) + 1;
+          }
+        }
       }
-      console.log(counter)
+      console.log(map)
 
       // const playerPos = game.getThing('player').position
       // console.log(this.chunks[vox.ts(vox.positionToChunkKey(playerPos))])
